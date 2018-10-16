@@ -23,8 +23,7 @@ use std::path::Path;
 use regex::Regex;
 
 
-const DEFAULT_PORT: usize = 80;
-const DEFAULT_ADDRESS: &'static str = "172.16.3.1";
+const DEFAULT_ADDRESS: &'static str = "172.16.3.1:80";
 const HOSTS_RESOURCE: &'static str = "/hosts/";
 const CUSTODY_PATH: &'static str = "/Shared/Custody";
 const CELLS_PATH: &'static str = "/Shared/Prison/Cells";
@@ -151,11 +150,10 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
 pub fn main() {
     use std::env;
     let key = "LISTEN_ADDRESS";
-    let address = match env::var(key) {
+    let listen_address = match env::var(key) {
         Ok(addr) => addr,
         Err(_) => DEFAULT_ADDRESS.to_string(),
     };
-    let listen_address = format!("{}:{}", address, DEFAULT_PORT);
     println!("Listen at: http://{}", listen_address);
     gotham::start(listen_address, router())
 }
