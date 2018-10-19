@@ -23,7 +23,6 @@ use regex::Regex;
 
 const DEFAULT_ADDRESS: &'static str = "172.16.3.1:80";
 const HOSTS_RESOURCE: &'static str = "/hosts/";
-const CUSTODY_PATH: &'static str = "/Shared/Custody";
 const CELLS_PATH: &'static str = "/Shared/Prison/Cells";
 
 
@@ -106,7 +105,6 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
             Ok(valid_body) => {
                 let uri = Uri::borrow_from(&state).to_string();
                 let name = uri.replace(HOSTS_RESOURCE, "");
-                let path = format!("{}/{}", CUSTODY_PATH, name);
                 let ssh_pubkey = String::from_utf8(valid_body.to_vec()).unwrap(); // Read SSH pubkey from request body:
                 println!("Hostname: {}, SSH-ED25519 pubkey: {} (key-length: {})", name, ssh_pubkey, ssh_pubkey.len());
 
@@ -120,7 +118,7 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
                     return future::ok((state, res))
                 }
                 let cell_dir = format!("{}/{}", CELLS_PATH, name);
-                if Path::new(&path).exists() || Path::new(&cell_dir).exists() {
+                if Path::new(&cell_dir).exists() {
                     let res = create_response(&state, StatusCode::Conflict, None);
                     return future::ok((state, res))
                 }
