@@ -24,6 +24,8 @@ use std::path::Path;
 use regex::Regex;
 
 
+const GVR_BIN: &'static str = "gvr";
+const JAIL_BIN: &'static str = "jail";
 const DEFAULT_ADDRESS: &'static str = "172.16.3.1:80";
 const HOSTS_RESOURCE: &'static str = "/hosts/";
 const CELLS_PATH: &'static str = "/Shared/Prison/Cells";
@@ -66,10 +68,10 @@ fn router() -> Router {
 
 fn destroy_jail(name: String) -> Result<(), ()> {
     use std::process::Command;
-    let destroy_output = Command::new("gvr")
+    let destroy_output = Command::new(GVR_BIN)
         .arg("destroy")
         .arg(name.clone())
-        .arg("I_KNOW_EXACTLY_WHAT_I_AM_DOING") // NOTE: special "gvr" argument - to destroy jail without stdin prompt (non interactive destroy)
+        .arg("I_KNOW_EXACTLY_WHAT_I_AM_DOING") // NOTE: special GVR_BIN argument - to destroy jail without stdin prompt (non interactive destroy)
         .output()
         .expect(&format!("Failed to destroy jail instance: {}!", name));
     if destroy_output.status.success() {
@@ -80,7 +82,7 @@ fn destroy_jail(name: String) -> Result<(), ()> {
         // NOTE: Sometimes jail services are locking some resources for a very long time after jail destroy
         //       and will remain "started" until some process lock is released..
         //       Let's make sure there's no running jail with our name after destroy command:
-        let post_handle = Command::new("jail")
+        let post_handle = Command::new(JAIL_BIN)
             .arg("-r")
             .arg(name.clone())
             .output()
@@ -169,7 +171,7 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
                 }
 
                 use std::process::Command;
-                let create_output = Command::new("gvr")
+                let create_output = Command::new(GVR_BIN)
                     .arg("create")
                     .arg(name.clone())
                     .output()
@@ -178,7 +180,7 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
                     info!("create_output:\n{}{}",
                              String::from_utf8_lossy(&create_output.stdout),
                              String::from_utf8_lossy(&create_output.stderr));
-                    let keyadd_output = Command::new("gvr")
+                    let keyadd_output = Command::new(GVR_BIN)
                         .arg("set")
                         .arg(name.clone())
                         .arg(format!("key='{}'", ssh_pubkey))
