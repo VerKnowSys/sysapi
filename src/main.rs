@@ -191,7 +191,9 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
 /// Start a server and use a `Router` to dispatch requests
 pub fn main() {
     use std::env;
-    simple_logger::init().unwrap_or(());
+    use log::Level;
+    simple_logger::init_with_level(Level::Info).unwrap_or(());
+
     let key = "LISTEN_ADDRESS";
     let listen_address = match env::var(key) {
         Ok(addr) => addr,
