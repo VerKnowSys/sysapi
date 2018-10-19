@@ -164,10 +164,10 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
                              String::from_utf8_lossy(&create_output.stderr));
                     let keyadd_output = Command::new("gvr")
                         .arg("set")
-                        .arg(name)
+                        .arg(name.clone())
                         .arg(format!("key='{}'", ssh_pubkey))
                         .output()
-                        .expect("Failed to add key to jail instance!");
+                        .expect(&format!("Failed to add key to jail instance: {}!", name));
                     if keyadd_output.status.success() {
                         info!("keyadd_output: {}", String::from_utf8_lossy(&keyadd_output.stdout));
                         let res = create_response(&state, StatusCode::Created, None);
