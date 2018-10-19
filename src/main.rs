@@ -241,27 +241,27 @@ mod tests {
     }
 
 
-    #[test]
-    fn test_ssh_pubkey_in_body() {
-        use std::fs;
-        let test_server = TestServer::new(router()).unwrap();
-        let hostname = "test12345";
-        let valid_sshed25519_pubkey = "AAAAC3NzaC1lZDI1NTE5AAAAIEafihGp0at+QR94JaF+NkJ4XuZLjleEz/owVzRBqC9d";
-        let filename = format!("{}/{}", CUSTODY_PATH, hostname);
-        fs::remove_file(filename.clone()).unwrap_or(());
-        let response = test_server
-            .client()
-            .post(&format!("http://localhost/hosts/{}", hostname), valid_sshed25519_pubkey, mime::TEXT_PLAIN)
-            .perform()
-            .unwrap();
-        assert_eq!(response.status(), StatusCode::Created);
+    // #[test]
+    // fn test_ssh_pubkey_in_body() {
+    //     use std::fs;
+    //     let test_server = TestServer::new(router()).unwrap();
+    //     let hostname = "test12345";
+    //     let valid_sshed25519_pubkey = "AAAAC3NzaC1lZDI1NTE5AAAAIEafihGp0at+QR94JaF+NkJ4XuZLjleEz/owVzRBqC9d";
+    //     let filename = format!("{}/{}", CUSTODY_PATH, hostname);
+    //     fs::remove_file(filename.clone()).unwrap_or(());
+    //     let response = test_server
+    //         .client()
+    //         .post(&format!("http://localhost/hosts/{}", hostname), valid_sshed25519_pubkey, mime::TEXT_PLAIN)
+    //         .perform()
+    //         .unwrap();
+    //     assert_eq!(response.status(), StatusCode::Created);
 
-        let mut f = File::open(filename.clone()).unwrap();
-        let mut contents = String::new();
-        f.read_to_string(&mut contents).unwrap_or(0);
-        assert_eq!(contents, format!("{}\n", valid_sshed25519_pubkey));
-        fs::remove_file(filename).unwrap_or(());
-    }
+    //     let mut f = File::open(filename.clone()).unwrap();
+    //     let mut contents = String::new();
+    //     f.read_to_string(&mut contents).unwrap_or(0);
+    //     assert_eq!(contents, format!("{}\n", valid_sshed25519_pubkey));
+    //     fs::remove_file(filename).unwrap_or(());
+    // }
 
 
     #[test]
