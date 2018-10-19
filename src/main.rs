@@ -199,7 +199,8 @@ pub fn main() {
         Ok(addr) => addr,
         Err(_) => DEFAULT_ADDRESS.to_string(),
     };
-    info!("Listen at: http://{}", listen_address);
+    let version = env!("CARGO_PKG_VERSION");
+    info!("ServeD SysAPI v{} listens on: http://{}", version, listen_address);
     gotham::start(listen_address, router())
 }
 
