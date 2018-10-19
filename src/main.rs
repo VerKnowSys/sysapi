@@ -133,7 +133,7 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
                 let uri = Uri::borrow_from(&state).to_string();
                 let name = uri.replace(HOSTS_RESOURCE, "");
                 let ssh_pubkey = String::from_utf8(valid_body.to_vec()).unwrap(); // Read SSH pubkey from request body:
-                info!("Hostname: {}, SSH-ED25519 pubkey: {} (key-length: {})", name, ssh_pubkey, ssh_pubkey.len());
+                info!("Creating hostname: {}, SSH-ED25519 pubkey: {} (key-length: {})", name, ssh_pubkey, ssh_pubkey.len());
 
                 // Validate all input data:
                 if !NAME_PATTERN.is_match(&name)
