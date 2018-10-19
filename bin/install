@@ -1,0 +1,8 @@
+#!/bin/sh
+
+echo "Installing service: SysAPI"
+cargo clean && \
+git pull --jobs 4 && \
+cargo build --release && \
+killall sysapi 2>/dev/null && \
+install -v target/release/sysapi /usr/bin/sysapi
