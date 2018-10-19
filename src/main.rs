@@ -145,7 +145,7 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
                         let res = create_response(&state, StatusCode::Created, None);
                         return future::ok((state, res))
                     } else {
-                        let res = create_response(&state, StatusCode::Unauthorized, None);
+                        let res = create_response(&state, StatusCode::NoContent, None);
                         return future::ok((state, res))
                     }
                 } else {
