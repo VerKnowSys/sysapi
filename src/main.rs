@@ -95,7 +95,7 @@ fn delete_handler(mut state: State) -> Box<HandlerFuture> {
                             .arg(name.clone())
                             .spawn();
                         match post_handle {
-                            Ok(_) => info!("WARNING: Dangling jail stopped: {}!", name),
+                            Ok(_) => debug!("Command for removing dangling jails spawned successfully: {}!", name),
                             Err(_) => ()
                         }
                     }
