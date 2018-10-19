@@ -7,6 +7,7 @@ authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
 gotham = "0.2"
 gotham_derive = "0.2"
 log = "0.4"
+pretty_env_logger = "0.2"
 hyper = { version = "0.11", features = [] }
 serde = "1"
 serde_derive = "1"
