@@ -93,10 +93,12 @@ fn delete_handler(mut state: State) -> Box<HandlerFuture> {
                         let post_handle = Command::new("jail")
                             .arg("-r")
                             .arg(name.clone())
-                            .spawn();
-                        match post_handle {
-                            Ok(_) => debug!("Command for removing dangling jails spawned successfully: {}!", name),
-                            Err(_) => ()
+                            .output()
+                            .unwrap();
+                        if post_handle.status.success() {
+                            warn!("Dangling jail stopped: {}!", name);
+                        } else {
+                            debug!("No dangling jail found.");
                         }
                     }
 
