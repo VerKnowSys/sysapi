@@ -81,7 +81,7 @@ fn delete_handler(mut state: State) -> Box<HandlerFuture> {
                             .arg(name.clone())
                             .arg("I_KNOW_EXACTLY_WHAT_I_AM_DOING") // NOTE: special "gvr" argument - to destroy jail without stdin prompt (non interactive destroy)
                             .output()
-                            .expect("Failed to destroy jail instance!");
+                            .expect(&format!("Failed to destroy jail instance: {}!", name));
                     if destroy_output.status.success() {
                         info!("Destroy jail: {}", &name);
                         info!("destroy_output: {}{}",
@@ -157,7 +157,7 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
                         .arg("create")
                         .arg(name.clone())
                         .output()
-                        .expect("Failed to create new jail instance!");
+                        .expect(&format!("Failed to create new jail instance: {}!", name));
                 if create_output.status.success() {
                     info!("create_output: {}{}",
                              String::from_utf8_lossy(&create_output.stdout),
