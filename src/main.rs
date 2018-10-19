@@ -170,12 +170,12 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
 
                 use std::process::Command;
                 let create_output = Command::new("gvr")
-                        .arg("create")
-                        .arg(name.clone())
-                        .output()
-                        .expect(&format!("Failed to create new jail instance: {}!", name));
+                    .arg("create")
+                    .arg(name.clone())
+                    .output()
+                    .expect(&format!("Failed to create new jail instance: {}!", name));
                 if create_output.status.success() {
-                    info!("create_output: {}{}",
+                    info!("create_output:\n{}{}",
                              String::from_utf8_lossy(&create_output.stdout),
                              String::from_utf8_lossy(&create_output.stderr));
                     let keyadd_output = Command::new("gvr")
@@ -183,19 +183,23 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
                         .arg(name.clone())
                         .arg(format!("key='{}'", ssh_pubkey))
                         .output()
-                        .expect(&format!("Failed to add key to jail instance: {}!", name));
+                        .expect(&format!("Failed to add key: '{}', to jail instance: {}!", ssh_pubkey, name));
                     if keyadd_output.status.success() {
-                        info!("keyadd_output: {}", String::from_utf8_lossy(&keyadd_output.stdout));
+                        info!("keyadd_output:\n{}", String::from_utf8_lossy(&keyadd_output.stdout));
                         let res = create_response(&state, StatusCode::Created, None);
                         return future::ok((state, res))
                     } else {
-                        // TODO: handle failure!
-                        let res = create_response(&state, StatusCode::NoContent, None);
+                        warn!("Something went wrong and key couldn't be set for jail instance: {}. Please contact administator or file a bug!", name);
+                        info!("Destroying faulty jail: {}", name);
+                        destroy_jail(name).unwrap_or(());
+                        let res = create_response(&state, StatusCode::PartialContent, None);
                         return future::ok((state, res))
                     }
                 } else {
-                        // TODO: handle failure!
-                    let res = create_response(&state, StatusCode::BadRequest, None);
+                    warn!("Something went wrong and jail instance: {} couldn't be created. Please contact administator or file a bug!", name);
+                    info!("Destroying faulty jail: {}", name);
+                    destroy_jail(name).unwrap_or(());
+                    let res = create_response(&state, StatusCode::PreconditionFailed, None);
                     return future::ok((state, res))
                 }
             }
