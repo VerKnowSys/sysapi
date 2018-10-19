@@ -4,7 +4,7 @@
 extern crate log;
 #[macro_use]
 extern crate lazy_static;
-extern crate pretty_env_logger;
+extern crate simple_logger;
 extern crate futures;
 extern crate gotham;
 extern crate hyper;
@@ -191,7 +191,7 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
 /// Start a server and use a `Router` to dispatch requests
 pub fn main() {
     use std::env;
-    pretty_env_logger::init();
+    simple_logger::init().unwrap_or(());
     let key = "LISTEN_ADDRESS";
     let listen_address = match env::var(key) {
         Ok(addr) => addr,
