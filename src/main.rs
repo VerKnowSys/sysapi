@@ -132,8 +132,9 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
                         .output()
                         .expect("Failed to create new jail instance!");
                 if create_output.status.success() {
-                    println!("create_output: {}", String::from_utf8_lossy(&create_output.stdout));
-                    println!("create_errput: {}", String::from_utf8_lossy(&create_output.stderr));
+                    println!("create_output: {}{}",
+                             String::from_utf8_lossy(&create_output.stdout),
+                             String::from_utf8_lossy(&create_output.stderr));
                     let keyadd_output = Command::new("gvr")
                         .arg("set")
                         .arg(name)
@@ -145,10 +146,12 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
                         let res = create_response(&state, StatusCode::Created, None);
                         return future::ok((state, res))
                     } else {
+                        // TODO: handle failure!
                         let res = create_response(&state, StatusCode::NoContent, None);
                         return future::ok((state, res))
                     }
                 } else {
+                        // TODO: handle failure!
                     let res = create_response(&state, StatusCode::BadRequest, None);
                     return future::ok((state, res))
                 }
