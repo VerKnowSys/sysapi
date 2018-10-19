@@ -63,6 +63,40 @@ fn router() -> Router {
 }
 
 
+
+fn destroy_jail(name: String) -> Result<(), ()> {
+    use std::process::Command;
+    let destroy_output = Command::new("gvr")
+        .arg("destroy")
+        .arg(name.clone())
+        .arg("I_KNOW_EXACTLY_WHAT_I_AM_DOING") // NOTE: special "gvr" argument - to destroy jail without stdin prompt (non interactive destroy)
+        .output()
+        .expect(&format!("Failed to destroy jail instance: {}!", name));
+    if destroy_output.status.success() {
+        info!("Destroying jail: {}", &name);
+        info!("destroy_output:\n{}{}",
+                 String::from_utf8_lossy(&destroy_output.stdout),
+                 String::from_utf8_lossy(&destroy_output.stderr));
+        // NOTE: Sometimes jail services are locking some resources for a very long time after jail destroy
+        //       and will remain "started" until some process lock is released..
+        //       Let's make sure there's no running jail with our name after destroy command:
+        let post_handle = Command::new("jail")
+            .arg("-r")
+            .arg(name.clone())
+            .output()
+            .unwrap();
+        if post_handle.status.success() {
+            warn!("Dangling jail stopped: {}!", name);
+        } else {
+            debug!("No dangling jail found.");
+        }
+        Ok(())
+    } else {
+        Err(())
+    }
+}
+
+
 /// Handle DELETEs
 fn delete_handler(mut state: State) -> Box<HandlerFuture> {
     // print_request_elements(&state);
@@ -75,35 +109,17 @@ fn delete_handler(mut state: State) -> Box<HandlerFuture> {
                 let cell_dir = format!("{}/{}", CELLS_PATH, name);
 
                 if Path::new(&cell_dir).exists() {
-                    use std::process::Command;
-                    let destroy_output = Command::new("gvr")
-                            .arg("destroy")
-                            .arg(name.clone())
-                            .arg("I_KNOW_EXACTLY_WHAT_I_AM_DOING") // NOTE: special "gvr" argument - to destroy jail without stdin prompt (non interactive destroy)
-                            .output()
-                            .expect(&format!("Failed to destroy jail instance: {}!", name));
-                    if destroy_output.status.success() {
-                        info!("Destroy jail: {}", &name);
-                        info!("destroy_output: {}{}",
-                                 String::from_utf8_lossy(&destroy_output.stdout),
-                                 String::from_utf8_lossy(&destroy_output.stderr));
-                        // NOTE: Sometimes jail services are locking some resources for a very long time after jail destroy
-                        //       and will remain "started" until some process lock is released..
-                        //       Let's make sure there's no running jail with our name after destroy command:
-                        let post_handle = Command::new("jail")
-                            .arg("-r")
-                            .arg(name.clone())
-                            .output()
-                            .unwrap();
-                        if post_handle.status.success() {
-                            warn!("Dangling jail stopped: {}!", name);
-                        } else {
-                            debug!("No dangling jail found.");
+                    match destroy_jail(name) {
+                        Ok(_) => {
+                            let res = create_response(&state, StatusCode::Ok, None);
+                            return future::ok((state, res))
+                        },
+                        Err(_) => {
+                            let res = create_response(&state, StatusCode::PreconditionFailed, None);
+                            return future::ok((state, res))
                         }
                     }
 
-                    let res = create_response(&state, StatusCode::Ok, None);
-                    return future::ok((state, res))
                 } else {
                     let res = create_response(&state, StatusCode::NotModified, None);
                     return future::ok((state, res))
