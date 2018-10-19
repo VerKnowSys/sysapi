@@ -1,6 +1,8 @@
 //! sysapi.centra.systems
 
 #[macro_use]
+extern crate log;
+#[macro_use]
 extern crate lazy_static;
 extern crate futures;
 extern crate gotham;
@@ -40,10 +42,10 @@ fn _print_request_elements(state: &State) {
     let uri = Uri::borrow_from(state);
     let http_version = HttpVersion::borrow_from(state);
     let headers = Headers::borrow_from(state);
-    println!("Method: {:?}", method);
-    println!("URI: {:?}", uri);
-    println!("HTTP Version: {:?}", http_version);
-    println!("Headers: {:?}", headers);
+    info!("Method: {:?}", method);
+    info!("URI: {:?}", uri);
+    info!("HTTP Version: {:?}", http_version);
+    info!("Headers: {:?}", headers);
 }
 
 
@@ -72,7 +74,31 @@ fn delete_handler(mut state: State) -> Box<HandlerFuture> {
                 let cell_dir = format!("{}/{}", CELLS_PATH, name);
 
                 if Path::new(&cell_dir).exists() {
-                    println!("Destroy jail: {}", &name);
+                    use std::process::Command;
+                    let destroy_output = Command::new("gvr")
+                            .arg("destroy")
+                            .arg(name.clone())
+                            .arg("I_KNOW_EXACTLY_WHAT_I_AM_DOING") // NOTE: special "gvr" argument - to destroy jail without stdin prompt (non interactive destroy)
+                            .output()
+                            .expect("Failed to destroy jail instance!");
+                    if destroy_output.status.success() {
+                        info!("Destroy jail: {}", &name);
+                        info!("destroy_output: {}{}",
+                                 String::from_utf8_lossy(&destroy_output.stdout),
+                                 String::from_utf8_lossy(&destroy_output.stderr));
+                        // NOTE: Sometimes jail services are locking some resources for a very long time after jail destroy
+                        //       and will remain "started" until some process lock is released..
+                        //       Let's make sure there's no running jail with our name after destroy command:
+                        let post_handle = Command::new("jail")
+                            .arg("-r")
+                            .arg(name.clone())
+                            .spawn();
+                        match post_handle {
+                            Ok(_) => info!("WARNING: Dangling jail stopped: {}!", name),
+                            Err(_) => ()
+                        }
+                    }
+
                     let res = create_response(&state, StatusCode::Ok, None);
                     return future::ok((state, res))
                 } else {
@@ -106,7 +132,7 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
                 let uri = Uri::borrow_from(&state).to_string();
                 let name = uri.replace(HOSTS_RESOURCE, "");
                 let ssh_pubkey = String::from_utf8(valid_body.to_vec()).unwrap(); // Read SSH pubkey from request body:
-                println!("Hostname: {}, SSH-ED25519 pubkey: {} (key-length: {})", name, ssh_pubkey, ssh_pubkey.len());
+                info!("Hostname: {}, SSH-ED25519 pubkey: {} (key-length: {})", name, ssh_pubkey, ssh_pubkey.len());
 
                 // Validate all input data:
                 if !NAME_PATTERN.is_match(&name)
@@ -130,7 +156,7 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
                         .output()
                         .expect("Failed to create new jail instance!");
                 if create_output.status.success() {
-                    println!("create_output: {}{}",
+                    info!("create_output: {}{}",
                              String::from_utf8_lossy(&create_output.stdout),
                              String::from_utf8_lossy(&create_output.stderr));
                     let keyadd_output = Command::new("gvr")
@@ -140,7 +166,7 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
                         .output()
                         .expect("Failed to add key to jail instance!");
                     if keyadd_output.status.success() {
-                        println!("keyadd_output: {}", String::from_utf8_lossy(&keyadd_output.stdout));
+                        info!("keyadd_output: {}", String::from_utf8_lossy(&keyadd_output.stdout));
                         let res = create_response(&state, StatusCode::Created, None);
                         return future::ok((state, res))
                     } else {
@@ -169,7 +195,7 @@ pub fn main() {
         Ok(addr) => addr,
         Err(_) => DEFAULT_ADDRESS.to_string(),
     };
-    println!("Listen at: http://{}", listen_address);
+    info!("Listen at: http://{}", listen_address);
     gotham::start(listen_address, router())
 }
 
