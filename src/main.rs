@@ -17,8 +17,6 @@ use gotham::router::Router;
 use gotham::router::builder::{build_simple_router, DefineSingleRoute, DrawRoutes};
 use gotham::handler::{HandlerFuture, IntoHandlerError};
 
-use std::fs::File;
-use std::io::prelude::*;
 use std::path::Path;
 use regex::Regex;
 
@@ -126,17 +124,32 @@ fn post_handler(mut state: State) -> Box<HandlerFuture> {
                     let res = create_response(&state, StatusCode::Conflict, None);
                     return future::ok((state, res))
                 }
-                match File::create(&path) {
-                    Ok(mut valid_file) => {
-                        valid_file.write_all((format!("{}\n", ssh_pubkey)).as_bytes()).unwrap();
+
+                use std::process::Command;
+                let create_output = Command::new("gvr")
+                        .arg("create")
+                        .arg(name.clone())
+                        .output()
+                        .expect("Failed to create new jail instance!");
+                if create_output.status.success() {
+                    println!("create_output: {}", String::from_utf8_lossy(&create_output.stdout));
+                    let keyadd_output = Command::new("gvr")
+                        .arg("set")
+                        .arg(name)
+                        .arg(format!("key='{}'", ssh_pubkey))
+                        .output()
+                        .expect("Failed to add key to jail instance!");
+                    if keyadd_output.status.success() {
+                        println!("keyadd_output: {}", String::from_utf8_lossy(&keyadd_output.stdout));
                         let res = create_response(&state, StatusCode::Created, None);
                         return future::ok((state, res))
-                    },
-                    Err(failure) => {
-                        println!("Error: Failed to create file: {}. Reason: {}", &path, &failure);
-                        let res = create_response(&state, StatusCode::BadRequest, None);
+                    } else {
+                        let res = create_response(&state, StatusCode::Unauthorized, None);
                         return future::ok((state, res))
-                    },
+                    }
+                } else {
+                    let res = create_response(&state, StatusCode::BadRequest, None);
+                    return future::ok((state, res))
                 }
             }
             Err(e) => return future::err((state, e.into_handler_error())),
