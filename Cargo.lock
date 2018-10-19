@@ -772,7 +772,7 @@ dependencies = [
 
 [[package]]
 name = "sysapi"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "base64 0.9.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "bincode 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
