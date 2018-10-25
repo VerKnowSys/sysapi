@@ -46,6 +46,24 @@ pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<(), 
 }
 
 
+pub fn create_cell(name: &String) -> Result<(), Error> {
+    Command::new(GVR_BIN)
+        .arg("create")
+        .arg(name.clone())
+        .output()
+        .and_then(|gvr_handle| {
+            debug!("gvr_handle:\n{}{}",
+                 String::from_utf8_lossy(&gvr_handle.stdout),
+                 String::from_utf8_lossy(&gvr_handle.stderr));
+            if gvr_handle.status.success() {
+                Ok(())
+            } else {
+                Err(Error::new(ErrorKind::Other, format!("Failed to create_cell(): {}", name)))
+            }
+        })
+}
+
+
 pub fn destroy_cell(name: &String) -> Result<(), Error> {
     Command::new(GVR_BIN)
         .arg("destroy")

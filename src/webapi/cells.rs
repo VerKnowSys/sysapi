@@ -139,21 +139,8 @@ pub fn post_handler(mut state: State) -> Box<HandlerFuture> {
                     return future::ok((state, res))
                 }
 
-                // Execute gvr create …
-                match Command::new(GVR_BIN)
-                    .arg("create")
-                    .arg(name.clone())
-                    .output()
-                    .and_then(|gvr_handle| {
-                        debug!("gvr_handle:\n{}{}",
-                             String::from_utf8_lossy(&gvr_handle.stdout),
-                             String::from_utf8_lossy(&gvr_handle.stderr));
-                        if gvr_handle.status.success() {
-                            Ok(gvr_handle)
-                        } else {
-                            Err(Error::new(ErrorKind::Other, format!("Failed to create_cell(): {}", name)))
-                        }
-                    })
+                // Execute gvr create + gvr set
+                match create_cell(&name)
                     .and_then(|_| {
                         info!("Cell created: {}.", name);
                         add_ssh_pubkey_to_cell(&name, &ssh_pubkey)
