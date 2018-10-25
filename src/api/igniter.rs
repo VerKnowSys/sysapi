@@ -1,4 +1,4 @@
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum Actions {
     Create,
     Destroy,
@@ -11,7 +11,7 @@ pub enum Actions {
 }
 
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Igniter {
     service_name: String,
     action: Actions,

@@ -1,11 +1,10 @@
 use hyper::{Body, Headers, HttpVersion, Method, Response, StatusCode, Uri};
 use std::path::Path;
-use std::process::Command;
 use futures::{future, Future, Stream};
 use gotham::http::response::create_response;
 use gotham::state::{FromState, State};
 use gotham::handler::{HandlerFuture, IntoHandlerError};
-use std::io::{Error, ErrorKind};
+
 
 // Load all internal modules:
 use api::*;
@@ -60,17 +59,10 @@ pub fn delete_handler(state: State) -> (State, Response<Body>) {
 
 
 /// Handle GETs
-pub fn get_handler(state: State) -> (State, Response<Body>) {
-    // print_request_elements(&state);
-    let res = create_response(&state, StatusCode::NotImplemented, None);
-    // create_response(
-    //     state,
-    //     StatusCode::OK,
-    //     mime::APPLICATION_JSON,
-    //     serde_json::to_string(&self).expect("serialized product"),
-    // )
-
-    (state, res)
+pub fn get_handler(state: State) -> (State, Cell) {
+    let uri = Uri::borrow_from(&state).to_string();
+    let name = uri.replace(CELL_RESOURCE, "");
+    (state, Cell::new(&name)) // XXX: TODO: it should load current service state and return json
 }
 
 
