@@ -3,13 +3,15 @@ use std::io::{Error, ErrorKind};
 
 // Load all internal modules:
 use api::*;
+use api::igniter::*;
 
 
 #[derive(Debug, Serialize)]
 pub struct Cell {
-    name: String,
-    ipv4: String,
-    domain: String,
+    pub name: String,
+    pub ipv4: String,
+    pub domain: String,
+    pub action: Actions,
 }
 
 
