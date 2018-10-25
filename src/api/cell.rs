@@ -1,12 +1,18 @@
 use std::process::Command;
 use std::io::{Error, ErrorKind};
+use gotham::state::State;
+use hyper::Response;
+use gotham::handler::IntoResponse;
+use hyper::StatusCode;
+use serde_json;
+
 
 // Load all internal modules:
 use api::*;
 use api::igniter::*;
 
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Cell {
     pub name: String,
     pub ipv4: String,
@@ -15,16 +21,36 @@ pub struct Cell {
 }
 
 
-// impl IntoResponse for Cell {
-//     fn into_response(self, state: &State) -> Response<Body> {
-//         create_response(
-//             state,
-//             StatusCode::OK,
-//             mime::APPLICATION_JSON,
-//             serde_json::to_string(&self).expect("serialized product"),
-//         )
-//     }
-// }
+impl ToString for Cell {
+    fn to_string(&self) -> String {
+        serde_json::to_string(&self).unwrap()
+    }
+}
+
+
+impl IntoResponse for Cell {
+    fn into_response(self, _state: &State) -> Response {
+        Response::new()
+            .with_status(StatusCode::Ok)
+            .with_body(self.to_string())
+    }
+}
+
+
+impl Cell {
+
+
+    pub fn new(name: &String) -> Cell {
+        Cell {
+            name: name.to_string(),
+            ipv4: "127.0.0.1".to_string(),
+            domain: "some.local".to_string(),
+            action: Actions::Create,
+        }
+    }
+
+
+}
 
 
 pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<(), Error> {
