@@ -45,16 +45,16 @@ pub fn delete_handler(state: State) -> (State, Response<Body>) {
         match cell::destroy_cell(&name) {
             Ok(_) => {
                 let res = create_response(&state, StatusCode::Ok, None);
-                return (state, res)
+                (state, res)
             },
             Err(_) => {
                 let res = create_response(&state, StatusCode::PreconditionFailed, None);
-                return (state, res)
+                (state, res)
             }
         }
     } else {
         let res = create_response(&state, StatusCode::NotModified, None);
-        return (state, res)
+        (state, res)
     }
 }
 
