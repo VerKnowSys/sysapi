@@ -66,43 +66,6 @@ pub fn get_handler(state: State) -> (State, Cell) {
 }
 
 
-/// Handle GETs
-// fn get_handler(mut state: State) -> Box<HandlerFuture> {
-//     let f = Body::take_from(&mut state)
-//         .concat2()
-//         .then(|full_body| match full_body {
-//             Ok(_) => {
-//                 let uri = Uri::borrow_from(&state).to_string();
-//                 let name = uri.replace(CELL_RESOURCE, "");
-//                 let create_output = Command::new(GVR_BIN)
-//                     .arg("status")
-//                     .arg(name.clone())
-//                     .output()
-//                     .expect(&format!("Failed to get status of instance: {}!", name));
-//                 if create_output.status.success() {
-//                     info!("status_output:\n{}{}",
-//                              String::from_utf8_lossy(&create_output.stdout),
-//                              String::from_utf8_lossy(&create_output.stderr));
-//                     let res = create_response(&state, StatusCode::Ok, None);
-//                     // let res = create_response(
-//                     //     &state,
-//                     //     StatusCode::Ok,
-//                     //     mime::TEXT_PLAIN,
-//                     //     Some("teresf")
-//                     // );
-
-//                     return future::ok((state, res))
-//                 } else {
-//                     let res = create_response(&state, StatusCode::NotFound, None);
-//                     return future::ok((state, res))
-//                 }
-//             },
-//             Err(e) => return future::err((state, e.into_handler_error())),
-//         });
-//     Box::new(f)
-// }
-
-
 /// Handle POSTs
 pub fn post_handler(mut state: State) -> Box<HandlerFuture> {
     let f = Body::take_from(&mut state)
