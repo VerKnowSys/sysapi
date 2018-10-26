@@ -56,7 +56,7 @@ impl Cell {
 pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<(), Error> {
     Command::new(GVR_BIN)
         .arg("set")
-        .arg(name.clone())
+        .arg(name)
         .arg(format!("key='{}'", ssh_pubkey))
         .output()
         .and_then(|add_ssh_pubkey| {
@@ -75,7 +75,7 @@ pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<(), 
 pub fn create_cell(name: &String) -> Result<(), Error> {
     Command::new(GVR_BIN)
         .arg("create")
-        .arg(name.clone())
+        .arg(name)
         .output()
         .and_then(|gvr_handle| {
             info!("create_cell():\n{}{}",
