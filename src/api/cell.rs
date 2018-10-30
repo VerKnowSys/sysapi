@@ -35,7 +35,6 @@ pub struct Cell {
     pub domain: Option<String>,
     pub keys: Option<List>,
     pub attributes: Option<List>,
-    pub zones: Option<List>,
     pub status: CellState,
 }
 
@@ -56,7 +55,6 @@ impl Default for Cell {
            domain: None,
            keys: None,
            attributes: None,
-           zones: None,
            netid: None,
            status: CellState::NotFound,
         }
