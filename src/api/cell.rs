@@ -124,14 +124,31 @@ impl Cell {
     /// Load cell state from system files:
     pub fn state(name: &String) -> Option<Cell> {
         // TODO: attributes => /Shared/Prison/Sentry/CELLNAME/cell-attributes/*
-        // TODO: keys => /Shared/Prison/Sentry/CELLNAME/cell-attributes/key
 
         let cell_dir = format!("{}/{}", SENTRY_PATH, name);
+        let key_file = format!("{}/{}", cell_dir, "cell-attributes/key");
         let status_file = format!("{}/{}", cell_dir, "cell.status");
         let netid_file = format!("{}/{}", cell_dir, "cell.vlan.number");
         let ipv4_file = format!("{}/{}", cell_dir, "cell.ip.addresses");
         let domain_file = format!("{}/{}", cell_dir, "cell-domains/local.conf");
         if Path::new(&cell_dir).exists() {
+            // key => /Shared/Prison/Sentry/CELLNAME/cell-attributes/key
+            let key = File::open(&key_file)
+                .and_then(|file| {
+                    let mut line = String::new();
+                    BufReader::new(file)
+                        .read_line(&mut line)
+                        .and_then(|_| {
+                            // trim newlines and other whitespaces:
+                            Ok(str::trim(&line).to_string())
+                        })
+                })
+                .map_err(|err| {
+                    error!("Couldn't read default key from file: {}. Fallback to no key.", key_file);
+                    err
+                })
+                .unwrap_or("".to_string());
+
             // ip => /Shared/Prison/Sentry/CELLNAME/cell.ip.addresses
             let ipv4 = File::open(&ipv4_file)
                 .and_then(|file| {
@@ -214,6 +231,7 @@ impl Cell {
 
             let cell_result = Cell {
                 name: Some(name.to_string()),
+                key: Some(key),
                 ipv4: Some(ipv4),
                 domain: Some(domain),
                 netid: Some(netid),
