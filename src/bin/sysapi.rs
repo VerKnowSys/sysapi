@@ -52,15 +52,14 @@ pub fn main() {
     Dispatch::new()
         .format(move |out, message, record| {
             out.finish(format_args!(
-                "[{} {}] {}: {}",
-                Local::now().format("%d-%H%M%S"),
+                "{} {}: {}: {}",
+                Local::now().format("%d-%H%M%S").to_string().black(),
                 default_colors.color(record.level()),
                 record.target().cyan(),
                 message
             ))
         })
         .level(loglevel)
-        // .chain(std::io::stdout())
         .chain(log_file("/var/log/sysapi.log")
                     .unwrap_or(File::open("/dev/stdout")
                     .expect("FATAL: No /dev/stdout!?")))
