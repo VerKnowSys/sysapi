@@ -18,6 +18,7 @@ use api::*;
 
 use regex::Regex;
 lazy_static! {
+    /// Regex extractor match for Unbound 1.7+ local-zone definition:
     pub static ref CELL_DOMAIN_PATTERN: Regex = {
         Regex::new(r"local-zone: (?:([a-zA-Z0-9.]+)). ").unwrap()
     };
@@ -29,16 +30,32 @@ pub type List = Vec<String>;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Cell {
+
+    /// Cell name:
     pub name: Option<String>,
+
+    /// Cell IPv4:
     pub ipv4: Option<String>,
+
+    /// Cell worker uid and network card id:
     pub netid: Option<String>,
+
+    /// Cell default zone:
     pub domain: Option<String>,
-    pub keys: Option<List>,
+
+    /// Cell creator ED25519 SSH public key:
+    pub key: Option<String>,
+
+    /// Cell attributes (mostly RCTL and ZFS settings override)
     pub attributes: Option<List>,
+
+    /// Cell status:
     pub status: CellState,
+
 }
 
 
+/// State of the cell
 #[derive(Debug, Serialize, Deserialize)]
 pub enum CellState {
     Offline,
@@ -53,7 +70,7 @@ impl Default for Cell {
            name: None,
            ipv4: None,
            domain: None,
-           keys: None,
+           key: None,
            attributes: None,
            netid: None,
            status: CellState::NotFound,
@@ -62,6 +79,7 @@ impl Default for Cell {
 }
 
 
+/// Serialize to JSON on .to_string()
 impl ToString for Cell {
     fn to_string(&self) -> String {
         serde_json::to_string(&self).unwrap()
@@ -69,27 +87,26 @@ impl ToString for Cell {
 }
 
 
+/// Implement response for GETs:
 impl IntoResponse for Cell {
     fn into_response(self, state: &State) -> Response<Body> {
         // serialize only if name is set - so Cell is initialized/ exists
         match self.name {
-            Some(_) => {
+            Some(_) =>
                 create_response(
                     state,
                     StatusCode::OK,
                     mime::APPLICATION_JSON,
                     serde_json::to_string(&self)
                         .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
-                )
-            },
-            None => {
+                ),
+            None =>
                 create_response(
                     state,
                     StatusCode::NOT_FOUND,
                     mime::APPLICATION_JSON,
                     Body::from("{\"status\": \"NotFound\"}"),
                 )
-            }
         }
     }
 }
@@ -107,6 +124,7 @@ impl Cell {
     /// Load cell state from system files:
     pub fn state(name: &String) -> Option<Cell> {
         // TODO: attributes => /Shared/Prison/Sentry/CELLNAME/cell-attributes/*
+        // TODO: keys => /Shared/Prison/Sentry/CELLNAME/cell-attributes/key
 
         let cell_dir = format!("{}/{}", SENTRY_PATH, name);
         let status_file = format!("{}/{}", cell_dir, "cell.status");
