@@ -14,7 +14,15 @@ use std::fs::File;
 
 // Load all internal modules:
 use api::*;
-use api::igniter::*;
+
+
+use regex::Regex;
+lazy_static! {
+    pub static ref CELL_DOMAIN_PATTERN: Regex = {
+        Regex::new(r"local-zone: (?:([a-zA-Z0-9.]+)). ").unwrap()
+    };
+}
+
 
 pub type List = Vec<String>;
 
