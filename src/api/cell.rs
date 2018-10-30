@@ -174,13 +174,14 @@ impl Cell {
     pub fn state(name: &String) -> Option<Cell> {
         // TODO: attributes => /Shared/Prison/Sentry/CELLNAME/cell-attributes/*
 
-        let cell_dir = format!("{}/{}", SENTRY_PATH, name);
-        let key_file = format!("{}/{}", cell_dir, "cell-attributes/key");
-        let status_file = format!("{}/{}", cell_dir, "cell.status");
-        let netid_file = format!("{}/{}", cell_dir, "cell.vlan.number");
-        let ipv4_file = format!("{}/{}", cell_dir, "cell.ip.addresses");
-        let domain_file = format!("{}/{}", cell_dir, "cell-domains/local.conf");
-        if Path::new(&cell_dir).exists() {
+        let sentry_dir = format!("{}/{}", SENTRY_PATH, name);
+        let key_file = format!("{}/{}", sentry_dir, "cell-attributes/key");
+        let status_file = format!("{}/{}", sentry_dir, "cell.status");
+        let netid_file = format!("{}/{}", sentry_dir, "cell.vlan.number");
+        let ipv4_file = format!("{}/{}", sentry_dir, "cell.ip.addresses");
+        let domain_file = format!("{}/{}", sentry_dir, "cell-domains/local.conf");
+        debug!("SENTRY DIR: {}", sentry_dir);
+        if Path::new(&sentry_dir).exists() {
             // key => /Shared/Prison/Sentry/CELLNAME/cell-attributes/key
             let key = File::open(&key_file)
                 .and_then(|file| {
@@ -291,6 +292,7 @@ impl Cell {
             debug!("Get cell: {:?}", cell_result);
             Some(cell_result)
         } else {
+            debug!("Cells list is empty!");
             None
         }
     }
