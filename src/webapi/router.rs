@@ -19,12 +19,20 @@ pub fn router() -> Router {
 
     build_simple_router(|route| {
 
+        // …/cells/list
         route.associate(
-            &format!("{resource}:cell", resource = CELL_RESOURCE), |handler| {
+            &format!("{}list", CELLS_RESOURCE), |handler| {
+                handler.get().to(cells_get_handler);
+            });
+
+        // …/cell/:cell (name)
+        route.associate(
+            &format!("{}:cell", CELL_RESOURCE), |handler| {
                 handler.get().to(cell_get_handler);
                 handler.post().to(cell_post_handler);
                 handler.delete().to(cell_delete_handler);
             });
+
 
     })
 }

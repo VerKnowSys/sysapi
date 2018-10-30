@@ -59,7 +59,13 @@ pub fn cell_delete_handler(state: State) -> (State, Response<Body>) {
 }
 
 
-/// Handle GETs
+/// Handle GET for /cell/ (no cell name) - list all cells
+pub fn cells_get_handler(state: State) -> (State, Cells) {
+    (state, Cells::default())
+}
+
+
+/// handle GET for /cell/:cell (name given) - list single cell
 pub fn cell_get_handler(state: State) -> (State, Cell) {
     let uri = Uri::borrow_from(&state).to_string();
     let name = uri.replace(CELL_RESOURCE, "");
