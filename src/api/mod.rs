@@ -9,6 +9,7 @@ pub const SENTRY_PATH: &'static str = "/Shared/Prison/Sentry";
 
 /* API */
 pub const CELL_RESOURCE: &'static str = "/cell/";
+pub const CELLS_RESOURCE: &'static str = "/cells/";
 pub const SENTRY_RESOURCE: &'static str = "/sentry/";
 pub const IGNITER_RESOURCE: &'static str = "/igniter/";
 pub const ZONE_RESOURCE: &'static str = "/zone/";
