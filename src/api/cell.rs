@@ -9,7 +9,7 @@ use std::io::prelude::*;
 use gotham::helpers::http::response::create_response;
 use std::io::BufReader;
 use std::fs::File;
-
+use mime::*;
 
 
 // Load all internal modules:
@@ -131,7 +131,7 @@ impl IntoResponse for Cell {
                 create_response(
                     state,
                     StatusCode::OK,
-                    mime::APPLICATION_JSON,
+                    APPLICATION_JSON,
                     serde_json::to_string(&self)
                         .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
                 ),
@@ -139,7 +139,7 @@ impl IntoResponse for Cell {
                 create_response(
                     state,
                     StatusCode::NOT_FOUND,
-                    mime::APPLICATION_JSON,
+                    APPLICATION_JSON,
                     Body::from("{\"status\": \"NotFound\"}"),
                 )
         }
@@ -153,7 +153,7 @@ impl IntoResponse for Cells {
         create_response(
             state,
             StatusCode::OK,
-            mime::APPLICATION_JSON,
+            APPLICATION_JSON,
             serde_json::to_string(&self)
                 .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
         )
