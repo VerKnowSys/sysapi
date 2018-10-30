@@ -5,6 +5,7 @@ use futures::{future, Future, Stream};
 use gotham::helpers::http::response::create_response;
 use gotham::state::{FromState, State};
 use gotham::handler::{HandlerFuture, IntoHandlerError};
+use mime::*;
 
 
 // Load all internal modules:
@@ -44,16 +45,16 @@ pub fn cell_delete_handler(state: State) -> (State, Response<Body>) {
     if Path::new(&cell_dir).exists() {
         match cell::destroy_cell(&name) {
             Ok(_) => {
-                let res = create_response(&state, StatusCode::OK, mime::APPLICATION_JSON, Body::from("{\"status\": \"Ok\"}"));
+                let res = create_response(&state, StatusCode::OK, APPLICATION_JSON, Body::from("{\"status\": \"Ok\"}"));
                 (state, res)
             },
             Err(_) => {
-                let res = create_response(&state, StatusCode::BAD_REQUEST, mime::APPLICATION_JSON, Body::from("{\"status\": \"Bad Request\"}"));
+                let res = create_response(&state, StatusCode::BAD_REQUEST, APPLICATION_JSON, Body::from("{\"status\": \"Bad Request\"}"));
                 (state, res)
             }
         }
     } else {
-        let res = create_response(&state, StatusCode::NOT_MODIFIED, mime::APPLICATION_JSON, Body::from("{\"status\": \"Not Modified\"}"));
+        let res = create_response(&state, StatusCode::NOT_MODIFIED, APPLICATION_JSON, Body::from("{\"status\": \"Not Modified\"}"));
         (state, res)
     }
 }
@@ -88,7 +89,7 @@ pub fn cell_post_handler(mut state: State) -> Box<HandlerFuture> {
                 // Validate all input data:
                 let cell_dir = format!("{}/{}", CELLS_PATH, name);
                 if Path::new(&cell_dir).exists() {
-                    let res = create_response(&state, StatusCode::CONFLICT, mime::APPLICATION_JSON, Body::from("{\"status\": \"Conflict\"}"));
+                    let res = create_response(&state, StatusCode::CONFLICT, APPLICATION_JSON, Body::from("{\"status\": \"Conflict\"}"));
                     return future::ok((state, res))
                 }
 
@@ -97,7 +98,7 @@ pub fn cell_post_handler(mut state: State) -> Box<HandlerFuture> {
                     || ssh_pubkey.len() > 70
                     || name.len() < 3        // Hostname can't be shorter than 3 chars and not longer than 27 chars
                     || name.len() > 27 {
-                    let res = create_response(&state, StatusCode::NOT_ACCEPTABLE, mime::APPLICATION_JSON, Body::from("{\"status\": \"Not Acceptable\"}"));
+                    let res = create_response(&state, StatusCode::NOT_ACCEPTABLE, APPLICATION_JSON, Body::from("{\"status\": \"Not Acceptable\"}"));
                     return future::ok((state, res))
                 }
 
@@ -115,12 +116,12 @@ pub fn cell_post_handler(mut state: State) -> Box<HandlerFuture> {
                     // create a new response based on the result:
                     Ok(_) => {
                         info!("Cell started: {}", name);
-                        let res = create_response(&state, StatusCode::CREATED, mime::APPLICATION_JSON, Body::from("{\"status\": \"Created\"}"));
+                        let res = create_response(&state, StatusCode::CREATED, APPLICATION_JSON, Body::from("{\"status\": \"Created\"}"));
                         future::ok((state, res))
                     },
                     Err(err) => {
                         error!("Failed to create cell: {}. Last error: {}", name, err);
-                        let res = create_response(&state, StatusCode::EXPECTATION_FAILED, mime::APPLICATION_JSON, Body::from("{\"status\": \"Expectation Failed\"}"));
+                        let res = create_response(&state, StatusCode::EXPECTATION_FAILED, APPLICATION_JSON, Body::from("{\"status\": \"Expectation Failed\"}"));
                         future::ok((state, res))
                     }
                 }
