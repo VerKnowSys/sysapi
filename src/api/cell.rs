@@ -14,6 +14,7 @@ use std::fs::File;
 
 // Load all internal modules:
 use api::*;
+use utils::*;
 
 
 use regex::Regex;
@@ -55,6 +56,14 @@ pub struct Cell {
 }
 
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Cells {
+    /// List of all cells
+    pub list: Vec<Cell>
+}
+
+
+
 /// State of the cell
 #[derive(Debug, Serialize, Deserialize)]
 pub enum CellState {
@@ -79,10 +88,36 @@ impl Default for Cell {
 }
 
 
+impl Default for Cells {
+    fn default() -> Cells {
+        Cells {
+            list:
+                list_cells()
+                    .iter()
+                    .flat_map(|cell| {
+                        let state = Cell::state(&cell);
+                        debug!("Cells STATE: {:?}", state);
+                        state
+                    })
+                    .collect()
+        }
+    }
+}
+
+
 /// Serialize to JSON on .to_string()
 impl ToString for Cell {
     fn to_string(&self) -> String {
-        serde_json::to_string(&self).unwrap()
+        serde_json::to_string(&self)
+            .unwrap_or(String::from(""))
+    }
+}
+
+
+impl ToString for Cells {
+    fn to_string(&self) -> String {
+        serde_json::to_string(&self)
+            .unwrap_or(String::from(""))
     }
 }
 
@@ -108,6 +143,20 @@ impl IntoResponse for Cell {
                     Body::from("{\"status\": \"NotFound\"}"),
                 )
         }
+    }
+}
+
+
+/// Implement response for GETs:
+impl IntoResponse for Cells {
+    fn into_response(self, state: &State) -> Response<Body> {
+        create_response(
+            state,
+            StatusCode::OK,
+            mime::APPLICATION_JSON,
+            serde_json::to_string(&self)
+                .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
+        )
     }
 }
 
