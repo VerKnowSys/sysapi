@@ -27,6 +27,6 @@ pub fn list_cells() -> Vec<String> {
             },
         }
     }
-    warn!("list_cells(): Elements: {:?}", list);
+    debug!("list_cells(): Elements: {:?}", list);
     list
 }
