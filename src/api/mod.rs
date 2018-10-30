@@ -19,23 +19,20 @@ pub const SNAPSHOT_RESOURCE: &'static str = "/snapshot/";
 pub const ROLLBACK_RESOURCE: &'static str = "/rollback/";
 
 
-/// Internal CellAPI module for system cell management:
+/// Internal CellAPI module with system cell management:
 pub mod cell;
 
-/// Internal SysAPI module for igniter actions:
+/// Internal SysAPI module with igniter actions:
 pub mod igniter;
 
-/// Internal SysAPI module for web proxy:
+/// Internal SysAPI module with web proxy:
 pub mod proxy;
 
-/// Internal SysAPI module for ZFS snapshotting:
-pub mod snapshot;
-
-/// Internal SysAPI module for system status:
+/// Internal SysAPI module with system status:
 pub mod status;
 
-/// Internal SysAPI module for ZFS rollback.:
-pub mod rollback;
+/// Internal SysAPI module with ZFS features:
+pub mod zfs;
 
-/// Internal SysAPI module for local DNS management:
+/// Internal SysAPI module with local DNS management:
 pub mod zone;
