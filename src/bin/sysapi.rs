@@ -16,17 +16,20 @@ extern crate serde_derive;
 extern crate serde_json;
 
 
+extern crate sysapi;
+
+
 use std::env;
 use log::Level;
 
 
-extern crate sysapi;
-use sysapi::api::*;
-use sysapi::webapi::*;
+use sysapi::router;
+use sysapi::DEFAULT_ADDRESS;
 
 
 /// Start a server and use a `Router` to dispatch requests
 pub fn main() {
+    // TODO: add env key to control default logger level
     simple_logger::init_with_level(Level::Info).unwrap_or(());
 
     let key = "LISTEN_ADDRESS";
