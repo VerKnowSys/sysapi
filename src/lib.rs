@@ -30,7 +30,7 @@ pub use webapi::cells::*;
 #[cfg(test)]
 mod tests {
     // Load all internal modules:
-    use hyper::StatusCode;
+    use hyper::*;
     use gotham::test::TestServer;
     use regex::Regex;
     use super::*;
@@ -60,10 +60,10 @@ mod tests {
         let test_server = TestServer::new(router::router()).unwrap();
         let response = test_server
             .client()
-            .post("http://localhost/cell/12", None, mime::TEXT_PLAIN)
+            .post("http://localhost/cell/12", Body::from("".to_string()), mime::TEXT_PLAIN)
             .perform()
             .unwrap();
-        assert_eq!(response.status(), StatusCode::NotAcceptable);
+        assert_eq!(response.status(), StatusCode::NOT_ACCEPTABLE);
     }
 
 
@@ -72,10 +72,10 @@ mod tests {
         let test_server = TestServer::new(router::router()).unwrap();
         let response = test_server
             .client()
-            .post("http://localhost/cell/123456789012345678901234567890", None, mime::TEXT_PLAIN)
+            .post("http://localhost/cell/123456789012345678901234567890", Body::from("".to_string()), mime::TEXT_PLAIN)
             .perform()
             .unwrap();
-        assert_eq!(response.status(), StatusCode::NotAcceptable);
+        assert_eq!(response.status(), StatusCode::NOT_ACCEPTABLE);
     }
 
 
@@ -84,10 +84,10 @@ mod tests {
         let test_server = TestServer::new(router::router()).unwrap();
         let response = test_server
             .client()
-            .post("http://localhost/cell/12345", None, mime::TEXT_PLAIN)
+            .post("http://localhost/cell/12345", Body::from("".to_string()), mime::TEXT_PLAIN)
             .perform()
             .unwrap();
-        assert_eq!(response.status(), StatusCode::NotAcceptable);
+        assert_eq!(response.status(), StatusCode::NOT_ACCEPTABLE);
     }
 
 
@@ -99,7 +99,7 @@ mod tests {
             .post("http://localhost/cell/12345", "my-nokey", mime::TEXT_PLAIN)
             .perform()
             .unwrap();
-        assert_eq!(response.status(), StatusCode::NotAcceptable);
+        assert_eq!(response.status(), StatusCode::NOT_ACCEPTABLE);
     }
 
 
@@ -134,7 +134,7 @@ mod tests {
             .delete("http://localhost/cell/test12345")
             .perform()
             .unwrap();
-        assert_eq!(response.status(), StatusCode::NotModified);
+        assert_eq!(response.status(), StatusCode::NOT_MODIFIED);
     }
 
 
