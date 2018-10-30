@@ -109,7 +109,7 @@ impl Default for Cells {
 impl ToString for Cell {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or(String::from(""))
+            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
     }
 }
 
@@ -117,7 +117,7 @@ impl ToString for Cell {
 impl ToString for Cells {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or(String::from(""))
+            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
     }
 }
 
