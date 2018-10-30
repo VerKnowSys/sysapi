@@ -1,4 +1,7 @@
 
+/// Public SysAPI Web utilities functions
+pub mod utils;
+
 /// Web-Router module:
 pub mod router;
 
