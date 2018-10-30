@@ -80,7 +80,8 @@ impl IntoResponse for Cell {
                     state,
                     StatusCode::OK,
                     mime::APPLICATION_JSON,
-                    serde_json::to_string(&self).expect("Cell object should be serializable!"),
+                    serde_json::to_string(&self)
+                        .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
                 )
             },
             None => {
