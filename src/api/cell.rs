@@ -30,6 +30,14 @@ pub struct Cell {
     pub status: CellState,
 }
 
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum CellState {
+    Offline,
+    Online,
+    NotFound,
+}
+
 }
 
 
