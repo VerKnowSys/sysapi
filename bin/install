@@ -4,5 +4,6 @@ echo "Building and installing: SysAPI"
 git pull --jobs 4 && \
 cargo build --release && \
 killall sysapi 2>/dev/null && \
+strip -s -d target/release/sysapi && \
 install -v target/release/sysapi /usr/bin/sysapi && \
 echo "Successfully installed: SysAPI"
