@@ -2,9 +2,9 @@
 
 #[macro_use]
 extern crate log;
+extern crate fern;
 #[macro_use]
 extern crate lazy_static;
-extern crate simple_logger;
 extern crate futures;
 extern crate gotham;
 extern crate hyper;
@@ -21,6 +21,8 @@ extern crate glob;
 /// Public sysapi modules:
 pub mod api;
 pub mod webapi;
+
+pub use fern::colors::{Color, ColoredLevelConfig};
 
 pub use api::*;
 pub use webapi::*;
