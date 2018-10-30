@@ -62,10 +62,26 @@ impl ToString for Cell {
 
 
 impl IntoResponse for Cell {
-    fn into_response(self, _state: &State) -> Response {
-        Response::new()
-            .with_status(StatusCode::Ok)
-            .with_body(self.to_string())
+    fn into_response(self, state: &State) -> Response<Body> {
+        // serialize only if name is set - so Cell is initialized/ exists
+        match self.name {
+            Some(_) => {
+                create_response(
+                    state,
+                    StatusCode::OK,
+                    mime::APPLICATION_JSON,
+                    serde_json::to_string(&self).expect("Cell object should be serializable!"),
+                )
+            },
+            None => {
+                create_response(
+                    state,
+                    StatusCode::NOT_FOUND,
+                    mime::APPLICATION_JSON,
+                    Body::from("{\"status\": \"NotFound\"}"),
+                )
+            }
+        }
     }
 }
 
