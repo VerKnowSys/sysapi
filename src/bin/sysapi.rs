@@ -16,6 +16,8 @@ extern crate serde;
 // #[macro_use]
 // extern crate serde_derive;
 extern crate serde_json;
+extern crate hostname;
+
 
 extern crate sysapi;
 
@@ -27,7 +29,7 @@ use chrono::Local;
 use std::fs::File;
 use fern::colors::{Color, ColoredLevelConfig};
 use colored::*;
-
+use hostname::get_hostname;
 
 use sysapi::router;
 use sysapi::DEFAULT_ADDRESS;
@@ -71,7 +73,8 @@ pub fn main() {
                 Err(_) => DEFAULT_ADDRESS.to_string(),
             };
             let version = env!("CARGO_PKG_VERSION");
-            info!("ServeD-SysAPI v{}, started on: http://{}", version, listen_address);
+            info!("ServeD-SysAPI (v{}) - started on hostname: {} - http://{}",
+                  version, get_hostname().unwrap_or(String::from("localhost")), listen_address);
             Ok(gotham::start(listen_address, router::router()))
         })
         .map_err(|err| {
