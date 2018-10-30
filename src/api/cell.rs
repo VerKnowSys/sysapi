@@ -23,6 +23,7 @@ pub type List = Vec<String>;
 pub struct Cell {
     pub name: Option<String>,
     pub ipv4: Option<String>,
+    pub netid: Option<String>,
     pub domain: Option<String>,
     pub keys: Option<List>,
     pub attributes: Option<List>,
@@ -48,6 +49,7 @@ impl Default for Cell {
            keys: None,
            attributes: None,
            zones: None,
+           netid: None,
            status: CellState::NotFound,
         }
     }
