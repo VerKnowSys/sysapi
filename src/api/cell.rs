@@ -16,13 +16,20 @@ use std::fs::File;
 use api::*;
 use api::igniter::*;
 
+pub type List = Vec<String>;
+
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Cell {
-    pub name: String,
-    pub ipv4: String,
-    pub domain: String,
-    pub action: Actions,
+    pub name: Option<String>,
+    pub ipv4: Option<String>,
+    pub domain: Option<String>,
+    pub keys: Option<List>,
+    pub attributes: Option<List>,
+    pub zones: Option<List>,
+    pub status: CellState,
+}
+
 }
 
 
