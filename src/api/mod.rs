@@ -1,6 +1,7 @@
 
 /* Defaults */
 pub const GVR_BIN: &'static str = "gvr";
+pub const ZFS_BIN: &'static str = "zfs";
 pub const JAIL_BIN: &'static str = "jail";
 pub const DEFAULT_ADDRESS: &'static str = "172.16.3.1:80";
 pub const CELLS_PATH: &'static str = "/Shared/Prison/Cells";
