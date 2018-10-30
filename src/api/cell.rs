@@ -99,12 +99,115 @@ impl IntoResponse for Cell {
 impl Cell {
 
 
-    pub fn new(name: &String) -> Cell {
-        Cell {
-            name: name.to_string(),
-            ipv4: "127.0.0.1".to_string(),
-            domain: "some.local".to_string(),
-            action: Actions::Create,
+    /// New cell - no values are set:
+    pub fn new() -> Cell {
+        Cell::default()
+    }
+
+
+    /// Load cell state from system files:
+    pub fn state(name: &String) -> Option<Cell> {
+        // TODO: attributes => /Shared/Prison/Sentry/CELLNAME/cell-attributes/*
+
+        let cell_dir = format!("{}/{}", SENTRY_PATH, name);
+        let status_file = format!("{}/{}", cell_dir, "cell.status");
+        let netid_file = format!("{}/{}", cell_dir, "cell.vlan.number");
+        let ipv4_file = format!("{}/{}", cell_dir, "cell.ip.addresses");
+        let domain_file = format!("{}/{}", cell_dir, "cell-domains/local.conf");
+        if Path::new(&cell_dir).exists() {
+            // ip => /Shared/Prison/Sentry/CELLNAME/cell.ip.addresses
+            let ipv4 = File::open(&ipv4_file)
+                .and_then(|file| {
+                    let mut line = String::new();
+                    BufReader::new(file)
+                        .read_line(&mut line)
+                        .and_then(|_| {
+                            // trim newlines and other whitespaces:
+                            Ok(str::trim(&line).to_string())
+                        })
+                })
+                .map_err(|err| {
+                    error!("Couldn't read cell file: {}. Fallback to 127.1", ipv4_file);
+                    err
+                })
+                .unwrap_or("127.0.0.1".to_string());
+
+            // netid => /Shared/Prison/Sentry/CELLNAME/cell.vlan.number
+            let netid = File::open(&netid_file)
+                .and_then(|file| {
+                    let mut line = String::new();
+                    BufReader::new(file)
+                        .read_line(&mut line)
+                        .and_then(|_| {
+                            // trim newlines and other whitespaces:
+                            Ok(str::trim(&line).to_string())
+                        })
+                })
+                .map_err(|err| {
+                    error!("Couldn't read cell netid file: {}. Fallback to 0", netid_file);
+                    err
+                })
+                .unwrap_or("0".to_string());
+
+            // domain => /Shared/Prison/Sentry/CELLNAME/cell-domains/local.conf
+            let domain = File::open(&domain_file)
+                .and_then(|file| {
+                    let mut line = String::new();
+                    BufReader::new(file)
+                        .read_to_string(&mut line)
+                        .and_then(|_| {
+                            let trim_line = line.replace("\n", " ").replace("\"", "");
+                            let cap = &CELL_DOMAIN_PATTERN
+                                .captures(&trim_line)
+                                .and_then(|cap| {
+                                    match cap.get(1).map_or("", |m| m.as_str()) {
+                                        "" => None,
+                                        domain => Some(domain),
+                                    }
+                                });
+                            debug!("Got domain: {:?}. Full domain definition file contents: {:?}", cap, trim_line);
+                            match cap {
+                                Some(domain) => Ok(domain.to_string()),
+                                None => Err(Error::new(ErrorKind::Other, format!("Empty domain entry in file: {}", domain_file)))
+                            }
+                        })
+                })
+                .map_err(|err| {
+                    error!("Couldn't read domain file: {}. Reason: {}. Fallback to localhost!", domain_file, err);
+                    err
+                })
+                .unwrap_or("localhost".to_string());
+
+            // status => /Shared/Prison/Sentry/CELLNAME/cell.status
+            let status = File::open(&status_file)
+                .and_then(|file| {
+                    let mut line = String::new();
+                    BufReader::new(file)
+                        .read_line(&mut line)
+                        .and_then(|_| {
+                            // trim newlines and other whitespaces:
+                            Ok(CellState::Online)
+                        })
+                })
+                .map_err(|err| {
+                    error!("Couldn't read cell status file: {}. Fallback to Unknown", status_file);
+                    err
+                })
+                .unwrap_or(CellState::Offline);
+
+            let cell_result = Cell {
+                name: Some(name.to_string()),
+                ipv4: Some(ipv4),
+                domain: Some(domain),
+                netid: Some(netid),
+                status: status,
+
+                .. Cell::default()
+            };
+            debug!("Get cell: {:?}", cell_result);
+            Some(cell_result)
+        } else {
+            None
         }
     }
 
