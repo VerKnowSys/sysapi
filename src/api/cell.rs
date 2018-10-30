@@ -176,7 +176,7 @@ impl Cell {
 
         let sentry_dir = format!("{}/{}", SENTRY_PATH, name);
         let key_file = format!("{}/{}", sentry_dir, "cell-attributes/key");
-        let status_file = format!("{}/{}", sentry_dir, "cell.status");
+        let status_file = format!("{}/{}", sentry_dir, "cell.running");
         let netid_file = format!("{}/{}", sentry_dir, "cell.vlan.number");
         let ipv4_file = format!("{}/{}", sentry_dir, "cell.ip.addresses");
         let domain_file = format!("{}/{}", sentry_dir, "cell-domains/local.conf");
@@ -272,10 +272,6 @@ impl Cell {
                             // trim newlines and other whitespaces:
                             Ok(CellState::Online)
                         })
-                })
-                .map_err(|err| {
-                    error!("Couldn't read cell status file: {}. Fallback to Unknown", status_file);
-                    err
                 })
                 .unwrap_or(CellState::Offline);
 
