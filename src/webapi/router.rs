@@ -21,17 +21,10 @@ pub fn router() -> Router {
 
         route.associate(
             &format!("{resource}:cell", resource = CELL_RESOURCE), |handler| {
-                handler.get().to(get_handler);
-                handler.post().to(post_handler);
-                handler.delete().to(delete_handler);
+                handler.get().to(cell_get_handler);
+                handler.post().to(cell_post_handler);
+                handler.delete().to(cell_delete_handler);
             });
-
-        route.associate(
-            &format!("{resource}:cell", resource = SENTRY_RESOURCE), |handler| {
-                handler.get().to(get_handler);
-                handler.post().to(post_handler);
-                handler.delete().to(delete_handler);
-            })
 
     })
 }

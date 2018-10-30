@@ -36,7 +36,7 @@ lazy_static! {
 
 
 /// Handle DELETEs
-pub fn delete_handler(state: State) -> (State, Response<Body>) {
+pub fn cell_delete_handler(state: State) -> (State, Response<Body>) {
     let uri = Uri::borrow_from(&state).to_string();
     let name = uri.replace(CELL_RESOURCE, "");
     let cell_dir = format!("{}/{}", CELLS_PATH, name);
@@ -60,7 +60,7 @@ pub fn delete_handler(state: State) -> (State, Response<Body>) {
 
 
 /// Handle GETs
-pub fn get_handler(state: State) -> (State, Cell) {
+pub fn cell_get_handler(state: State) -> (State, Cell) {
     let uri = Uri::borrow_from(&state).to_string();
     let name = uri.replace(CELL_RESOURCE, "");
     (state, Cell::state(&name).unwrap_or(Cell::new())) // XXX: TODO: it should load current service state and return json
@@ -68,7 +68,7 @@ pub fn get_handler(state: State) -> (State, Cell) {
 
 
 /// Handle POSTs
-pub fn post_handler(mut state: State) -> Box<HandlerFuture> {
+pub fn cell_post_handler(mut state: State) -> Box<HandlerFuture> {
     let f = Body::take_from(&mut state)
         .concat2()
         .then(|full_body| match full_body {
@@ -113,7 +113,7 @@ pub fn post_handler(mut state: State) -> Box<HandlerFuture> {
                         future::ok((state, res))
                     },
                     Err(err) => {
-                        error!("Cell failed: {}. Last error: {}", name, err);
+                        error!("Failed to create cell: {}. Last error: {}", name, err);
                         let res = create_response(&state, StatusCode::EXPECTATION_FAILED, mime::APPLICATION_JSON, Body::from("{\"status\": \"Expectation Failed\"}"));
                         future::ok((state, res))
                     }
