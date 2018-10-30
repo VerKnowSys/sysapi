@@ -5,7 +5,7 @@ use api::SENTRY_PATH;
 
 
 pub fn list_cells() -> Vec<String> {
-    let glob_pattern = format!("{}/**", SENTRY_PATH);
+    let glob_pattern = format!("{}/*", SENTRY_PATH);
     let mut list = vec!();
     for entry in glob(&glob_pattern).unwrap() {
         match entry {
