@@ -1,12 +1,13 @@
 use glob::glob;
 
-use api::CELLS_PATH;
+
+use api::SENTRY_PATH;
 
 
 pub fn list_cells() -> Vec<String> {
-    let pattern = format!("{}/**", CELLS_PATH);
-    let mut list: Vec<String> = vec!();
-    for entry in glob(&pattern).unwrap() {
+    let glob_pattern = format!("{}/**", SENTRY_PATH);
+    let mut list = vec!();
+    for entry in glob(&glob_pattern).unwrap() {
         match entry {
             Ok(path) => {
                 match path.file_name() {
