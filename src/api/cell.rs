@@ -38,6 +38,19 @@ pub enum CellState {
     NotFound,
 }
 
+
+impl Default for Cell {
+    fn default() -> Cell {
+        Cell {
+           name: None,
+           ipv4: None,
+           domain: None,
+           keys: None,
+           attributes: None,
+           zones: None,
+           status: CellState::NotFound,
+        }
+    }
 }
 
 
