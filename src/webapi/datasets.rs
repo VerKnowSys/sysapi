@@ -164,7 +164,8 @@ pub fn zfs_snapshot_post_handler(mut state: State) -> Box<HandlerFuture> {
                     || snapshot_name.len() < 3 // @nme - minimal snapname
                     || snapshot_name.len() > 27
                     || dataset_path.len() < 9 // zroot/nme - minimal dataset path
-                    || dataset_path.len() > 512 {
+                    || dataset_path.len() > 512
+                    || dataset_path.contains("@") {
                     let res = create_response(&state, StatusCode::NOT_ACCEPTABLE, APPLICATION_JSON, Body::from("{\"status\": \"Not Acceptable\"}"));
                     future::ok((state, res))
                 } else {
@@ -208,7 +209,8 @@ pub fn zfs_rollback_post_handler(mut state: State) -> Box<HandlerFuture> {
                     || snapshot_name.len() < 3 // @nme - minimal snapname
                     || snapshot_name.len() > 27
                     || dataset_path.len() < 9 // zroot/nme - minimal dataset path
-                    || dataset_path.len() > 512 {
+                    || dataset_path.len() > 512
+                    || dataset_path.contains("@") {
                     let res = create_response(&state, StatusCode::NOT_ACCEPTABLE, APPLICATION_JSON, Body::from("{\"status\": \"Not Acceptable\"}"));
                     future::ok((state, res))
                 } else {
