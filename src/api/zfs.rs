@@ -186,6 +186,36 @@ impl Snapshot {
     }
 
 
+    /// Checj snapshot state under a cell:
+    pub fn state(cell_name: &String, snapshot_name: &String) -> Result<String, Error> {
+        Command::new(JEXEC_BIN)
+            .arg("-U")
+            .arg(CELL_USERNAME)
+            .arg(cell_name)
+            .arg(ZFS_BIN)
+            .arg("list")
+            .arg("-Hro")
+            .arg("name")
+            .arg("-t")
+            .arg("snapshot")
+            .arg(snapshot_name)
+            .output()
+            .and_then(|after_snap| {
+                if after_snap.status.success() {
+                    let strng = String::from_utf8_lossy(&after_snap.stdout);
+                    debug!("ZFS snapshot matching pattern: {} is present. Output: {}", snapshot_name, strng);
+                    Ok(strng.to_string())
+                } else {
+                    let error_msg = format!("No such snapshot: {}!", snapshot_name);
+                    error!("{}", error_msg);
+                    Err(
+                        Error::new(ErrorKind::Other, error_msg)
+                    )
+                }
+            })
+    }
+
+
 }
 
 
