@@ -109,8 +109,13 @@ impl Snapshot {
 
 
     /// Create snapshot of dataset with given name:
-    pub fn of(dataset_path: &String, snapshot_name: &String) -> Result<Snapshot, Error> {
-        Command::new(ZFS_BIN)
+    pub fn new(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<Snapshot, Error> {
+        // ex: jexec -U worker centra24 zfs snapshot zroot/User/centra24@dupa
+        Command::new(JEXEC_BIN)
+            .arg("-U")
+            .arg(CELL_USERNAME)
+            .arg(cell_name)
+            .arg(ZFS_BIN)
             .arg("snapshot")
             .arg(format!("{}@{}", dataset_path, snapshot_name))
             .output()
@@ -138,8 +143,12 @@ impl Snapshot {
 
 
     /// Destroy existing snapshot with given name:
-    pub fn destroy(dataset_path: &String, snapshot_name: &String) -> Result<(), Error> {
-        Command::new(ZFS_BIN)
+    pub fn destroy(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<(), Error> {
+        Command::new(JEXEC_BIN)
+            .arg("-U")
+            .arg(CELL_USERNAME)
+            .arg(cell_name)
+            .arg(ZFS_BIN)
             .arg("destroy")
             .arg(format!("{}@{}", dataset_path, snapshot_name))
             .output()
@@ -159,9 +168,13 @@ impl Snapshot {
     }
 
 
-    /// Destroy existing snapshot with given name:
-    pub fn list(&self) -> Result<Vec<String>, Error> {
-        Command::new(ZFS_BIN)
+    /// List all snapshots of a cell:
+    pub fn list(cell_name: &String) -> Result<String, Error> {
+        Command::new(JEXEC_BIN)
+            .arg("-U")
+            .arg(CELL_USERNAME)
+            .arg(cell_name)
+            .arg(ZFS_BIN)
             .arg("list")
             .arg("-Hro")
             .arg("name")
@@ -170,11 +183,9 @@ impl Snapshot {
             .output()
             .and_then(|after_snap| {
                 if after_snap.status.success() {
-                    let list = String::from_utf8_lossy(&after_snap.stdout)
-                        .split("\n")
-                        .collect();
-                    debug!("List of ZFS snapshots: {}", list);
-                    Ok(vec!(list))
+                    let strng = String::from_utf8_lossy(&after_snap.stdout);
+                    debug!("List of ZFS snapshots: {}", strng);
+                    Ok(strng.to_string())
                 } else {
                     let error_msg = format!("ZFS snapshot listing failed!");
                     error!("{}", error_msg);
@@ -223,8 +234,12 @@ impl Rollback {
 
 
     /// Rollback dataset to given snapshot name:
-    pub fn to(dataset_path: &String, snapshot_name: &String) -> Result<Rollback, Error> {
-        Command::new(ZFS_BIN)
+    pub fn new(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<Rollback, Error> {
+        Command::new(JEXEC_BIN)
+            .arg("-U")
+            .arg(CELL_USERNAME)
+            .arg(cell_name)
+            .arg(ZFS_BIN)
             .arg("rollback")
             .arg("-Rf")
             .arg(format!("{}@{}", dataset_path, snapshot_name))
