@@ -9,13 +9,11 @@ use webapi::datasets::*;
 
 /// Define router
 pub fn router() -> Router {
-    // TODO: define routes
-    // const IGNITER_RESOURCE: &'static str = "/igniter/";
-    // const ZONE_RESOURCE: &'static str = "/zone/";
-    // const PROXY_RESOURCE: &'static str = "/proxy/";
-    // const STATUS_RESOURCE: &'static str = "/status/";
-    // const SNAPSHOT_RESOURCE: &'static str = "/snapshot/";
-    // const ROLLBACK_RESOURCE: &'static str = "/rollback/";
+    // TODO: define all missing routes:
+    // TODO: const IGNITER_RESOURCE: &'static str = "/igniter/";
+    // TODO: const ZONE_RESOURCE: &'static str = "/zone/";
+    // TODO: const PROXY_RESOURCE: &'static str = "/proxy/";
+    // TODO: const STATUS_RESOURCE: &'static str = "/status/";
 
 
     build_simple_router(|route| {
