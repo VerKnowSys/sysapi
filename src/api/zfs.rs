@@ -228,16 +228,25 @@ impl Snapshot {
             .output()
             .and_then(|after_snap| {
                 if after_snap.status.success() {
-                    let strng = String::from_utf8_lossy(&after_snap.stdout);
-                    if strng.contains(&format!("@{}", snapshot_name)) {
-                        debug!("ZFS snapshot matching pattern: {} is present. Output: {}", snapshot_name, strng);
-                        Ok(strng.to_string())
-                    } else {
-                        let error_msg = format!("No such snapshot: {}!", snapshot_name);
-                        error!("{}", error_msg);
-                        Err(
-                            Error::new(ErrorKind::Other, error_msg)
-                        )
+                    let stdout = String::from_utf8_lossy(&after_snap.stdout);
+                    let matching_line: String = stdout
+                        .split("\n")
+                        .filter(|elem| {
+                            elem.contains(&format!("@{}", snapshot_name))
+                        })
+                        .collect();
+                    match matching_line.as_ref() {
+                        "" => {
+                            let error_msg = format!("No such snapshot: {}!", snapshot_name);
+                            error!("{}", error_msg);
+                            Err(
+                                Error::new(ErrorKind::Other, error_msg)
+                            )
+                        },
+                        line => {
+                            debug!("ZFS snapshot matching pattern: {} is present. Output: {}", snapshot_name, stdout);
+                            Ok(line.to_string())
+                        }
                     }
                 } else {
                     let error_msg = format!("Failed to list any snapshot!");
