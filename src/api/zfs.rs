@@ -22,9 +22,13 @@ pub struct Rollback {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Snapshot {
-    name: Option<String>,
-    dataset_path: Option<String>,
-    timestamp: Option<String>,
+    pub name: Option<String>,
+    pub cell_name: Option<String>,
+    pub dataset_path: Option<String>,
+
+    pub timestamp: Option<String>,
+}
+
 }
 
 
