@@ -225,15 +225,22 @@ impl Snapshot {
             .arg("name")
             .arg("-t")
             .arg("snapshot")
-            .arg(snapshot_name)
             .output()
             .and_then(|after_snap| {
                 if after_snap.status.success() {
                     let strng = String::from_utf8_lossy(&after_snap.stdout);
-                    debug!("ZFS snapshot matching pattern: {} is present. Output: {}", snapshot_name, strng);
-                    Ok(strng.to_string())
+                    if strng.contains(&format!("@{}", snapshot_name)) {
+                        debug!("ZFS snapshot matching pattern: {} is present. Output: {}", snapshot_name, strng);
+                        Ok(strng.to_string())
+                    } else {
+                        let error_msg = format!("No such snapshot: {}!", snapshot_name);
+                        error!("{}", error_msg);
+                        Err(
+                            Error::new(ErrorKind::Other, error_msg)
+                        )
+                    }
                 } else {
-                    let error_msg = format!("No such snapshot: {}!", snapshot_name);
+                    let error_msg = format!("Failed to list any snapshot!");
                     error!("{}", error_msg);
                     Err(
                         Error::new(ErrorKind::Other, error_msg)
