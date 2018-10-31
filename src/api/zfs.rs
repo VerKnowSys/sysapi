@@ -17,6 +17,9 @@ pub struct Rollback {
     name: Option<String>,
     dataset_path: Option<String>,
     timestamp: Option<String>,
+
+    /// Rollback to snapshot of cell: "cell_name":
+    pub cell_name: Option<String>,
 }
 
 
@@ -252,6 +255,7 @@ impl Rollback {
                        Rollback {
                            name: Some(snapshot_name.to_owned()),
                            dataset_path: Some(dataset_path.to_owned()),
+                           cell_name: Some(cell_name.to_owned()),
                            timestamp: Some(Local::now().format("%y-%m-%d_%H%M%S").to_string()),
                        }
                     )
