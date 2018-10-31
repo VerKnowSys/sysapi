@@ -29,6 +29,22 @@ pub struct Snapshot {
     pub timestamp: Option<String>,
 }
 
+
+/// Serialize to JSON on .to_string()
+impl ToString for Snapshot {
+    fn to_string(&self) -> String {
+        serde_json::to_string(&self)
+            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
+    }
+}
+
+
+/// Serialize to JSON on .to_string()
+impl ToString for Rollback {
+    fn to_string(&self) -> String {
+        serde_json::to_string(&self)
+            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
+    }
 }
 
 
@@ -105,6 +121,7 @@ impl Snapshot {
                     Ok(
                        Snapshot {
                             name: Some(snapshot_name.to_owned()),
+                            cell_name: Some(cell_name.to_owned()),
                             dataset_path: Some(dataset_path.to_owned()),
                             timestamp: Some(Local::now().format("%y-%m-%d_%H%M%S-%s").to_string()),
                         }
