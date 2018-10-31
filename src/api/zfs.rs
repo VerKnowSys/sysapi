@@ -213,7 +213,7 @@ impl Snapshot {
     }
 
 
-    /// Checj snapshot state under a cell:
+    /// Check snapshot state under a cell:
     pub fn state(cell_name: &String, snapshot_name: &String) -> Result<String, Error> {
         Command::new(JEXEC_BIN)
             .arg("-U")

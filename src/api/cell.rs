@@ -110,6 +110,7 @@ impl ToString for Cell {
 }
 
 
+/// Serialize to JSON on .to_string()
 impl ToString for Cells {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
