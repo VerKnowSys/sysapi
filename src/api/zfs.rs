@@ -234,6 +234,9 @@ impl Snapshot {
                         .filter(|elem| {
                             elem.contains(&format!("@{}", snapshot_name))
                         })
+                        .map(|elem| {
+                            format!("\"{}\"", elem)
+                        })
                         .collect();
                     match matching_line.as_ref() {
                         "" => {
