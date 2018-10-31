@@ -303,7 +303,7 @@ pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<(), 
         .output()
         .and_then(|add_ssh_pubkey| {
             if add_ssh_pubkey.status.success() {
-                info!("add_ssh_pubkey_to_cell():\n{}", String::from_utf8_lossy(&add_ssh_pubkey.stdout));
+                debug!("add_ssh_pubkey_to_cell():\n{}", String::from_utf8_lossy(&add_ssh_pubkey.stdout));
                 Ok(())
             } else {
                 let error_msg = format!("Something went wrong and key: '{}' couldn't be set for cell: {}. Please contact administator or file a bug!", ssh_pubkey, name);
@@ -320,7 +320,7 @@ pub fn create_cell(name: &String) -> Result<(), Error> {
         .arg(name)
         .output()
         .and_then(|gvr_handle| {
-            info!("create_cell():\n{}{}",
+            debug!("create_cell():\n{}{}",
                  String::from_utf8_lossy(&gvr_handle.stdout),
                  String::from_utf8_lossy(&gvr_handle.stderr));
             if gvr_handle.status.success() {
@@ -340,7 +340,7 @@ pub fn destroy_cell(name: &String) -> Result<(), Error> {
         .output()
         .and_then(|gvr_handle| {
             if gvr_handle.status.success() {
-                info!("destroy_cell():\n{}{}",
+                debug!("destroy_cell():\n{}{}",
                        String::from_utf8_lossy(&gvr_handle.stdout),
                        String::from_utf8_lossy(&gvr_handle.stderr));
                 Command::new(JAIL_BIN)
