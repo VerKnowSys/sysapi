@@ -1,4 +1,19 @@
-//! sysapi.centra.systems
+//! ServeD-SysAPI
+
+//! Crate docs
+
+
+#![deny(
+        // missing_docs,
+        unstable_features,
+        unsafe_code,
+        missing_debug_implementations,
+        missing_copy_implementations,
+        trivial_casts,
+        trivial_numeric_casts,
+        unused_import_braces,
+        unused_qualifications)]
+
 
 #[macro_use]
 extern crate log;
