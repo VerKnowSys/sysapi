@@ -30,9 +30,11 @@ use std::fs::File;
 use fern::colors::{Color, ColoredLevelConfig};
 use colored::*;
 use hostname::get_hostname;
+use std::path::Path;
+
 
 use sysapi::router;
-use sysapi::DEFAULT_ADDRESS;
+use sysapi::*;
 
 
 /// Start a server and use a `Router` to dispatch requests
@@ -73,7 +75,15 @@ pub fn main() {
                 Err(_) => DEFAULT_ADDRESS.to_string(),
             };
             let version = env!("CARGO_PKG_VERSION");
-            info!("ServeD-SysAPI (v{}) - started on hostname: {} - http://{}",
+
+            // Last check - sysapi relies on zfs feature:
+            if !Path::new(ZFS_BIN).exists() {
+                error!("SysAPI requires ZFS functionality available in system!");
+                panic!("No ZFS available!");
+            }
+
+            // Start main event loop:
+            info!("ServeD-SysAPI (v{}) - started on hostname: {}: http://{}",
                   version, get_hostname().unwrap_or(String::from("localhost")), listen_address);
             Ok(gotham::start(listen_address, router::router()))
         })
