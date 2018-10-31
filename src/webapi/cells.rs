@@ -1,4 +1,3 @@
-// use hyper::{Body, headers::Headers, headers::HttpVersion, Method, Response, StatusCode, Uri};
 use hyper::*;
 use std::path::Path;
 use futures::{future, Future, Stream};
@@ -16,9 +15,12 @@ use api::cell::*;
 // Precompile CELL_NAME_PATTERN only once:
 use regex::Regex;
 lazy_static! {
+
+    /// Cell name restriction - has to match following pattern:
     pub static ref CELL_NAME_PATTERN: Regex = {
         Regex::new(r"^[a-zA-Z0-9]*$").unwrap()
     };
+
 }
 
 
@@ -43,7 +45,7 @@ pub fn cell_delete_handler(state: State) -> (State, Response<Body>) {
     let cell_dir = format!("{}/{}", CELLS_PATH, name);
 
     if Path::new(&cell_dir).exists() {
-        match cell::destroy_cell(&name) {
+        match destroy_cell(&name) {
             Ok(_) => {
                 let res = create_response(&state, StatusCode::OK, APPLICATION_JSON, Body::from("{\"status\": \"Ok\"}"));
                 (state, res)

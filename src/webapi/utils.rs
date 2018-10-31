@@ -4,6 +4,7 @@ use glob::glob;
 use api::SENTRY_PATH;
 
 
+/// Lists all available cells based on files found under Sentry dir:
 pub fn list_cells() -> Vec<String> {
     let glob_pattern = format!("{}/*", SENTRY_PATH);
     let mut list = vec!();

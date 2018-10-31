@@ -29,7 +29,7 @@ lazy_static! {
 pub type List = Vec<String>;
 
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Cell {
 
     /// Cell name:
@@ -56,7 +56,7 @@ pub struct Cell {
 }
 
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Cells {
     /// List of all cells
     pub list: Vec<Cell>
@@ -65,7 +65,7 @@ pub struct Cells {
 
 
 /// State of the cell
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 pub enum CellState {
     Offline,
     Online,

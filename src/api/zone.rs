@@ -1,4 +1,4 @@
-#[derive(Debug, Serialize)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 enum ZoneTypes {
     A_,
     Cname,
@@ -6,9 +6,9 @@ enum ZoneTypes {
 }
 
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Zone {
-    domain_name: String,
-    ipv4: String,
-    zone_type: ZoneTypes,
+    domain_name: Option<String>,
+    ipv4: Option<String>,
+    zone_type: Option<ZoneTypes>,
 }

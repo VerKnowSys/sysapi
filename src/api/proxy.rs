@@ -1,5 +1,10 @@
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Proxy {
-    from: String,
-    to: String,
+
+    /// Proxy from URL:
+    from: Option<String>,
+
+    /// Proxy to URL:
+    to: Option<String>,
+
 }

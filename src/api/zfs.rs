@@ -14,21 +14,34 @@ use api::*;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Rollback {
-    name: Option<String>,
-    dataset_path: Option<String>,
-    timestamp: Option<String>,
 
     /// Rollback to snapshot of cell: "cell_name":
     pub cell_name: Option<String>,
+
+    /// Rollback to snapshot with name: "@name":
+    pub name: Option<String>,
+
+    /// Full ZFS dataset path to perform rollback on:
+    pub dataset_path: Option<String>,
+
+    /// Rollback timestamp metadata:
+    pub timestamp: Option<String>,
 }
 
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Snapshot {
-    pub name: Option<String>,
+
+    /// Snapshot of one of datasets of cell: "cell_name":
     pub cell_name: Option<String>,
+
+    /// Snapshot name: "@name":
+    pub name: Option<String>,
+
+    /// Full ZFS dataset path to perform snapshot of:
     pub dataset_path: Option<String>,
 
+    /// Snapshot timestamp metadata:
     pub timestamp: Option<String>,
 }
 
