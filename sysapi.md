@@ -1,7 +1,7 @@
 ## sysapi
 
 
-    - "/cell/list/:cellname":
+    - "/cells/list":
 
                  ✅ GET    > returns JSON list of all created cells
 

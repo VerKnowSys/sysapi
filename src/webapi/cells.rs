@@ -62,7 +62,7 @@ pub fn cell_delete_handler(state: State) -> (State, Response<Body>) {
 }
 
 
-/// Handle GET for /cell/ (no cell name) - list all cells
+/// Handle GET for /cells/list (no cell name) - list all cells
 pub fn cells_get_handler(state: State) -> (State, Cells) {
     (state, Cells::default())
 }
