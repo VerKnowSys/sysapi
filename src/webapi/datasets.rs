@@ -79,7 +79,7 @@ pub fn zfs_snapshot_delete_handler(mut state: State) -> Box<HandlerFuture> {
 pub fn zfs_snapshot_list_handler(state: State) -> (State, Response<Body>) {
     let uri = Uri::borrow_from(&state).to_string();
     let cell_and_snapshot_name = uri.replace(SNAPSHOT_RESOURCE, "");
-    let cell_name: String = cell_and_snapshot_name.split("/").take(1).collect();
+    let cell_name: String = cell_and_snapshot_name.split("/").skip(1).take(1).collect(); // first is "list", second "cell_name"
 
     let pre_list = Snapshot::list(&cell_name)
         .and_then(|snapshots| {
@@ -89,6 +89,7 @@ pub fn zfs_snapshot_list_handler(state: State) -> (State, Response<Body>) {
                 .filter(|e| e.len() > 1)
                 .map(|e| format!("\"{}\", ", e))
                 .collect();
+            debug!("zfs_snapshot_list_handler(): Cell name: {}, string_list: {}", cell_name, string_list);
             Ok(string_list)
         })
         .map_err(|err| {
