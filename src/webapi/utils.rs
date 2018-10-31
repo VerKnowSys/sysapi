@@ -23,7 +23,7 @@ pub fn produce_list(glob_pattern: &String) -> Vec<String> {
                 }
             },
             Err(err) => {
-                error!("Error: list_dirs(): {}", err);
+                error!("Error: produce_list(): {}", err);
             },
         }
     }
@@ -34,7 +34,8 @@ pub fn produce_list(glob_pattern: &String) -> Vec<String> {
 
 // Lists all cell attributes => /Shared/Prison/Sentry/CELLNAME/cell-attributes/*
 pub fn list_attributes(cell_name: &String) -> Vec<String> {
-    let glob_pattern = format!("{}/{}/cell-attributes/*", cell_name, SENTRY_PATH);
+    let glob_pattern = format!("{}/{}/cell-attributes/*", SENTRY_PATH, cell_name);
+    debug!("glob_pattern(): {}", glob_pattern);
     produce_list(&glob_pattern)
 }
 
@@ -42,6 +43,7 @@ pub fn list_attributes(cell_name: &String) -> Vec<String> {
 /// Lists all available cells based on files found under Sentry dir:
 pub fn list_cells() -> Vec<String> {
     let glob_pattern = format!("{}/*", SENTRY_PATH);
+    debug!("glob_pattern(): {}", glob_pattern);
     produce_list(&glob_pattern)
 }
 
