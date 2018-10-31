@@ -26,9 +26,11 @@ lazy_static! {
 }
 
 
+/// Shortcut List type:
 pub type List = Vec<String>;
 
 
+/// Cell structure:
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Cell {
 
@@ -53,19 +55,28 @@ pub struct Cell {
 }
 
 
+/// Cells (Cell List) structure for easy list management
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Cells {
+
     /// List of all cells
     pub list: Vec<Cell>
+
 }
 
 
 
-/// State of the cell
+/// State of the Cell
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 pub enum CellState {
+
+    /// Cell is Offline:
     Offline,
+
+    /// Cell is Online:
     Online,
+
+    /// Cell doesn't exist:
     NotFound,
 }
 
@@ -296,6 +307,7 @@ impl Cell {
 }
 
 
+/// Add SSH pubkey to a cell
 pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<(), Error> {
     Command::new(GVR_BIN)
         .arg("set")
@@ -315,6 +327,7 @@ pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<(), 
 }
 
 
+/// Create cell
 pub fn create_cell(name: &String) -> Result<(), Error> {
     Command::new(GVR_BIN)
         .arg("create")
@@ -333,6 +346,7 @@ pub fn create_cell(name: &String) -> Result<(), Error> {
 }
 
 
+/// Destroy cell
 pub fn destroy_cell(name: &String) -> Result<(), Error> {
     Command::new(GVR_BIN)
         .arg("destroy")

@@ -12,6 +12,7 @@ use mime::*;
 use api::*;
 
 
+/// ZFS Rollback wrapper
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Rollback {
 
@@ -29,6 +30,7 @@ pub struct Rollback {
 }
 
 
+/// ZFS Snapshot wrapper
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Snapshot {
 

@@ -6,6 +6,7 @@ enum ZoneTypes {
 }
 
 
+/// DNS Zone representation:
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Zone {
     domain_name: Option<String>,

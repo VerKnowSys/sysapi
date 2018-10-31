@@ -1,3 +1,4 @@
+/// Web proxy wrapper:
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Proxy {
 

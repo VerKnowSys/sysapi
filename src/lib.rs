@@ -4,7 +4,7 @@
 
 
 #![deny(
-        // missing_docs,
+        missing_docs,
         unstable_features,
         unsafe_code,
         missing_debug_implementations,
@@ -37,7 +37,10 @@ extern crate hostname;
 
 /// Public sysapi modules:
 pub mod api;
+
+/// Public webapi modules:
 pub mod webapi;
+
 
 pub use fern::colors::{Color, ColoredLevelConfig};
 

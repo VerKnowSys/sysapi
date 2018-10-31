@@ -1,4 +1,5 @@
 
+/// Status of the cell representation:
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CellStatus {
 

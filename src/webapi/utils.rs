@@ -32,7 +32,7 @@ pub fn produce_list(glob_pattern: &String) -> Vec<String> {
 }
 
 
-// Lists all cell attributes => /Shared/Prison/Sentry/CELLNAME/cell-attributes/*
+/// Lists all cell attributes => /Shared/Prison/Sentry/CELLNAME/cell-attributes/*
 pub fn list_attributes(cell_name: &String) -> Vec<String> {
     let glob_pattern = format!("{}/{}/cell-attributes/*", SENTRY_PATH, cell_name);
     debug!("glob_pattern(): {}", glob_pattern);
