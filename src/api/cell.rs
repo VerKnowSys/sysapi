@@ -172,15 +172,14 @@ impl Cell {
 
     /// Load cell state from system files:
     pub fn state(name: &String) -> Option<Cell> {
-        // TODO: attributes => /Shared/Prison/Sentry/CELLNAME/cell-attributes/*
-
         let sentry_dir = format!("{}/{}", SENTRY_PATH, name);
+        let attributes_dir = format!("{}/{}", sentry_dir, "cell-attributes");
         let key_file = format!("{}/{}", sentry_dir, "cell-attributes/key");
         let status_file = format!("{}/{}", sentry_dir, "cell.running");
         let netid_file = format!("{}/{}", sentry_dir, "cell.vlan.number");
         let ipv4_file = format!("{}/{}", sentry_dir, "cell.ip.addresses");
         let domain_file = format!("{}/{}", sentry_dir, "cell-domains/local.conf");
-        debug!("SENTRY DIR: {}", sentry_dir);
+        debug!("state() dirs: Sentry dir: {}, Attributes dir: {}", sentry_dir, attributes_dir);
         if Path::new(&sentry_dir).exists() {
             // key => /Shared/Prison/Sentry/CELLNAME/cell-attributes/key
             let key = File::open(&key_file)
@@ -269,11 +268,31 @@ impl Cell {
                     BufReader::new(file)
                         .read_line(&mut line)
                         .and_then(|_| {
-                            // trim newlines and other whitespaces:
                             Ok(CellState::Online)
                         })
                 })
                 .unwrap_or(CellState::Offline);
+
+            // attributes => /Shared/Prison/Sentry/CELLNAME/cell-attributes/*
+            let attributes = list_attributes(name)
+                .iter()
+                .map(|attribute| {
+                    let attribute_value = File::open(&format!("{}/{}", attributes_dir, attribute))
+                        .and_then(|file| {
+                            let mut line = String::new();
+                            BufReader::new(file)
+                                .read_line(&mut line)
+                                .and_then(|_| Ok(str::trim(&line).to_string()))
+                        })
+                        .map_err(|err| {
+                            error!("{}", err);
+                            err
+                        })
+                        .unwrap_or(String::from(""));
+                    debug!("Cell: {}, attribute: {}, value: {}", name, attribute, attribute_value);
+                    format!("{}={}", attribute, attribute_value)
+                })
+                .collect();
 
             let cell_result = Cell {
                 name: Some(name.to_string()),
@@ -281,6 +300,7 @@ impl Cell {
                 ipv4: Some(ipv4),
                 domain: Some(domain),
                 netid: Some(netid),
+                attributes: Some(attributes),
                 status: status,
 
                 .. Cell::default()
