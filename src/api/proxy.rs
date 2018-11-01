@@ -21,12 +21,16 @@ pub struct Proxy {
     /// Resolved IPv4 from "to" URL:
     pub to_ipv4: Option<IpAddr>,
 
+    /// Generated Nginx-Proxy configuration:
+    pub config: Option<String>,
+
 }
 
 
 impl Default for Proxy {
     fn default() -> Proxy {
         Proxy{
+            config: None,
             from: None,
             from_ipv4: None,
             to: None,
