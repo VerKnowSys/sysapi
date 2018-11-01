@@ -62,25 +62,22 @@ impl Proxy {
     /// Create new Web Proxy configuration:
     pub fn new(from: &String, to: &String) -> Result<Proxy, Error> {
         // Validate both domains, and if both Zones are valid, create Proxy object:
-        match Zone::validate_domain_addresses(from, to) {
-            Ok((valid_ipv4_from, valid_ipv4_to)) => {
-                let new_proxy_conf = Proxy::config_from_template(from, to);
-                debug!("New Web-Proxy configuration block:\n{}\n", new_proxy_conf);
+        Zone::validate_domain_addresses(from, to)
+            .and_then(|(valid_ipv4_from, valid_ipv4_to)| {
                 let proxy = Proxy {
-                    config: Some(new_proxy_conf),
+                    config: Some(Proxy::config_from_template(from, to)),
                     from: Some(from.to_string()),
                     from_ipv4: Some(valid_ipv4_from),
                     to: Some(to.to_string()),
                     to_ipv4: Some(valid_ipv4_to),
                 };
-                debug!("Proxy object: {}", proxy.to_string());
+                debug!("new(): Proxy object: {}", proxy.to_string());
                 Ok(proxy)
-            },
-            Err(err) => {
+            })
+            .map_err(|err| {
                 error!("{}", err);
-                Err(Error::new(ErrorKind::Other, err))
-            }
-        }
+                Error::new(ErrorKind::Other, err)
+            })
     }
 
 
