@@ -1,4 +1,10 @@
 use std::net::IpAddr;
+use std::io::{Error, ErrorKind};
+
+
+use zone::*;
+
+
 /// Web proxy wrapper:
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Proxy {
@@ -38,4 +44,39 @@ impl ToString for Proxy {
     }
 }
 
+
+impl Proxy {
+
+
+    /// Empty proxy
+    pub fn empty() -> Result<Proxy, Error> {
+        Ok(Proxy::default())
+    }
+
+
+    /// Create new Web Proxy configuration:
+    pub fn new(from: &String, to: &String) -> Result<Proxy, Error> {
+        // Validate both domains, and if both Zones are valid, create Proxy object:
+        match Zone::validate_domain_addresses(from, to) {
+            Ok((valid_ipv4_from, valid_ipv4_to)) => {
+                let proxy = Proxy {
+                    from: Some(from.to_string()),
+                    from_ipv4: Some(valid_ipv4_from),
+                    to: Some(to.to_string()),
+                    to_ipv4: Some(valid_ipv4_to),
+                };
+                debug!("Proxy object: {}", proxy.to_string());
+                Ok(proxy)
+            },
+            Err(err) => {
+                error!("{}", err);
+                Err(Error::new(ErrorKind::Other, err))
+            }
+        }
+
+    }
+
+
 }
+
+
