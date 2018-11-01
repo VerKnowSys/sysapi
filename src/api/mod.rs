@@ -16,6 +16,9 @@ pub const JEXEC_BIN: &'static str = "/usr/sbin/jexec";
 /// Default username (jail user):
 pub const CELL_USERNAME: &'static str = "worker";
 
+/// Default local DNS server address:
+pub const DEFAULT_DNS: &'static str = "172.16.3.1";
+
 /// Default listen address to listen on:
 pub const DEFAULT_ADDRESS: &'static str = "172.16.3.1:80";
 
