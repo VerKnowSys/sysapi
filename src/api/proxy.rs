@@ -1,7 +1,8 @@
-use std::net::IpAddr;
+use std::net::*;
 use std::io::{Error, ErrorKind};
 
 
+use api::*;
 use zone::*;
 
 
@@ -63,7 +64,10 @@ impl Proxy {
         // Validate both domains, and if both Zones are valid, create Proxy object:
         match Zone::validate_domain_addresses(from, to) {
             Ok((valid_ipv4_from, valid_ipv4_to)) => {
+                let new_proxy_conf = Proxy::config_from_template(from, to);
+                debug!("New Web-Proxy configuration block:\n{}\n", new_proxy_conf);
                 let proxy = Proxy {
+                    config: Some(new_proxy_conf),
                     from: Some(from.to_string()),
                     from_ipv4: Some(valid_ipv4_from),
                     to: Some(to.to_string()),
@@ -77,6 +81,8 @@ impl Proxy {
                 Err(Error::new(ErrorKind::Other, err))
             }
         }
+    }
+
 
     /// Nginx proxy config from predefined template:
     pub fn config_from_template(from_domain: &String, to_domain: &String) -> String {
