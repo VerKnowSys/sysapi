@@ -31,6 +31,43 @@ pub struct Zone {
 impl Zone {
 
 
+    /// Validate each domain pair (from => to) has also valid/resolvable/non-local address:
+    pub fn validate_domain_addresses(from: &String, to: &String) -> Result<(IpAddr, IpAddr), FromStrError> {
+        Zone::lookup_domain(from)
+            .and_then(|valid_ipv4_from| {
+                Zone::lookup_domain(to)
+                    .and_then(|valid_ipv4_to| {
+                        if !valid_ipv4_from.is_ipv4()
+                        || valid_ipv4_from.is_loopback()
+                        || valid_ipv4_from.is_unspecified()
+                        || valid_ipv4_from.is_multicast()
+                        || !valid_ipv4_to.is_ipv4()
+                        || valid_ipv4_to.is_loopback()
+                        || valid_ipv4_to.is_unspecified()
+                        || valid_ipv4_to.is_multicast() {
+                            let validate_state = format!("FROM:   Ipv4: {}, Lpbck: {}, Wldcrd: {}, Mltcst: {}",
+                                !valid_ipv4_from.is_ipv4(),
+                                valid_ipv4_from.is_loopback(),
+                                valid_ipv4_from.is_unspecified(),
+                                valid_ipv4_from.is_multicast());
+                            let validate_state2 = format!("TO:   Ipv4: {}, Lpbck: {}, Wldcrd: {}, Mltcst: {}",
+                                !valid_ipv4_to.is_ipv4(),
+                                valid_ipv4_to.is_loopback(),
+                                valid_ipv4_to.is_unspecified(),
+                                valid_ipv4_to.is_multicast());
+                            let err_msg = format!("validate_domain_addresses(): Validation failed for pair: {} -> {}. Validation details:\n\n{}\n{}\n",
+                                                  valid_ipv4_from, valid_ipv4_to, validate_state, validate_state2);
+                            error!("{}", err_msg);
+                            Err(FromStrError::EmptyLabel)
+                        } else {
+                            debug!("validate_domain_addresses(): IPv4 pair: {} -> {}", valid_ipv4_from, valid_ipv4_to);
+                            Ok((valid_ipv4_from, valid_ipv4_to))
+                        }
+                    })
+            })
+    }
+
+
     /// Validate IPv4 address of given domain:
     pub fn lookup_domain(domain: &String) -> Result<IpAddr, FromStrError> {
         let ip_localhost = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
