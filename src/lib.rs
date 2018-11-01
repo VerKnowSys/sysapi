@@ -33,6 +33,7 @@ extern crate serde;
 extern crate serde_json;
 extern crate glob;
 extern crate hostname;
+extern crate domain;
 
 
 /// Public sysapi modules:
