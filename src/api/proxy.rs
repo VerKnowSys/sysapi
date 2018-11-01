@@ -100,9 +100,9 @@ server {{
     access_log off;
 }}
     ",
-        from_domain,
+        to_domain,
         &DEFAULT_DNS.parse().unwrap_or(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1))), // resolver
-        to_domain)
+        from_domain)
     }
 
 
