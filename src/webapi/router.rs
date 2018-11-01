@@ -1,5 +1,6 @@
 use gotham::router::Router;
 use gotham::router::builder::{build_simple_router, DefineSingleRoute, DrawRoutes};
+use gotham::handler::assets::*;
 
 
 use api::*;
@@ -17,6 +18,32 @@ pub fn router() -> Router {
 
 
     build_simple_router(|route| {
+
+
+        /* Dashboard */
+
+        route.get("/").to_file("web/dashboard.html");
+
+        route.get("/css/*").to_dir(
+            FileOptions::new("web/static/css/")
+                .with_gzip(true)
+                .build(),
+        );
+
+        route.get("/js/*").to_dir(
+            FileOptions::new("web/static/js/")
+                .with_gzip(true)
+                .build(),
+        );
+
+        route.get("/static/*").to_dir(
+            FileOptions::new("web/static/")
+                .with_gzip(false)
+                .build(),
+        );
+
+
+        /* WebAPI: */
 
         // …/cells/list
         route.associate(
