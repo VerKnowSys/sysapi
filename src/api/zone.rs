@@ -87,14 +87,14 @@ impl Zone {
                             .iter()
                             .next()
                             .unwrap_or(ip_localhost);
-                        debug!("Proxy: Domain -> IpV4: {:?} -> {:?}", from_domain, ipv4_from);
+                        debug!("Proxy: Domain -> IpV4: {} -> {}", from_domain, ipv4_from);
                         if from_domain != ipv4.canonical_name() {
                             info!("Proxy::new(): Domain: {} is an alias for: {}",
                                   from_domain, ipv4.canonical_name());
 
                             Ok(ipv4_from)
                         } else {
-                            info!("Proxy::new(): Domain: {} has address: {:?}", ipv4.canonical_name(), ipv4_from);
+                            info!("Proxy::new(): Domain: {} has address: {}", ipv4.canonical_name(), ipv4_from);
                             Ok(ipv4_from)
                         }
                     })
