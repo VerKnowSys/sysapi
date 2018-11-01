@@ -78,6 +78,31 @@ impl Proxy {
             }
         }
 
+    /// Nginx proxy config from predefined template:
+    pub fn config_from_template(from_domain: &String, to_domain: &String) -> String {
+        /*
+         * external/public domain is proxied to internal one
+         * We explicitly set Nginx to re-resolve domains
+         * using our local DNS server
+         */
+        format!(r"
+server {{
+    listen 80;
+    server_name {};
+
+    resolver {} valid=15s;
+    set $backend 'http://{}';
+
+    location / {{
+        proxy_pass $backend;
+    }}
+
+    access_log off;
+}}
+    ",
+        from_domain,
+        &DEFAULT_DNS.parse().unwrap_or(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1))), // resolver
+        to_domain)
     }
 
 
