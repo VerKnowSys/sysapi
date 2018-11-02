@@ -71,6 +71,7 @@ pub fn main() {
         }
     };
 
+    // Dispatch logger:
     Dispatch::new()
         .format(move |out, message, record| {
             out.finish(format_args!(
@@ -87,20 +88,20 @@ pub fn main() {
                     .expect("FATAL: No /dev/stdout!?")))
         .apply()
         .and_then(|_| {
-            // Last check - sysapi relies on zfs feature:
-            if !Path::new(ZFS_BIN).exists() {
-                error!("SysAPI requires ZFS functionality available in system!");
-                panic!("No ZFS available!");
-            }
-
             // Start main event loop:
             info!("ServeD-SysAPI (v{}) - started on hostname: {}: http://{}",
                   version, get_hostname().unwrap_or(String::from("localhost")), listen_address);
-            Ok(gotham::start(listen_address, router::router()))
+            Ok(())
         })
         .map_err(|err| {
-            panic!("FATAL: Couldn't initialize default logger. Error: {:?}", err);
+            error!("FATAL: Couldn't initialize SysAPI. Error details: {:?}", err);
         })
-        .unwrap_or(());
+        .unwrap();
+
+    // Last check - sysapi relies on zfs feature:
+    if !Path::new(ZFS_BIN).exists() {
+        error!("SysAPI requires ZFS functionality available in system!");
+        panic!("FATAL: ZFS feature is NOT available!");
+    }
 
 }
