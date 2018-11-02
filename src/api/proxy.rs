@@ -78,7 +78,33 @@ impl Proxy {
                     to: Some(to.to_string()),
                     to_ipv4: Some(valid_ipv4_to),
                 };
-                Ok(proxy)
+
+                // Write Nginx proxy object to local file under dir: /Shared/Prison/Sentry/CELLNAME/cell-webconfs/*.conf:
+                let proxy_file_name = format!("{}_proxy_{}_{}.conf", cell_name, from.replace(".", "-"), to.replace(".", "-"));
+                let proxy_dest_dir = format!("{}/{}/cell-webconfs", SENTRY_PATH, cell_name);
+                let proxy_dest_file = format!("{}/{}", proxy_dest_dir, proxy_file_name);
+
+                AtomicFile::new(proxy_dest_file.clone(), AllowOverwrite)
+                    .write(|file| {
+                        file.write_all(
+                            proxy.clone()
+                                .config.unwrap()
+                                .to_string()
+                                .as_bytes()
+                        )
+                    })
+                    .and_then(|_| {
+                        info!("Proxy: Written Web-Proxy config to file: {}. Which belongs to cell: {}",
+                              &proxy_dest_file, &cell_name);
+                        // Finally - return object metadata- since atomic write succeded at this point:
+                        Ok(proxy)
+                    })
+                    .map_err(|err| {
+                        let err_msg = format!("Atomic Write Failed for file: {}. Error details: {:?}!",
+                                              &proxy_dest_file, err);
+                        error!("{}", err_msg);
+                        FromStrError::UnexpectedEnd
+                    })
             })
             .map_err(|err| {
                 error!("{}", err);
