@@ -1,5 +1,5 @@
 #!/bin/sh
 
-echo "Cleaning service: SysAPI"
+echo "Cleaning build dir and locks of project: SysAPI"
 rm -f Cargo.lock
 cargo clean

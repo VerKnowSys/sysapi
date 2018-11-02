@@ -62,6 +62,9 @@ impl Proxy {
     /// Create new Web Proxy configuration:
     pub fn new(from: &String, to: &String) -> Result<Proxy, Error> {
         // Validate both domains, and if both Zones are valid, create Proxy object:
+        // TODO: Write config and reload nginx proxy service
+
+
         Zone::validate_domain_addresses(from, to)
             .and_then(|(valid_ipv4_from, valid_ipv4_to)| {
                 let proxy = Proxy {
@@ -71,7 +74,6 @@ impl Proxy {
                     to: Some(to.to_string()),
                     to_ipv4: Some(valid_ipv4_to),
                 };
-                debug!("new(): Proxy object: {}", proxy.to_string());
                 Ok(proxy)
             })
             .map_err(|err| {

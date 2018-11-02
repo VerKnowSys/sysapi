@@ -1,13 +1,8 @@
-use domain::bits::DNameBuf;
-use domain::bits::name::*;
-use domain::resolv::{Resolver, ResolvConf};
-use domain::resolv::conf::ServerConf;
-use domain::resolv::lookup::lookup_host;
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
-use std::str::FromStr;
-
-
-use api::*;
+use domain::bits::name::FromStrError;
+use std::net::{IpAddr, Ipv4Addr};
+use abstract_ns::HostResolve;
+use ns_std_threaded::ThreadedResolver;
+use futures::future::*;
 
 
 /// DNS Zone types:
@@ -31,7 +26,7 @@ pub struct Zone {
 impl Zone {
 
 
-    /// Validate each domain pair (from => to) has also valid/resolvable/non-local address:
+    /// Validate each domain pair (from => to)— has also valid/resolvable/non-local address:
     pub fn validate_domain_addresses(from: &String, to: &String) -> Result<(IpAddr, IpAddr), FromStrError> {
         Zone::lookup_domain(from)
             .and_then(|valid_ipv4_from| {
