@@ -104,4 +104,17 @@ pub fn main() {
         panic!("FATAL: ZFS feature is NOT available!");
     }
 
+    // Define gotham server Future:
+    runtime.spawn(future::lazy(|| {
+        info!("Example async-lazy-worker-thread… Yay!");
+        Ok(())
+    }));
+
+    // NOTE: Use runtime.spawn(_) to launch future services like this:
+    let gotham = gotham::init_server(listen_address, router::router());
+
+    // Spawn the server task
+    runtime
+        .block_on_all(gotham) // Block forever on "serving duties"
+        .unwrap_or_default();
 }
