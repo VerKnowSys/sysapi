@@ -6,29 +6,29 @@ authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
 [dependencies]
 gotham = "0.3"
 gotham_derive = "0.3"
+hyper = { version = "0.12", features = [] }
+
 log = "0.4"
 fern = { version = "0.5", features = ["colored"] }
 colored = "1.6"
-hyper = { version = "0.12", features = [] }
+
 serde = "1"
 serde_derive = "1"
 serde_json = "1"
-bincode = "1"
-mime = "0.3"
+
 futures = "0.1"
-tokio-core = "0.1"
-mio = "0.6"
-borrow-bag = "1"
-url = "1"
+tokio = "0.1"
+mime = "0.3"
+
+domain = "0.2"
+abstract-ns = "0.4"
+ns-std-threaded = "0.3"
+
 uuid = { version = "0.6", features = ["v4"] }
 chrono = "0.4"
-base64 = "0.9"
 rand = "0.4"
-linked-hash-map = "0.5"
 num_cpus = "1.2"
-crossbeam = "0.3"
 regex = "0.2"
 lazy_static = "1.1"
 glob = "0.2"
 hostname = "0.1"
-domain = "0.2"
