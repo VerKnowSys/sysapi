@@ -6,6 +6,7 @@ use gotham::handler::assets::*;
 use api::*;
 use webapi::cells::*;
 use webapi::datasets::*;
+use webapi::proxies::*;
 
 
 /// Define router
@@ -79,5 +80,11 @@ pub fn router() -> Router {
                 handler.post().to(zfs_rollback_post_handler);
             });
 
+
+        // …/proxy/:cell/:from/:to
+        route.associate(
+            &format!("{}:cell/:from/:to", PROXY_RESOURCE), |handler| {
+                handler.post().to(web_proxy_post_handler);
+            });
     })
 }

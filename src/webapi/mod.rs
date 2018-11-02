@@ -2,6 +2,9 @@
 /// Public SysAPI Web utilities functions
 pub mod utils;
 
+/// Public SysAPI Nginx-proxy functions
+pub mod proxies;
+
 /// Web-Router module:
 pub mod router;
 
