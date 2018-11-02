@@ -14,7 +14,6 @@ pub fn router() -> Router {
     // TODO: define all missing routes:
     // TODO: const IGNITER_RESOURCE: &'static str = "/igniter/";
     // TODO: const ZONE_RESOURCE: &'static str = "/zone/";
-    // TODO: const PROXY_RESOURCE: &'static str = "/proxy/";
     // TODO: const STATUS_RESOURCE: &'static str = "/status/";
 
 
