@@ -56,7 +56,13 @@ pub fn main() {
         Err(_) => LevelFilter::Info,
     };
 
-    // Dispatch logger and start the server:
+    // Read environment values:
+    let listen_address = match env::var("LISTEN_ADDRESS") {
+        Ok(addr) => addr,
+        Err(_) => DEFAULT_ADDRESS.to_string(),
+    };
+    let version = env!("CARGO_PKG_VERSION");
+
     // Create the runtime
     let mut runtime: Runtime = match Runtime::new() {
         Ok(runtime) => runtime,
@@ -81,13 +87,6 @@ pub fn main() {
                     .expect("FATAL: No /dev/stdout!?")))
         .apply()
         .and_then(|_| {
-            // Read environment values and start server:
-            let listen_address = match env::var("LISTEN_ADDRESS") {
-                Ok(addr) => addr,
-                Err(_) => DEFAULT_ADDRESS.to_string(),
-            };
-            let version = env!("CARGO_PKG_VERSION");
-
             // Last check - sysapi relies on zfs feature:
             if !Path::new(ZFS_BIN).exists() {
                 error!("SysAPI requires ZFS functionality available in system!");
