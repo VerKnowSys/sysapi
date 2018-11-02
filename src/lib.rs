@@ -28,6 +28,13 @@ extern crate mime;
 extern crate regex;
 #[macro_use]
 extern crate serde_derive;
+extern crate tokio;
+// extern crate tokio_core;
+// extern crate tokio_reactor;
+// extern crate tokio_current_thread;
+extern crate abstract_ns;
+// extern crate ns_dns_tokio;
+extern crate ns_std_threaded;
 
 extern crate serde;
 extern crate serde_json;
@@ -43,6 +50,8 @@ pub mod api;
 pub mod webapi;
 
 
+// use std::sync::RwLock;
+// use tokio_core::reactor::{Core, Remote};
 pub use fern::colors::{Color, ColoredLevelConfig};
 
 pub use api::*;
