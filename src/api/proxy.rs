@@ -1,5 +1,7 @@
 use std::net::*;
-use std::io::{Error, ErrorKind};
+use std::io::{Write, Error, ErrorKind};
+use atomicwrites::{AtomicFile,AllowOverwrite};
+use domain::bits::name::FromStrError;
 
 
 use api::*;
@@ -9,6 +11,9 @@ use zone::*;
 /// Web proxy wrapper:
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Proxy {
+
+    /// Proxy belocngs to cell with name:
+    pub cell: Option<String>,
 
     /// Proxy from URL:
     pub from: Option<String>,
@@ -31,6 +36,7 @@ pub struct Proxy {
 impl Default for Proxy {
     fn default() -> Proxy {
         Proxy{
+            cell: None,
             config: None,
             from: None,
             from_ipv4: None,
