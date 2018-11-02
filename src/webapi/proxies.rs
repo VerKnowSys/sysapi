@@ -27,7 +27,7 @@ pub fn web_proxy_post_handler(mut state: State) -> Box<HandlerFuture> {
                 // if from.len() < 4
                 // || from.len() > 64
 
-                let proxy = Proxy::new(&from, &to)
+                let proxy = Proxy::new(&cell_name, &from, &to)
                     .and_then(|proxy_block| {
                         Ok(proxy_block.to_string())
                     });

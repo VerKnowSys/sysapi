@@ -66,14 +66,12 @@ impl Proxy {
 
 
     /// Create new Web Proxy configuration:
-    pub fn new(from: &String, to: &String) -> Result<Proxy, Error> {
-        // Validate both domains, and if both Zones are valid, create Proxy object:
-        // TODO: Write config and reload nginx proxy service
-
-
+    pub fn new(cell_name: &String, from: &String, to: &String) -> Result<Proxy, Error> {
         Zone::validate_domain_addresses(from, to)
             .and_then(|(valid_ipv4_from, valid_ipv4_to)| {
+                // When both domains are valid, create Proxy object:
                 let proxy = Proxy {
+                    cell: Some(cell_name.to_string()),
                     config: Some(Proxy::config_from_template(from, to)),
                     from: Some(from.to_string()),
                     from_ipv4: Some(valid_ipv4_from),
