@@ -30,6 +30,17 @@
                  ✅ POST   > rollbacks dataset to given snapshot [dataset_path is given in body as String]
 
 
+     - "/proxy/:cellname"
+                     GET    > get list of Nginx proxy for cell: 'cellname'.
+
+
+     - "/proxy/:cellname/:from-domain/:to-domain"
+
+                  ✅ POST   > defines new Nginx-Proxy entry, from external: ':from-domain', to internal: ':to-domain'.
+                     GET    > returns domain to proxy to
+                     DELETE > destroys domain proxy
+
+
     - "/cell/:cellname/some_key":
 
                     POST   > body contains new value of the key: 'some_key' to set for cell 'cellname'
@@ -57,18 +68,6 @@
     - "/zone/:cellname/CNAME/my.some.domain.local":
 
                     POST   > defines new A record for cell 'cellname' with IPv4 or name taken from the body
-
-
-    - "/proxy/:cellname"
-                    GET    > get list of Nginx proxy for cell: 'cellname'.
-
-
-    - "/proxy/:cellname/some.external.domain"
-
-                    GET    > returns domain to proxy to
-                    POST   > defines new Nginx entry for external domain 'some.external.domain' to point to
-                             default internal addressed cell domain [or taken from the body]
-                    DELETE > destroys domain proxy
 
 
     - "/status/:cellname":
