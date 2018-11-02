@@ -68,41 +68,31 @@ impl Zone {
     }
 
 
-    /// Validate IPv4 address of given domain:
+    /// Asynchronously resolves first available IPv4 defined for given "domain":
     pub fn lookup_domain(domain: &String) -> Result<IpAddr, FromStrError> {
-        let ip_localhost = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
-        let default_dns = &DEFAULT_DNS.parse().unwrap_or(ip_localhost);
-        let dns_address = SocketAddr::new(*default_dns, 53);
-        let svrconf_default = ServerConf::new(dns_address);
-        let resolver_conf = ResolvConf {
-            servers: vec!(svrconf_default),
-            .. ResolvConf::default()
-        };
-
-        DNameBuf::from_str(domain)
-            .and_then(|from_domain| {
-                Resolver::run_with_conf(resolver_conf, |resolv| lookup_host(resolv, &from_domain))
-                    .and_then(|ipv4| {
-                        let ipv4_from = ipv4
-                            .iter()
-                            .next()
-                            .unwrap_or(ip_localhost);
-                        debug!("Proxy: Domain -> IpV4: {} -> {}", from_domain, ipv4_from);
-                        if from_domain != ipv4.canonical_name() {
-                            info!("Proxy::new(): Domain: {} is an alias for: {}",
-                                  from_domain, ipv4.canonical_name());
-
-                            Ok(ipv4_from)
-                        } else {
-                            info!("Proxy::new(): Domain: {} has address: {}", ipv4.canonical_name(), ipv4_from);
-                            Ok(ipv4_from)
-                        }
-                    })
-                    .map_err(|err| {
-                        error!("Empty DNS resolve. Error: {}", err);
-                        FromStrError::EmptyLabel
+        let ip_localhost = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)); // Used as fallback if domain resolve fails
+        let response = ThreadedResolver::new()
+            .resolve_host(&domain.parse().unwrap())
+            .map(|addresses| {
+                debug!("Domain: {} resolves to IPv4(s): [{:?}]", &domain, &addresses);
+                addresses
+                    .iter()
+                    .filter(|&element| !element.to_string().contains(":")) /* NOTE: filter out IPv6 - unsupported yet */
+                    .next()
+                    .and_then(|&ipv4_first| {
+                        Some(ipv4_first)
                     })
             })
+            .wait();
+
+        let resolved_ip = response
+            .and_then(|ipv4_resolved| {
+                Ok(ipv4_resolved)
+            })
+            .unwrap_or(Some(ip_localhost));
+
+        info!("Domain: {} resolves to IPv4: {}", domain, resolved_ip.unwrap());
+        Ok(resolved_ip.unwrap())
     }
 
 
