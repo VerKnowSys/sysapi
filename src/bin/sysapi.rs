@@ -42,6 +42,7 @@ use sysapi::*;
 
 /// Start a server and use a `Router` to dispatch requests
 pub fn main() {
+
     // Set up ANSI colors for output:
     let default_colors = ColoredLevelConfig::new()
         .info(Color::White)
@@ -56,6 +57,14 @@ pub fn main() {
     };
 
     // Dispatch logger and start the server:
+    // Create the runtime
+    let mut runtime: Runtime = match Runtime::new() {
+        Ok(runtime) => runtime,
+        Err(err) => {
+            panic!("SysAPI: Runtime: Assertion Failed! Details: {}", err);
+        }
+    };
+
     Dispatch::new()
         .format(move |out, message, record| {
             out.finish(format_args!(
