@@ -222,7 +222,7 @@ server {{
     server_name {};
 
     resolver {} valid=15s;
-    set $backend 'http://{}';
+    set $backend 'https://{}';
 
     location / {{
         proxy_pass $backend;
