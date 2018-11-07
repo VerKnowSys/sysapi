@@ -33,6 +33,16 @@ pub struct Proxy {
 }
 
 
+/// Proxies (Proxy List) structure for easy list management
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Proxies {
+
+    /// List of all proxies
+    pub list: Vec<Proxy>
+
+}
+
+
 impl Default for Proxy {
     fn default() -> Proxy {
         Proxy{
