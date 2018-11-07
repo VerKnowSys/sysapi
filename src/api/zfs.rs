@@ -49,6 +49,18 @@ pub struct Snapshot {
 }
 
 
+impl Default for Snapshot {
+    fn default() -> Snapshot {
+        Snapshot {
+           cell_name: None,
+           name: None,
+           dataset_path: None,
+           timestamp: None,
+        }
+    }
+}
+
+
 /// List of Snapshots:
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Snapshots {
