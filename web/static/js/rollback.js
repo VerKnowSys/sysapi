@@ -1,6 +1,6 @@
 // Rollback to snapshot:
 function create_rollback() {
-    var cell_name = $("input#cell_name").val();
+    var cell_name = $("select#cell_name").val();
     var snapshot_name = $("input#snapshot_name").val();
     var dataset_path = $("input#snapshot_dataset_path").val();
     if (snapshot_name != undefined && cell_name != undefined && snapshot_name != "" && cell_name != "" && dataset_path != undefined && dataset_path != "") {
@@ -17,17 +17,17 @@ function create_rollback() {
               }
             },
             success: function(){
-                $("input#cell_form_cell_name").removeClass("is-invalid");
+                $("select#cell_name").removeClass("is-invalid");
                 $("input#snapshot_name").removeClass("is-invalid");
                 $("div.valid-feedback").show();
             }
         });
     } else {
         if (cell_name == "" || cell_name == undefined) {
-            $("input#cell_form_name").addClass("is-invalid");
+            $("select#cell_name").addClass("is-invalid");
         } else {
-            $("input#cell_form_name").removeClass("is-invalid");
-            $("input#cell_form_name").addClass("is-valid");
+            $("select#cell_name").removeClass("is-invalid");
+            $("select#cell_name").addClass("is-valid");
         }
         $("input#snapshot_name").addClass("is-invalid");
     }

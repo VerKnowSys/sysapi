@@ -1,6 +1,6 @@
 // Create WEB PROXY:
 function create_proxy() {
-    var cell_name = $("input#proxy_cell_name").val();
+    var cell_name = $("select#proxy_cell_name").val();
     var internal = $("input#proxy_from").val();
     var external = $("input#proxy_to").val();
     if (cell_name != undefined && external != undefined && internal != undefined && external != "" && internal != "" && cell_name != "") {
