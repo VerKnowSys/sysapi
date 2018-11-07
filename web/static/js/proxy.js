@@ -34,9 +34,9 @@ function create_proxy() {
 
 
 // Delete WEB PROXY:
-function delete_proxy(name, internal, external) {
+function delete_proxy(name, from, to) {
   if (name != undefined && name != "") {
-      var url = "/proxy/".concat(name).concat("/").concat(external).concat("/").concat(internal);
+      var url = "/proxy/".concat(name).concat("/").concat(from).concat("/").concat(to);
       $.ajax({
           type: "DELETE",
           url: url,
