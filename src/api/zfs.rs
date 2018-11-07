@@ -10,6 +10,7 @@ use mime::*;
 
 
 use api::*;
+use api::cell::*;
 
 
 /// ZFS Rollback wrapper
@@ -45,6 +46,14 @@ pub struct Snapshot {
 
     /// Snapshot timestamp metadata:
     pub timestamp: Option<String>,
+}
+
+
+/// List of ZFS Datasets:
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Datasets {
+    /// List of all datasets of given cell
+    pub list: Option<List>,
 }
 
 
@@ -115,12 +124,40 @@ impl IntoResponse for Rollback {
 }
 
 
-// pub enum Datasets {
-//     Shared(String),
-//     User(String),
-//     Software(String),
-//     Services(String),
-// }
+/// Implementes listing of ZFS datasets of given cell:
+impl Datasets {
+
+
+    /// List all datasets of a cell:
+    pub fn list(cell_name: &String) -> Result<String, Error> {
+        Command::new(JEXEC_BIN)
+            .arg("-U")
+            .arg(CELL_USERNAME)
+            .arg(cell_name)
+            .arg(ZFS_BIN)
+            .arg("list")
+            .arg("-Hro")
+            .arg("name")
+            .arg("-t")
+            .arg("filesystem")
+            .output()
+            .and_then(|after_snap| {
+                if after_snap.status.success() {
+                    let strng = String::from_utf8_lossy(&after_snap.stdout);
+                    debug!("List of ZFS snapshots: {}", strng);
+                    Ok(strng.to_string())
+                } else {
+                    let error_msg = format!("ZFS snapshot listing failed!");
+                    error!("{}", error_msg);
+                    Err(
+                        Error::new(ErrorKind::Other, error_msg)
+                    )
+                }
+            })
+    }
+
+
+}
 
 
 impl Snapshot {
