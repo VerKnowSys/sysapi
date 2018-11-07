@@ -2,6 +2,7 @@
 **/*.rs.bk
 *.lock
 tmp/**
+web/js/src/**
 web/img/avatars/**
 web/img/brand/**
 web/*.html
