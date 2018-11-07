@@ -1,0 +1,44 @@
+<script type="text/javascript" src="/static/js/dashboard.js"></script>
+<script type="text/javascript" src="/static/js/proxy.js"></script>
+
+<div class="card w-50">
+  <div class="card-header bg-dark">
+    New Proxy
+  </div>
+  <div class="card-body">
+
+      <form class="needs-validation" novalidate>
+
+        <div class="form-group">
+          <label for="proxy_cell_name">Cell name:</label>
+          <input class="form-control" id="proxy_cell_name" placeholder="somecell01" required>
+          <div class="invalid-feedback">
+            Cell name has to be present!
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="proxy_from">From:</label>
+          <input class="form-control" id="proxy_from" placeholder="external.somedomain.com" required>
+          <div class="invalid-feedback">
+            Domain to proxy from, has to be present!
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="proxy_to">To:</label>
+          <input class="form-control" id="proxy_to" placeholder="internal.somedomain.com" required>
+          <div class="invalid-feedback">
+            Domain to proxy to, has to be present!
+          </div>
+        </div>
+
+        <div class="valid-feedback">
+          Proxy successfully created!
+        </div>
+      </form>
+
+    <button class="btn btn-primary" onclick="create_proxy();">Create Proxy</button>
+  </div>
+</div>
+
