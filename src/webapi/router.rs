@@ -104,5 +104,12 @@ pub fn router() -> Router {
                 &format!("{}:cell/:from/:to", PROXY_RESOURCE), |handler| {
                     handler.post().to(web_proxy_post_handler);
                 });
+
+        // …/proxies/list
+        route
+            .associate(
+                &format!("{}:list", PROXIES_RESOURCE), |handler| {
+                    handler.get().to(web_proxies_get_handler);
+                });
     })
 }
