@@ -23,21 +23,6 @@ pub fn router() -> Router {
 
         /* Dashboard */
 
-        //
-        // NOTE: using simplest yet most powerful admin template I've found:
-        // https://github.com/coreui/coreui-free-bootstrap-admin-template-ajax#versions
-        //
-        // NOTE: This is pure Ajax version that has to be installed manually, following steps::
-        //
-        // # make sure you have nodejs installed - version 10+ is latest LTS.
-        //
-        //      git clone https://github.com/coreui/coreui-free-bootstrap-admin-template-ajax.git
-        //      cd coreui-free-bootstrap-admin-template-ajax
-        //      npm install
-        //      npm run build
-        //      cp -R dist/* /your/dir/to/sysapi/web/
-        //
-
         route
             .get("/")
             .to_file("web/static/html/panel.html");
