@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="ServeD / Dashboard and Panel, based on CoreUI">
+    <meta name="keyword" content="ServeD,svdOS,Sofin,SysAPI">
+    <meta name="author" content="@dmilith">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>ServeD-OS: Web-Dashboard&nbsp;&amp;&nbsp;System-Control-Panel</title>
+    <!-- Icons-->
+    <link href="vendors/@coreui/icons/css/coreui-icons.min.css" rel="stylesheet">
+    <link href="vendors/flag-icon-css/css/flag-icon.min.css" rel="stylesheet">
+    <link href="vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="vendors/simple-line-icons/css/simple-line-icons.css" rel="stylesheet">
+    <!-- Main styles for this application-->
+    <link href="css/style.css" rel="stylesheet">
+    <link href="vendors/pace-progress/css/pace.min.css" rel="stylesheet">
+
+    <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      // Shared ID
+      gtag('config', 'UA-118965717-3');
+      // Bootstrap ID
+      gtag('config', 'UA-118965717-5');
+    </script>
+  </head>
+  <body class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show">
+    <header class="app-header navbar">
+      <button class="navbar-toggler sidebar-toggler d-lg-none mr-auto" type="button" data-toggle="sidebar-show">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="#">
+        <img class="navbar-brand-full" src="../../static/vks.svg" width="100" height="32" alt="Logo">
+        <img class="navbar-brand-minimized" src="../../static/vks.svg" width="10" height="32" alt="Logo">
+      </a>
+      <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <!-- <ul class="nav navbar-nav d-md-down-none">
+        <li class="nav-item px-3">
+          <a class="nav-link" href="#">Cells</a>
+        </li>
+        <li class="nav-item px-3">
+          <a class="nav-link" href="#">Datasets</a>
+        </li>
+        <li class="nav-item px-3">
+          <a class="nav-link" href="#">Proxies</a>
+        </li>
+        <li class="nav-item px-3">
+          <a class="nav-link" href="#">DNS</a>
+        </li>
+      </ul> -->
+      <ul class="nav navbar-nav ml-auto">
+        <!-- <li class="nav-item d-md-down-none">
+          <a class="nav-link" href="#">
+            <i class="icon-bell"></i>
+            <span class="badge badge-pill badge-danger">5</span>
+          </a>
+        </li> -->
+        <!-- <li class="nav-item d-md-down-none">
+          <a class="nav-link" href="#">
+            <i class="icon-list"></i>
+          </a>
+        </li>
+        <li class="nav-item d-md-down-none">
+          <a class="nav-link" href="#">
+            <i class="icon-location-pin"></i>
+          </a>
+        </li> -->
+        <li class="nav-item dropdown">
+          <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+            <img class="img-avatar" src="img/avatars/6.jpg" alt="admin@bootstrapmaster.com">
+          </a>
+          <div class="dropdown-menu dropdown-menu-right">
+            <!-- <div class="dropdown-header text-center">
+              <strong>Account</strong>
+            </div>
+            <a class="dropdown-item" href="#">
+              <i class="fa fa-bell-o"></i> Updates
+              <span class="badge badge-info">42</span>
+            </a>
+            <a class="dropdown-item" href="#">
+              <i class="fa fa-envelope-o"></i> Messages
+              <span class="badge badge-success">42</span>
+            </a>
+            <a class="dropdown-item" href="#">
+              <i class="fa fa-tasks"></i> Tasks
+              <span class="badge badge-danger">42</span>
+            </a>
+            <a class="dropdown-item" href="#">
+              <i class="fa fa-comments"></i> Comments
+              <span class="badge badge-warning">42</span>
+            </a> -->
+            <div class="dropdown-header text-center">
+              <strong>Settings</strong>
+            </div>
+            <a class="dropdown-item" href="#">
+              <i class="fa fa-user"></i> Profile</a>
+            <a class="dropdown-item" href="#">
+              <i class="fa fa-wrench"></i> Settings</a>
+            <!-- <a class="dropdown-item" href="#">
+              <i class="fa fa-usd"></i> Payments
+              <span class="badge badge-secondary">42</span>
+            </a>
+            <a class="dropdown-item" href="#">
+              <i class="fa fa-file"></i> Projects
+              <span class="badge badge-primary">42</span>
+            </a> -->
+            <!-- <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">
+              <i class="fa fa-shield"></i> Lock Account</a>
+            <a class="dropdown-item" href="#">
+              <i class="fa fa-lock"></i> Logout</a> -->
+          </div>
+        </li>
+      </ul>
+      <!-- <button class="navbar-toggler aside-menu-toggler d-md-down-none" type="button" data-toggle="aside-menu-lg-show">
+        <span class="navbar-toggler-icon"></span>
+      </button> -->
+      <button class="navbar-toggler aside-menu-toggler d-lg-none" type="button" data-toggle="aside-menu-show">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </header>
+    <div class="app-body">
+      <div class="sidebar">
+        <nav class="sidebar-nav">
+          <ul class="nav">
+            <li class="nav-item">
+              <a class="nav-link" href="../../static/dashboard.html">
+                <i class="nav-icon icon-speedometer"></i> Dashboard
+                <span class="badge badge-primary"></span>
+              </a>
+            </li>
+            <li class="nav-title">VMS</li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../static/cells.html">
+                <i class="nav-icon icon-pie-chart"></i> Cells</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../static/cell.html">
+                <i class="nav-icon icon-chart"></i> New Cell</a>
+            </li>
+
+            <li class="nav-title">ZFS</li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../static/datasets.html">
+                <i class="nav-icon icon-list"></i> Datasets</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="../../static/dataset.html">
+                <i class="nav-icon icon-vector"></i> New Dataset</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="../../static/snapshots.html">
+                <i class="nav-icon icon-share"></i> Snapshots</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="../../static/snapshot.html">
+                <i class="nav-icon icon-vector"></i> New Snapshot</a>
+            </li>
+            <!--
+            <li class="nav-item">
+              <a class="nav-link" href="../rollback.html">
+                <i class="nav-icon icon-vector"></i> New Rollback</a>
+            </li> -->
+
+            <li class="nav-title">Web</li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../static/proxies.html">
+                <i class="nav-icon icon-share"></i> Proxies</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../static/proxy.html">
+                <i class="nav-icon icon-share"></i> New Proxy</a>
+            </li>
+
+            <li class="nav-title">DNS</li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../static/domains.html">
+                <i class="nav-icon icon-vector"></i> Domains</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../static/domain.html">
+                <i class="nav-icon icon-vector"></i> New Domain</a>
+            </li>
+
+            <li class="divider"></li>
+            <li class="nav-title">Other</li>
+            <li class="nav-item nav-dropdown">
+              <a class="nav-link nav-dropdown-toggle" href="#">
+                <i class="nav-icon icon-star"></i> Projects</a>
+              <ul class="nav-dropdown-items">
+                <li class="nav-item">
+                  <a class="nav-link" href="https://github.com/VerKnowSys/svdOS" target="_top">
+                    <i class="nav-icon icon-star"></i> svdOS</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://github.com/VerKnowSys/sofin/" target="_top">
+                    <i class="nav-icon icon-star"></i> Sofin</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://github.com/VerKnowSys/sofin-definitions/" target="_top">
+                    <i class="nav-icon icon-star"></i> Sofin-defs</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://github.com/VerKnowSys/sysapi" target="_top">
+                    <i class="nav-icon icon-star"></i> SysAPI</a>
+                </li>
+              </ul>
+            </li>
+            <!-- <li class="nav-item mt-auto">
+              <a class="nav-link nav-link-success" href="https://coreui.io" target="_top">
+                <i class="nav-icon icon-cloud-download"></i> Download CoreUI</a>
+            </li> -->
+            <!-- <li class="nav-item">
+              <a class="nav-link nav-link-danger" href="https://coreui.io/pro/" target="_top">
+                <i class="nav-icon icon-layers"></i> Try CoreUI
+                <strong>PRO</strong>
+              </a>
+            </li> -->
+          </ul>
+        </nav>
+        <button class="sidebar-minimizer brand-minimizer" type="button"></button>
+      </div>
+      <main class="main">
+
+        <!-- Breadcrumb-->
+        <ol class="breadcrumb">
+          <!-- <li class="breadcrumb-item">Home</li> -->
+          <!-- <li class="breadcrumb-item">
+            <a href="#">Admin</a>
+          </li> -->
+          <li class="location_info breadcrumb-item active">System Management Interface</li>
+          <!-- Breadcrumb Menu-->
+          <!-- <li class="breadcrumb-menu d-md-down-none">
+            <div class="btn-group" role="group" aria-label="Button group">
+              <a class="btn" href="#">
+                <i class="icon-speech"></i>
+              </a>
+              <a class="btn" href="./">
+                <i class="icon-graph"></i>  Dashboard</a>
+              <a class="btn" href="#">
+                <i class="icon-settings"></i>  Settings</a>
+            </div>
+          </li> -->
+        </ol>
+        <div class="container-fluid">
+          <div id="ui-view"></div>
+        </div>
+      </main>
+
+<!--       <aside class="aside-menu">
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#timeline" role="tab">
+              <i class="icon-list"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#messages" role="tab">
+              <i class="icon-speech"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#settings" role="tab">
+              <i class="icon-settings"></i>
+            </a>
+          </li>
+        </ul>
+      </aside>
+ -->
+    </div>
+    <footer class="app-footer">
+      <div class="ml-auto">
+        <span>2018 - <a href="https://www.twitter.com/dmilith">@dmilith</a></span>
+        <span> - based on</span>
+        <a href="https://coreui.io">CoreUI</a>
+        <span>by creativeLabs.</span>
+      </div>
+    </footer>
+    <!-- CoreUI and necessary plugins-->
+    <script src="vendors/jquery/js/jquery.min.js"></script>
+    <script src="vendors/popper.js/js/popper.min.js"></script>
+    <script src="vendors/bootstrap/js/bootstrap.min.js"></script>
+    <script src="vendors/pace-progress/js/pace.min.js"></script>
+    <script src="vendors/perfect-scrollbar/js/perfect-scrollbar.min.js"></script>
+    <script src="vendors/@coreui/coreui/js/coreui.min.js"></script>
+    <script>
+      $('#ui-view').ajaxLoad();
+      $(document).ajaxComplete(function() {
+        Pace.restart()
+      });
+    </script>
+  </body>
+</html>
