@@ -40,7 +40,7 @@ pub fn router() -> Router {
 
         route
             .get("/")
-            .to_file("web/static/panel.html");
+            .to_file("web/static/html/panel.html");
 
         route
             .get("/*")
