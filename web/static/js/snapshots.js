@@ -14,6 +14,7 @@ function render_snapshots() {
       success: function(data) {
         for (var i = data.list.length - 1; i >= 0; i--) {
           var cell = data.list[i];
+          console.log("CELL: " + JSON.stringify(cell));
           if (cell.name != undefined && cell.name != "") {
             $.ajax({
               type: "GET",
@@ -23,6 +24,7 @@ function render_snapshots() {
               success: function(snaps) {
                 for (var j = snaps.list.length - 1; j >= 0; j--) {
                   var snapshh = snaps.list[j];
+                  console.log("SNAPSHH: " + JSON.stringify(snapshh));
                   var snapshot_name = snapshh.name;
                   if (snapshot_name != undefined && snapshot_name != "") {
                     $.ajax({
