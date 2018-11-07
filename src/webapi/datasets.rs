@@ -153,8 +153,8 @@ pub fn zfs_snapshot_list_handler(state: State) -> (State, Response<Body>) {
 }
 
 
-/// handle GET for /snapshot/:cell - get state of snapshot of a cell
-pub fn zfs_snapshot_get_handler(state: State) -> (State, Response<Body>) {
+/// handle GET for /snapshot/:cell - get name of snapshot of a cell
+pub fn zfs_snapshot_get_handler(state: State) -> (State, Snapshot) {
     let uri = Uri::borrow_from(&state).to_string();
     let cell_and_snapshot_name = uri.replace(SNAPSHOT_RESOURCE, "");
     let cell_name: String = cell_and_snapshot_name.split("/").take(1).collect();
@@ -170,16 +170,13 @@ pub fn zfs_snapshot_get_handler(state: State) -> (State, Response<Body>) {
     let list = &CUT_LAST_COMMA.replace(&pre_list, "");
     match list.as_ref() {
         "" => {
-            let res = create_response(&state, StatusCode::NOT_FOUND, APPLICATION_JSON,
-                                      Body::from("{\"status\": \"Snapshot not found.\"}"));
-            (state, res)
+            debug!("Empty snapshot - Not found: @{}", snapshot_name);
+            (state, Snapshot::default())
         },
         snapshot => {
-            let res = create_response(&state, StatusCode::OK, APPLICATION_JSON,
-                                      snapshot.to_string());
-                                      // Body::from(format!("{{\"status\": \"OK\", \"snapshot\": [{}]}}",
-                                      //                    snapshot))); // XXX: returns multiple entries
-            (state, res)
+            let dataset_path = &snapshot.split("@").take(1).collect();
+            (state, Snapshot::new(&cell_name, &dataset_path, &snapshot_name)
+                .unwrap_or(Snapshot::default()))
         }
     }
 }
