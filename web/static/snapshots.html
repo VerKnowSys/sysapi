@@ -1,0 +1,25 @@
+<script type="text/javascript" src="/static/js/dashboard.js"></script>
+<script type="text/javascript" src="/static/js/snapshots.js"></script>
+
+<a href="#" class="badge badge-primary" onclick="clean_snapshots(); render_snapshots();">Refresh the list</a>
+<hr>
+<table class="table table-dark">
+  <thead>
+    <tr>
+      <th scope="col">Cell</th>
+      <th scope="col">Snapshot Name</th>
+      <th scope="col">ZFS Path</th>
+      <th scope="col">Timestamp</th>
+    </tr>
+  </thead>
+  <tbody class="snapshots_list">
+    <!--
+        <tr>
+          <td>cellname01</td>
+          <td>snapshot_2018-11-07-1522-1541600553</td>
+          <td>zroot/Some/Dataset</td>
+          <td>18279473649237493</td>
+        </tr>
+     -->
+  </tbody>
+</table>

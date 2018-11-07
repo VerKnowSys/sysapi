@@ -1,0 +1,51 @@
+<script type="text/javascript" src="/static/js/dashboard.js"></script>
+<script type="text/javascript" src="/static/js/snapshot.js"></script>
+
+<div class="card w-50">
+  <div class="card-header bg-dark">
+    New Snapshot
+  </div>
+  <div class="card-body">
+
+      <form class="needs-validation" novalidate>
+
+        <div class="form-group">
+          <label for="cell_name">Cell name:</label>
+          <input class="form-control" id="cell_name" placeholder="acell0123" required>
+          <div class="invalid-feedback">
+            Cell name is required!
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="snapshot_name">Name:</label>
+          <input class="form-control" id="snapshot_name" placeholder="snapname_01234" required>
+          <div class="invalid-feedback">
+            Snapshot name is required!
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="snapshot_dataset_path">ZFS Dataset:</label>
+          <input class="form-control" id="snapshot_dataset_path" placeholder="zroot/Some/Dataset/Path" required></textarea>
+          <div class="invalid-feedback">
+            ZFS Dataset Path is required!
+          </div>
+        </div>
+
+       <!--  <div class="form-group">
+          <label for="cell_owners">Owner:</label>
+          <select class="form-control" id="cell_owners">
+            <option selected>Default</option>
+          </select>
+        </div> -->
+
+        <div class="valid-feedback">
+          Snapshot successfully created
+        </div>
+      </form>
+
+    <button class="btn btn-primary" onclick="create_snapshot();">Create Snapshot</button>
+  </div>
+</div>
+
