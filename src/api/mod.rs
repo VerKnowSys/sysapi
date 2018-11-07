@@ -46,6 +46,9 @@ pub const ZONE_RESOURCE: &'static str = "/zone/";
 /// Web proxy management:
 pub const PROXY_RESOURCE: &'static str = "/proxy/";
 
+/// Web proxies management:
+pub const PROXIES_RESOURCE: &'static str = "/proxies/";
+
 /// Cell status management:
 pub const STATUS_RESOURCE: &'static str = "/status/";
 
