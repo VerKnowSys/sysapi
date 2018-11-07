@@ -18,6 +18,7 @@ function create_cell() {
             success: function(){
                 $("input#cell_form_name").removeClass("is-invalid");
                 $("textarea#cell_form_key").removeClass("is-invalid");
+                $("div.valid-feedback").show();
             }
         });
     } else {
