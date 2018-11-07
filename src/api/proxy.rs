@@ -1,11 +1,41 @@
+use std::path::Path;
+use gotham::state::State;
+use gotham::handler::IntoResponse;
+use hyper::{StatusCode, Body, Response};
+use serde_json;
+use gotham::helpers::http::response::create_response;
+use std::io::BufReader;
+use std::fs::File;
+use mime::*;
+
 use std::net::*;
 use std::io::{Write, Error, ErrorKind};
 use atomicwrites::{AtomicFile,AllowOverwrite};
-use domain::bits::name::FromStrError;
 
 
 use api::*;
 use zone::*;
+use webapi::utils::list_proxies;
+
+
+use regex::Regex;
+lazy_static! {
+    /// Regex to extract cell name from proxy file name:
+    pub static ref CELL_NAME_FROM_FILE_NAME_PATTERN: Regex = {
+        Regex::new(r"(?:([a-zA-Z0-9]+))_.*").unwrap()
+    };
+
+    /// Regex to extract proxy from
+    pub static ref PROXYFROM_FROM_FILE_NAME_PATTERN: Regex = {
+        Regex::new(r"proxyfrom_(?:([a-zA-Z0-9_-]+))_proxyto.*").unwrap()
+    };
+
+    /// Regex to extract proxy to
+    pub static ref PROXYTO_FROM_FILE_NAME_PATTERN: Regex = {
+        Regex::new(r"proxyto_(?:([a-zA-Z0-9_-]+))\..*").unwrap()
+    };
+
+}
 
 
 /// Web proxy wrapper:
@@ -52,6 +82,51 @@ impl Default for Proxy {
             from_ipv4: None,
             to: None,
             to_ipv4: None,
+        }
+    }
+}
+
+
+impl Default for Proxies {
+    fn default() -> Proxies {
+        Proxies {
+            list:
+                list_proxies()
+                    .iter()
+                    .flat_map(|proxy_file_name| {
+                        // Infer data from proxy file name:
+                        let cell_name = &CELL_NAME_FROM_FILE_NAME_PATTERN
+                            .captures(&proxy_file_name)
+                            .and_then(|cap| {
+                                match cap.get(1).map_or("", |m| m.as_str()) {
+                                    "" => None,
+                                    domain => Some(domain),
+                                }
+                            });
+                        let proxy_from = &PROXYFROM_FROM_FILE_NAME_PATTERN
+                            .captures(&proxy_file_name)
+                            .and_then(|cap| {
+                                match cap.get(1).map_or("", |m| m.as_str()) {
+                                    "" => None,
+                                    domain => Some(domain),
+                                }
+                            });
+                        let proxy_to = &PROXYTO_FROM_FILE_NAME_PATTERN
+                            .captures(&proxy_file_name)
+                            .and_then(|cap| {
+                                match cap.get(1).map_or("", |m| m.as_str()) {
+                                    "" => None,
+                                    domain => Some(domain),
+                                }
+                            });
+                        let name = cell_name.unwrap_or("");
+                        let from = proxy_from.unwrap_or("").replace("_", ".");
+                        let to = proxy_to.unwrap_or("").replace("_", ".");
+                        debug!("Proxy for cell: {}. Proxy from: {}. Proxy to: {}", name, from, to);
+
+                        Proxy::new(&name.to_string(), &from.to_string(), &to.to_string())
+                    })
+                    .collect()
         }
     }
 }
