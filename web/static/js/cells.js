@@ -52,14 +52,11 @@ function render_cells() {
   </div> \
 </div> \
 </div>";
-                cell_template = cell_template.replace("__IPV4__", cell.ipv4);
-                cell_template = cell_template.replace("__NETID__", cell.netid);
-                cell_template = cell_template.replace("__STATUS__", cell.status);
-                cell_template = cell_template.replace("__NAME__", cell.name);
-                cell_template = cell_template.replace("__NAME__", cell.name);
-                cell_template = cell_template.replace("__NAME__", cell.name);
-                cell_template = cell_template.replace("__DOMAIN__", cell.domain);
-                cell_template = cell_template.replace("__DOMAIN__", cell.domain);
+                cell_template = cell_template.replace(/__IPV4__/g, cell.ipv4);
+                cell_template = cell_template.replace(/__NETID__/g, cell.netid);
+                cell_template = cell_template.replace(/__STATUS__/g, cell.status);
+                cell_template = cell_template.replace(/__NAME__/g, cell.name);
+                cell_template = cell_template.replace(/__DOMAIN__/g, cell.domain);
                 $("div.cells_list").append(cell_template);
             }
             // $("input#cell_form_name").removeClass("is-invalid");
