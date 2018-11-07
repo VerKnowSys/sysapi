@@ -306,7 +306,7 @@ impl Snapshot {
                             )
                         },
                         line => {
-                            debug!("ZFS snapshot matching pattern: {} is present. Output: {}", snapshot_name, stdout);
+                            debug!("ZFS snapshot matching pattern: {} is present. Output matched to: {}", snapshot_name, line);
                             Ok(line.to_string())
                         }
                     }
