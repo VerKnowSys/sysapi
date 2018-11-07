@@ -18,7 +18,7 @@
         </div>
 
         <div class="form-group">
-          <label for="snapshot_name">Snapshot name:</label>
+          <label for="snapshot_name">Snapshot Name:</label>
           <input class="form-control" id="snapshot_name" placeholder="snapname_01234" required>
           <div class="invalid-feedback">
             Snapshot name is required!
@@ -37,8 +37,7 @@
           Dataset successfully rollback'ed!
         </div>
       </form>
-
-    <button class="btn btn-primary" onclick="create_rollback();">Rollback</button>
+    <button class="btn btn-warning" onclick="confirm('Are you sure you wish to rollback? You cannot revert this!'); create_rollback();">Rollback to snapshot</button>
   </div>
 </div>
 
