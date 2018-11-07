@@ -49,6 +49,14 @@ pub struct Snapshot {
 }
 
 
+/// List of Snapshots:
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Snapshots {
+    /// List of all datasets of given cell
+    pub list: Option<List>,
+}
+
+
 /// List of ZFS Datasets:
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Datasets {
