@@ -33,8 +33,8 @@ function fill_list_of_snapshots() {
             dataType: "json",
             contentType : "application/json",
             success: function(data) {
-              for (var i = data.list.length - 1; i >= 0; i--) {
-                var dataset_and_snapshot = data.list[i];
+              for (var j = data.list.length - 1; j >= 0; j--) {
+                var dataset_and_snapshot = data.list[j];
                 if (dataset_and_snapshot != undefined && dataset_and_snapshot != "") {
                   $('select.snapshot_names').append("<option>".concat(dataset_and_snapshot).concat("</option>"));
                 } else {
