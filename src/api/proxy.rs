@@ -154,3 +154,40 @@ server {{
 }
 
 
+/// Implement response for GETs:
+impl IntoResponse for Proxy {
+    fn into_response(self, state: &State) -> Response<Body> {
+        // serialize only if name is set - so Proxy is initialized/ exists
+        match self.from {
+            Some(_) =>
+                create_response(
+                    state,
+                    StatusCode::OK,
+                    APPLICATION_JSON,
+                    serde_json::to_string(&self)
+                        .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
+                ),
+            None =>
+                create_response(
+                    state,
+                    StatusCode::NOT_FOUND,
+                    APPLICATION_JSON,
+                    Body::from("{\"status\": \"NotFound\"}"),
+                )
+        }
+    }
+}
+
+
+/// Implement response for GETs:
+impl IntoResponse for Proxies {
+    fn into_response(self, state: &State) -> Response<Body> {
+        create_response(
+            state,
+            StatusCode::OK,
+            APPLICATION_JSON,
+            serde_json::to_string(&self)
+                .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
+        )
+    }
+}
