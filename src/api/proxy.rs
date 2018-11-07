@@ -75,22 +75,33 @@ impl Proxy {
     }
 
 
-    /// Create new Web Proxy configuration:
+    /// Generate proxy entry (validation pass for: from/to is required)
     pub fn new(cell_name: &String, from: &String, to: &String) -> Result<Proxy, Error> {
         Zone::validate_domain_addresses(from, to)
             .and_then(|(valid_ipv4_from, valid_ipv4_to)| {
                 // When both domains are valid, create Proxy object:
-                let proxy = Proxy {
+                Ok(Proxy {
                     cell: Some(cell_name.to_string()),
                     config: Some(Proxy::config_from_template(from, to)),
                     from: Some(from.to_string()),
                     from_ipv4: Some(valid_ipv4_from),
                     to: Some(to.to_string()),
                     to_ipv4: Some(valid_ipv4_to),
-                };
+                })
+            })
+            .map_err(|err| {
+                error!("{}", err);
+                Error::new(ErrorKind::Other, err)
+            })
+    }
 
+
+    /// Create new Web Proxy configuration:
+    pub fn create(cell_name: &String, from: &String, to: &String) -> Result<Proxy, Error> {
+        Proxy::new(cell_name, from, to)
+            .and_then(|proxy| {
                 // Write Nginx proxy object to local file under dir: /Shared/Prison/Sentry/CELLNAME/cell-webconfs/*.conf:
-                let proxy_file_name = format!("{}_proxy_{}_{}.conf", cell_name, from.replace(".", "-"), to.replace(".", "-"));
+                let proxy_file_name = format!("{}_proxyfrom_{}_proxyto_{}.conf", cell_name, from.replace(".", "_"), to.replace(".", "_"));
                 let proxy_dest_dir = format!("{}/{}/cell-webconfs", SENTRY_PATH, cell_name);
                 let proxy_dest_file = format!("{}/{}", proxy_dest_dir, proxy_file_name);
 
@@ -113,7 +124,7 @@ impl Proxy {
                         let err_msg = format!("Atomic Write Failed for file: {}. Error details: {:?}!",
                                               &proxy_dest_file, err);
                         error!("{}", err_msg);
-                        FromStrError::UnexpectedEnd
+                        Error::new(ErrorKind::Other, err_msg)
                     })
             })
             .map_err(|err| {
