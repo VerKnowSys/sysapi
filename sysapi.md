@@ -1,5 +1,12 @@
 ## sysapi
 
+    - "/version":
+                 ✅ GET    > returns JSON object with version field.
+
+
+    - "/datasets/list/:cellname":
+                 ✅ GET    > returns JSON list of all datasets of given cellname.
+
 
     - "/cells/list":
 
