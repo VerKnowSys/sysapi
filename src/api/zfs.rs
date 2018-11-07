@@ -87,6 +87,15 @@ impl ToString for Snapshot {
 
 
 /// Serialize to JSON on .to_string()
+impl ToString for Snapshots {
+    fn to_string(&self) -> String {
+        serde_json::to_string(&self)
+            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
+    }
+}
+
+
+/// Serialize to JSON on .to_string()
 impl ToString for Rollback {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
