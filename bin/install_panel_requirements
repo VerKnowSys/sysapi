@@ -1,0 +1,47 @@
+#!/bin/sh
+
+
+SYSTEM_NAME="$(uname 2>/dev/null)"
+
+#
+# NOTE: using simplest yet most powerful admin template I've found:
+# https:#github.com/coreui/coreui-free-bootstrap-admin-template-ajax#versions
+#
+# NOTE: This is pure Ajax version that has to be installed manually, following steps::
+#
+# # make sure you have nodejs installed - version 10+ is latest LTS.
+#
+#      git clone https://github.com/coreui/coreui-free-bootstrap-admin-template-ajax.git
+#      cd coreui-free-bootstrap-admin-template-ajax
+#      npm install
+#      npm run build
+#      cp -R dist/* /your/dir/to/sysapi/web/
+#
+
+case "${SYSTEM_NAME}" in
+    Darwin)
+        _pwd="${PWD}"
+        _destdir="tmp/coreui-free-bootstrap-admin-template-ajax-$(date +%F-%S-%s 2>/dev/null)"
+        echo "Install: SysAPI Web Panel Requirements…"
+
+        mkdir -p "tmp"
+        git clone --depth 1 --jobs 4 \
+            "https://github.com/coreui/coreui-free-bootstrap-admin-template-ajax.git" \
+            "${_destdir}"
+        cd "${_destdir}"
+
+        echo "Install: Node NPM Modules…" && \
+            npm install && \
+            echo "Install: Run NPM Build…" && \
+            npm run build
+
+        cp -fvR dist/* "${_pwd}/web/"
+        cd "${_pwd}"
+        ;;
+
+    *)
+        echo "Platform not supported: ${SYSTEM_NAME}" && \
+            exit 1
+        ;;
+
+esac
