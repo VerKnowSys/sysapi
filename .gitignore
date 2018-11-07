@@ -1,4 +1,9 @@
 /target
 **/*.rs.bk
 *.lock
-web/**
+web/css/**
+web/img/**
+web/js/**
+web/vendors/**
+web/views/**
+web/*.html
