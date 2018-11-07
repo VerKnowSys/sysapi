@@ -175,8 +175,10 @@ pub fn zfs_snapshot_get_handler(state: State) -> (State, Snapshot) {
         },
         snapshot => {
             let dataset_path = &snapshot.split("@").take(1).collect();
-            (state, Snapshot::new(&cell_name, &dataset_path, &snapshot_name)
-                .unwrap_or(Snapshot::default()))
+            let snapshot_obj = Snapshot::new(&cell_name, &dataset_path, &snapshot_name).unwrap();
+            debug!("zfs_snapshot_get_handler(): Dataset path: {}. Full snapshot: {}. Snapshot object: {}",
+                   dataset_path, snapshot, snapshot_obj.to_string());
+            (state, snapshot_obj)
         }
     }
 }
