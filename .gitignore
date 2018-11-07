@@ -1,9 +1,8 @@
 /target
 **/*.rs.bk
 *.lock
-web/css/**
-web/img/**
-web/js/**
-web/vendors/**
-web/views/**
+tmp/**
+web/img/avatars/**
+web/img/brand/**
 web/*.html
+web/views/*
