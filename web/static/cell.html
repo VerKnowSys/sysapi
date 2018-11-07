@@ -1,0 +1,43 @@
+<script type="text/javascript" src="/static/js/dashboard.js"></script>
+<script type="text/javascript" src="/static/js/cell.js"></script>
+
+<div class="card w-50">
+  <div class="card-header bg-dark">
+    New Cell
+  </div>
+  <div class="card-body">
+
+      <form class="needs-validation" novalidate>
+
+        <div class="form-group">
+          <label for="cell_form_name">Name:</label>
+          <input class="form-control" id="cell_form_name" placeholder="acell0123" required>
+          <div class="invalid-feedback">
+            Cell name is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cell_form_key">ED25519 Public Key:</label>
+          <textarea class="form-control" id="cell_form_key" placeholder="the middle-key-part of your ~/.ssh/ed25519.pub" rows="3" required></textarea>
+          <div class="invalid-feedback">
+            Key is too short or is not a valid ED25519 public key!
+          </div>
+        </div>
+
+       <!--  <div class="form-group">
+          <label for="cell_owners">Owner:</label>
+          <select class="form-control" id="cell_owners">
+            <option selected>Default</option>
+          </select>
+        </div> -->
+
+        <div class="valid-feedback">
+          Cell successfully created
+        </div>
+      </form>
+
+    <button class="btn btn-primary" onclick="create_cell();">Create Cell</button>
+  </div>
+</div>
+
