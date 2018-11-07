@@ -17,7 +17,7 @@ function render_proxies() {
                 var proxy_template = "<div class=\"col-sm-6 col-lg-4\"> \
 <div class=\"brand-card\"> \
   <div class=\"brand-card-header bg-dark\"> \
-    <i class=\"fa cui-monitor\"></i> \
+    <i class=\"fa icon-share\"></i> \
   </div> \
   <div class=\"brand-card-body\"> \
       <div class=\"text-value\"></div> \
