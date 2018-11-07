@@ -1,5 +1,8 @@
 /// Project defaults
 
+/// Project directory (for static files access for router):
+pub const PROJECT_DIRECTORY: &'static str = "/Projects/sysapi";
+
 
 /// svdOS cell governor:
 pub const GVR_BIN: &'static str = "/usr/bin/gvr";

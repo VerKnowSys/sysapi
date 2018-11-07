@@ -25,7 +25,7 @@ pub fn router() -> Router {
 
         route
             .get("/")
-            .to_file("web/static/html/panel.html");
+            .to_file(format!("{}/web/static/html/panel.html", PROJECT_DIRECTORY));
 
         route
             .get("/*")
