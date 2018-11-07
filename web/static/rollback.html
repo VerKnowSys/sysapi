@@ -1,0 +1,44 @@
+<script type="text/javascript" src="/static/js/dashboard.js"></script>
+<script type="text/javascript" src="/static/js/rollback.js"></script>
+
+<div class="card w-50">
+  <div class="card-header bg-dark">
+    Rollback to snapshot
+  </div>
+  <div class="card-body">
+
+      <form class="needs-validation" novalidate>
+
+        <div class="form-group">
+          <label for="cell_name">Cell name:</label>
+          <input class="form-control" id="cell_name" placeholder="acell0123" required>
+          <div class="invalid-feedback">
+            Cell name is required!
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="snapshot_name">Snapshot name:</label>
+          <input class="form-control" id="snapshot_name" placeholder="snapname_01234" required>
+          <div class="invalid-feedback">
+            Snapshot name is required!
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="snapshot_dataset_path">ZFS Dataset:</label>
+          <input class="form-control" id="snapshot_dataset_path" placeholder="zroot/Some/Dataset/Path" required></textarea>
+          <div class="invalid-feedback">
+            ZFS Dataset Path is required!
+          </div>
+        </div>
+
+        <div class="valid-feedback">
+          Dataset successfully rollback'ed!
+        </div>
+      </form>
+
+    <button class="btn btn-primary" onclick="create_rollback();">Rollback</button>
+  </div>
+</div>
+
