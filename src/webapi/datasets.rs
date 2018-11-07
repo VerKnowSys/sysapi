@@ -176,8 +176,9 @@ pub fn zfs_snapshot_get_handler(state: State) -> (State, Response<Body>) {
         },
         snapshot => {
             let res = create_response(&state, StatusCode::OK, APPLICATION_JSON,
-                                      Body::from(format!("{{\"status\": \"OK\", \"snapshot\": [{}]}}",
-                                                         snapshot)));
+                                      snapshot.to_string());
+                                      // Body::from(format!("{{\"status\": \"OK\", \"snapshot\": [{}]}}",
+                                      //                    snapshot))); // XXX: returns multiple entries
             (state, res)
         }
     }
