@@ -207,9 +207,9 @@ impl Snapshot {
                         }
                     )
                 } else {
-                    let error_msg = format!("Unable to create snapshot: {}@{}", dataset_path, snapshot_name);
-                    error!("{}", error_msg);
-                    Err(
+                    .map_err(|err| {
+                        let error_msg = format!("Unable to create snapshot: {}@{}. Error cause: {}", dataset_path, snapshot_name, err);
+                        error!("{}", error_msg);
                         Error::new(ErrorKind::Other, error_msg)
                     )
                 }
@@ -351,7 +351,7 @@ impl Rollback {
                        }
                     )
                 } else {
-                    let error_msg = format!("Unable to create snapshot: {}@{}", dataset_path, snapshot_name);
+                    let error_msg = format!("Unable to rollback to: {}@{}", dataset_path, snapshot_name);
                     error!("{}", error_msg);
                     Err(
                         Error::new(ErrorKind::Other, error_msg)
