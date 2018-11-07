@@ -58,6 +58,9 @@ pub const SNAPSHOT_RESOURCE: &'static str = "/snapshot/";
 /// Cell ZFS Rollback management:
 pub const ROLLBACK_RESOURCE: &'static str = "/rollback/";
 
+/// Cell ZFS datasets management:
+pub const DATASETS_RESOURCE: &'static str = "/datasets/";
+
 
 /// Internal CellAPI module with system cell management:
 pub mod cell;
