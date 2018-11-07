@@ -21,7 +21,7 @@ function render_proxies() {
   </div> \
   <div class=\"brand-card-body\"> \
       <div class=\"text-value\"></div> \
-      <a href=\"#\" class=\"badge\"><div name=\"__NAME__\" from=\"__FROM__\" to=\"__TO__\" class=\"delete_proxy text-value cui-circle-x\"></div></a> \
+      <a href=\"#\" class=\"badge\"><div onclick=\"confirm('Are you sure you wish to destroy this Proxy?');\" name=\"__NAME__\" from=\"__FROM__\" to=\"__TO__\" class=\"delete_proxy text-value cui-circle-x\"></div></a> \
   </div> \
   <div class=\"brand-card-body\"> \
     <div> \
