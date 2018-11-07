@@ -19,6 +19,7 @@ extern crate domain;
 extern crate tokio;
 extern crate abstract_ns;
 extern crate ns_std_threaded;
+extern crate systemstat;
 
 extern crate sysapi;
 
