@@ -4,6 +4,7 @@ use gotham::handler::assets::*;
 
 
 use api::*;
+use webapi::internals::*;
 use webapi::cells::*;
 use webapi::datasets::*;
 use webapi::proxies::*;
@@ -57,6 +58,13 @@ pub fn router() -> Router {
 
 
         /* WebAPI: */
+
+        // …/version
+        route
+            .associate(
+                &format!("/version"), |handler| {
+                    handler.get().to(api_version_get_handler);
+                });
 
         // …/cells/list
         route
