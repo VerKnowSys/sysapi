@@ -291,7 +291,7 @@ impl Snapshot {
                     let matching_line: String = stdout
                         .split("\n")
                         .filter(|elem| {
-                            !elem.contains(&format!("@{}", snapshot_name))
+                            elem.contains(&format!("@{}", snapshot_name))
                         })
                         .map(|elem| {
                             format!("\"{}\"", elem)
