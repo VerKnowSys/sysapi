@@ -17,12 +17,13 @@ function render_snapshots() {
           if (cell_name != undefined && cell_name != "") {
             $.ajax({
               type: "GET",
-              url: "/snapshot/list/".concat(cell_name),
+              url: "/snapshot/".concat(cell_name),
               dataType: "json",
               contentType : "application/json",
-              success: function(data){
-                  for (var i = data.list.length - 1; i >= 0; i--) {
-                      var snapshot = data.list[i];
+              success: function(snapshot){
+                  // for (var i = data.list.length - 1; i >= 0; i--) {
+                      // var snapshot = data.list[i];
+
                       var snapshot_template = "\
   <tr class=\"delete_snapshot\" cell_name=\"__CELL_NAME__\" snapshot_name=\"__SNAPSHOT_NAME__\" dataset_path=\"__DATASET_PATH__\"> \
     <td>__CELL_NAME__</td> \
@@ -37,7 +38,7 @@ function render_snapshots() {
                       snapshot_template = snapshot_template.replace(/__TIMESTAMP__/g, snapshot.timestamp);
                       console.log("GNE: ".concat(snapshot_template));
                       $("tbody.snapshots_list").append(snapshot_template);
-                  }
+                  // }
               }
             });
           }
