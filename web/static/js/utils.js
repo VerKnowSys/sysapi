@@ -57,7 +57,8 @@ function fill_list_of_snapshots() {
 
 // Auto-Fill select with available Cell datasets
 function fill_list_of_datasets() {
-  var selected_cell_name = $("select.cell_name").val();
+  var selected_cell_name = $("select#cell_name").val();
+  console.log("fill_list_of_datasets(): ".concat(selected_cell_name));
   if (selected_cell_name != undefined && selected_cell_name != "") {
     $.ajax({
       type: "GET",
