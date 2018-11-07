@@ -333,8 +333,9 @@ impl Snapshot {
                             )
                         },
                         line => {
-                            debug!("ZFS snapshot matching pattern: {} is present. Output matched to: {}", snapshot_name, line);
-                            Ok(line.to_string())
+                            let entry = line.replace("\"", "");
+                            debug!("ZFS snapshot matching pattern: {} is present. Output matched to: {}", snapshot_name, entry);
+                            Ok(entry)
                         }
                     }
                 } else {
