@@ -75,6 +75,45 @@ pub fn zfs_snapshot_delete_handler(mut state: State) -> Box<HandlerFuture> {
 }
 
 
+/// handle GET for /datasets/list/:cell - list all datasets of cell
+pub fn zfs_dataset_list_handler(state: State) -> (State, Response<Body>) {
+    let uri = Uri::borrow_from(&state).to_string();
+    let cell_and_snapshot_name = uri.replace(DATASETS_RESOURCE, "");
+    let cell_name: String = cell_and_snapshot_name.split("/").skip(1).take(1).collect(); // first is "list", second "cell_name"
+
+    let pre_list = Datasets::list(&cell_name)
+        .and_then(|datasets| {
+            let string_list: String = datasets
+                .trim()
+                .split("\n")
+                .filter(|e| e.len() > 1)
+                .map(|e| format!("\"{}\", ", e))
+                .collect();
+            debug!("zfs_dataset_list_handler(): Cell name: {}, string_list: {}", cell_name, string_list);
+            Ok(string_list)
+        })
+        .map_err(|err| {
+            error!("Datasets list. Error details: {}", err);
+            err
+        })
+        .unwrap_or(String::from(""));
+    let list = &CUT_LAST_COMMA.replace(&pre_list, "");
+    match list.as_ref() {
+        "" => {
+            let res = create_response(&state, StatusCode::NOT_FOUND, APPLICATION_JSON,
+                                      Body::from("{\"status\": \"No ZFS Datasets.\", \"list\": []}"));
+            (state, res)
+        },
+        raw_list => {
+            let res = create_response(&state, StatusCode::OK, APPLICATION_JSON,
+                                      Body::from(format!("{{\"status\": \"OK\", \"list\": [{}]}}",
+                                                         raw_list)));
+            (state, res)
+        }
+    }
+}
+
+
 /// handle GET for /snapshot/list/:cell - list all snapshots of cell
 pub fn zfs_snapshot_list_handler(state: State) -> (State, Response<Body>) {
     let uri = Uri::borrow_from(&state).to_string();

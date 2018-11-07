@@ -105,6 +105,12 @@ pub fn router() -> Router {
                     handler.post().to(zfs_rollback_post_handler);
                 });
 
+        // …/datasets/list/:cell
+        route
+            .associate(
+                &format!("{}list/:cell", DATASETS_RESOURCE), |handler| {
+                    handler.get().to(zfs_dataset_list_handler);
+                });
 
         // …/proxy/:cell/:from/:to
         route
