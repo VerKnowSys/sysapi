@@ -1,8 +1,8 @@
 // Create Snapshot:
 function create_snapshot() {
-    var cell_name = $("select#cell_name").val();
+    var cell_name = $("select.cell_names").val();
     var snapshot_name = $("input#snapshot_name").val();
-    var dataset_path = $("input#snapshot_dataset_path").val();
+    var dataset_path = $("select#snapshot_dataset_path").val();
     if (snapshot_name != undefined && cell_name != undefined && snapshot_name != "" && cell_name != "" && dataset_path != undefined && dataset_path != "") {
         var url = "/snapshot/".concat(cell_name).concat("/").concat(snapshot_name);
         $.ajax({
@@ -17,19 +17,25 @@ function create_snapshot() {
               }
             },
             success: function(){
-                $("select#cell_name").removeClass("is-invalid");
+                $("select.cell_names").removeClass("is-invalid");
                 $("input#snapshot_name").removeClass("is-invalid");
                 $("div.valid-feedback").show();
             }
         });
     } else {
         if (cell_name == "" || cell_name == undefined) {
-            $("select#cell_name").addClass("is-invalid");
+            $("select.cell_names").addClass("is-invalid");
         } else {
-            $("select#cell_name").removeClass("is-invalid");
-            $("select#cell_name").addClass("is-valid");
+            $("select.cell_names").removeClass("is-invalid");
+            $("select.cell_names").addClass("is-valid");
         }
-        $("input#snapshot_name").addClass("is-invalid");
+        if (snapshot_name == "" || snapshot_name == undefined) {
+            $("input#snapshot_name").addClass("is-invalid");
+        } else {
+            $("input#snapshot_name").removeClass("is-invalid");
+            $("input#snapshot_name").addClass("is-valid");
+        }
+        $("select.datasets_names").addClass("is-invalid");
     }
 }
 
@@ -64,6 +70,7 @@ function delete_snapshot(cell_name, dataset_path, snapshot_name) {
 $( document ).ready(function() {
   $('li.location_info').text("System Management Interface - New ZFS Snapshot");
   fill_list_of_cells();
+  fill_list_of_datasets();
 
   // Handle delete cell (once):
   $(document).off("click",".delete_snapshot");

@@ -29,7 +29,9 @@
 
         <div class="form-group">
           <label for="snapshot_dataset_path">ZFS Dataset:</label>
-          <input class="form-control" id="snapshot_dataset_path" placeholder="zroot/Some/Dataset/Path" required></textarea>
+          <select class="datasets_names form-control" id="snapshot_dataset_path" required>
+            <!-- <option></option> -->
+          </select>
           <div class="invalid-feedback">
             ZFS Dataset Path is required!
           </div>
