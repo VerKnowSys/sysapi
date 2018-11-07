@@ -31,6 +31,7 @@ function render_snapshots() {
                       dataType: "json",
                       contentType : "application/json",
                       success: function(snapshot_obj) {
+                        console.log("SNAPSHOT_OBJECT: ".concat(JSON.stringify(snapshot_obj)));
                         var snapshot_template = "\
 <tr class=\"delete_snapshot\" cell_name=\"__CELL_NAME__\" snapshot_name=\"__SNAPSHOT_NAME__\" dataset_path=\"__DATASET_PATH__\"> \
   <td>__CELL_NAME__</td> \
