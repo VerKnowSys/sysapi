@@ -194,34 +194,52 @@ impl Snapshot {
 
     /// Create snapshot of dataset with given name:
     pub fn new(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<Snapshot, Error> {
-        // ex: jexec -U worker centra24 zfs snapshot zroot/User/centra24@dupa
-        Command::new(JEXEC_BIN)
-            .arg("-U")
-            .arg(CELL_USERNAME)
-            .arg(cell_name)
-            .arg(ZFS_BIN)
-            .arg("snapshot")
-            .arg(format!("{}@{}", dataset_path, snapshot_name))
-            .output()
-            .and_then(|after_snap| {
-                if after_snap.status.success() {
-                    debug!("ZFS snapshot created:\n{}{}",
-                          String::from_utf8_lossy(&after_snap.stdout), String::from_utf8_lossy(&after_snap.stderr));
-                    Ok(
-                       Snapshot {
-                            name: Some(snapshot_name.to_owned()),
-                            cell_name: Some(cell_name.to_owned()),
-                            dataset_path: Some(dataset_path.to_owned()),
-                            timestamp: Some(Local::now().format("%y-%m-%d_%H%M%S-%s").to_string()),
+        Ok(Snapshot {
+            name: Some(snapshot_name.to_owned()),
+            cell_name: Some(cell_name.to_owned()),
+            dataset_path: Some(dataset_path.to_owned()),
+            timestamp: Some(Local::now().format("%y-%m-%d_%H%M%S-%s").to_string()),
+        })
+   }
+
+
+    /// Create snapshot of dataset with given name:
+    pub fn create(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<Snapshot, Error> {
+        Snapshot::new(&cell_name, &dataset_path, &snapshot_name)
+            .and_then(|_new_cell| {
+                Command::new(JEXEC_BIN)
+                    .arg("-U")
+                    .arg(CELL_USERNAME)
+                    .arg(cell_name)
+                    .arg(ZFS_BIN)
+                    .arg("snapshot")
+                    .arg(format!("{}@{}", dataset_path, snapshot_name))
+                    .output()
+                    .and_then(|after_snap| {
+                        if after_snap.status.success() {
+                            debug!("ZFS snapshot created:\n{}{}",
+                                  String::from_utf8_lossy(&after_snap.stdout), String::from_utf8_lossy(&after_snap.stderr));
+                            Ok(
+                               Snapshot {
+                                    name: Some(snapshot_name.to_owned()),
+                                    cell_name: Some(cell_name.to_owned()),
+                                    dataset_path: Some(dataset_path.to_owned()),
+                                    timestamp: Some(Local::now().format("%y-%m-%d_%H%M%S-%s").to_string()),
+                                }
+                            )
+                        } else {
+                            let error_msg = format!("Unable to create snapshot: {}@{}", dataset_path, snapshot_name);
+                            error!("{}", error_msg);
+                            Err(
+                                Error::new(ErrorKind::Other, error_msg)
+                            )
                         }
-                    )
-                } else {
+                    })
                     .map_err(|err| {
                         let error_msg = format!("Unable to create snapshot: {}@{}. Error cause: {}", dataset_path, snapshot_name, err);
                         error!("{}", error_msg);
                         Error::new(ErrorKind::Other, error_msg)
-                    )
-                }
+                    })
             })
     }
 
