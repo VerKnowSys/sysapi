@@ -26,25 +26,27 @@ function fill_list_of_snapshots() {
     success: function(data) {
       for (var i = data.list.length - 1; i >= 0; i--) {
         var cell = data.list[i];
-        $.ajax({
-          type: "GET",
-          url: "/snapshot/list/".concat(cell.cell_name),
-          dataType: "json",
-          contentType : "application/json",
-          success: function(data) {
-            for (var i = data.list.length - 1; i >= 0; i--) {
-              var dataset_and_snapshot = data.list[i];
-              if (dataset_and_snapshot != undefined && dataset_and_snapshot != "") {
-                $('select.snapshot_names').append("<option>".concat(dataset_and_snapshot).concat("</option>"));
-              } else {
-                $("select#snapshot_name").addClass("is-invalid");
+        if (cell != undefined && cell != "") {
+          $.ajax({
+            type: "GET",
+            url: "/snapshot/list/".concat(cell.cell_name),
+            dataType: "json",
+            contentType : "application/json",
+            success: function(data) {
+              for (var i = data.list.length - 1; i >= 0; i--) {
+                var dataset_and_snapshot = data.list[i];
+                if (dataset_and_snapshot != undefined && dataset_and_snapshot != "") {
+                  $('select.snapshot_names').append("<option>".concat(dataset_and_snapshot).concat("</option>"));
+                } else {
+                  $("select#snapshot_name").addClass("is-invalid");
+                }
               }
+            },
+            error: function(doc, err) {
+              $("select#snapshot_name").addClass("is-invalid");
             }
-          },
-          error: function(doc, err) {
-            $("select#snapshot_name").addClass("is-invalid");
-          }
-        });
+          });
+        }
       }
     }
   });
