@@ -29,12 +29,12 @@ function fill_list_of_snapshots() {
         if (cell != undefined && cell != "") {
           $.ajax({
             type: "GET",
-            url: "/snapshot/list/".concat(cell.cell_name),
+            url: "/snapshot/list/".concat(cell.name),
             dataType: "json",
             contentType : "application/json",
-            success: function(data) {
-              for (var j = data.list.length - 1; j >= 0; j--) {
-                var dataset_and_snapshot = data.list[j];
+            success: function(snap_data) {
+              for (var j = snap_data.list.length - 1; j >= 0; j--) {
+                var dataset_and_snapshot = snap_data.list[j];
                 if (dataset_and_snapshot != undefined && dataset_and_snapshot != "") {
                   $('select.snapshot_names').append("<option>".concat(dataset_and_snapshot).concat("</option>"));
                 } else {
@@ -74,14 +74,14 @@ function fill_list_of_datasets() {
               for (var i = data.list.length - 1; i >= 0; i--) {
                 var dataset_and_snapshot = data.list[i];
                 if (dataset_and_snapshot != undefined && dataset_and_snapshot != "") {
-                  $('select.datasets_names').append("<option>".concat(dataset_and_snapshot).concat("</option>"));
+                  $('select#snapshot_dataset_path').append("<option>".concat(dataset_and_snapshot).concat("</option>"));
                 } else {
-                  $("select.datasets_names").addClass("is-invalid");
+                  $("select#snapshot_dataset_path").addClass("is-invalid");
                 }
               }
             },
             error: function(doc, err) {
-              $("select.datasets_names").addClass("is-invalid");
+              $("select#snapshot_dataset_path").addClass("is-invalid");
             }
           });
         }
