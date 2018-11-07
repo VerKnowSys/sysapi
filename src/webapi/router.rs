@@ -39,13 +39,13 @@ pub fn router() -> Router {
 
         route
             .get("/")
-            .to_file("web/index.html");
+            .to_file("web/static/panel.html");
 
         route
             .get("/*")
-                .to_dir(FileOptions::new("web/")
-                .with_gzip(true)
-                .build()
+            .to_dir(FileOptions::new("web/")
+            .with_gzip(true)
+            .build()
         );
 
         route
