@@ -209,7 +209,7 @@ pub fn zfs_snapshot_post_handler(mut state: State) -> Box<HandlerFuture> {
                     let res = create_response(&state, StatusCode::NOT_ACCEPTABLE, APPLICATION_JSON, Body::from("{\"status\": \"Not Acceptable\"}"));
                     future::ok((state, res))
                 } else {
-                    match Snapshot::new(&cell_name, &dataset_path, &snapshot_name) {
+                    match Snapshot::create(&cell_name, &dataset_path, &snapshot_name) {
                         Ok(snapshot) => {
                             debug!("Snapshot created: {}", snapshot.to_string());
                             let res = create_response(&state, StatusCode::CREATED, APPLICATION_JSON, Body::from("{\"status\": \"Created\"}"));
