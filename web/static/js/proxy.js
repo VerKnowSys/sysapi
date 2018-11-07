@@ -61,6 +61,7 @@ function delete_proxy(name, internal, external) {
 
 $( document ).ready(function() {
   $('li.location_info').text("System Management Interface - New Proxy");
+  fill_list_of_cells();
 
   // Handle delete cell (once):
   $(document).off("click",".delete_proxy");
