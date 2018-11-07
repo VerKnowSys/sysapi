@@ -101,12 +101,12 @@ pub fn zfs_snapshot_list_handler(state: State) -> (State, Response<Body>) {
     match list.as_ref() {
         "" => {
             let res = create_response(&state, StatusCode::NOT_FOUND, APPLICATION_JSON,
-                                      Body::from("{\"status\": \"Snapshot not found.\"}"));
+                                      Body::from("{\"status\": \"No Snapshots.\", \"list\": []}"));
             (state, res)
         },
         raw_list => {
             let res = create_response(&state, StatusCode::OK, APPLICATION_JSON,
-                                      Body::from(format!("{{\"status\": \"OK\", \"snapshots\": [{}]}}",
+                                      Body::from(format!("{{\"status\": \"OK\", \"list\": [{}]}}",
                                                          raw_list)));
             (state, res)
         }
