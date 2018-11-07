@@ -1,4 +1,7 @@
 
+/// Public SysAPI (internal):
+pub mod internals;
+
 /// Public SysAPI Web utilities functions
 pub mod utils;
 
