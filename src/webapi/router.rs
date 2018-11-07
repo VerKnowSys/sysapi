@@ -29,14 +29,14 @@ pub fn router() -> Router {
 
         route
             .get("/*")
-            .to_dir(FileOptions::new("web/")
+            .to_dir(FileOptions::new(format!("{}/web/", PROJECT_DIRECTORY))
             .with_gzip(true)
             .build()
         );
 
         route
             .get("/static/*")
-            .to_dir(FileOptions::new("web/static/")
+            .to_dir(FileOptions::new(format!("{}/web/static/", PROJECT_DIRECTORY))
             .with_gzip(false)
             .build()
         );
