@@ -5,7 +5,7 @@ use hyper::{StatusCode, Body, Response};
 use serde_json;
 use gotham::helpers::http::response::create_response;
 use std::io::BufReader;
-use std::fs::File;
+use std::fs;
 use mime::*;
 
 use std::net::*;
@@ -206,6 +206,27 @@ impl Proxy {
                 error!("{}", err);
                 Error::new(ErrorKind::Other, err)
             })
+    }
+
+
+    /// Destroy Web Proxy configuration:
+    pub fn destroy(cell_name: &String, from: &String, to: &String) -> Result<(), Error> {
+        let proxy_file_name = format!("{}_proxyfrom_{}_proxyto_{}.conf", cell_name, from.replace(".", "_"), to.replace(".", "_"));
+        let proxy_dest_dir = format!("{}/{}/cell-webconfs", SENTRY_PATH, cell_name);
+        let proxy_dest_file = format!("{}/{}", proxy_dest_dir, proxy_file_name);
+        debug!("Calling Proxy::destroy() on file: {}", &proxy_dest_file);
+
+        match fs::remove_file(&proxy_dest_file) {
+            Ok(_) => {
+                debug!("Destroyed Proxy configuration from file: {}", &proxy_dest_file);
+                Ok(())
+            },
+            Err(err) => {
+                let err_msg = format!("Error destroying Proxy file: {}! Error details: {:?}", &proxy_dest_file, err);
+                error!("{}", err_msg);
+                Err(Error::new(ErrorKind::Other, err_msg))
+            }
+        }
     }
 
 
