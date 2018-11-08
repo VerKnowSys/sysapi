@@ -332,11 +332,11 @@ impl Default for Systat {
                         debug!("CPU load: {}% user, {}% nice, {}% system, {}% intr, {}% idle ",
                             cpu.user * 100.0, cpu.nice * 100.0, cpu.system * 100.0, cpu.interrupt * 100.0, cpu.idle * 100.0);
                         Ok(
-                            SystatCPU {
-                                user: Some(cpu.user.into()),
-                                system: Some(cpu.system.into()),
-                                interrupt: Some(cpu.interrupt.into()),
-                                idle: Some(cpu.idle.into()),
+                            SystatCPU { // NOTE: percentage:
+                                user: Some(100.0 * cpu.user as f64),
+                                system: Some(100.0 * cpu.system as f64),
+                                interrupt: Some(100.0 * cpu.interrupt as f64),
+                                idle: Some(100.0 * cpu.idle as f64),
                                 temperature: Some(cputemp_stat.into()),
                             }
                         )
