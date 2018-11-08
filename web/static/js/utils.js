@@ -65,7 +65,7 @@ function fill_list_of_snapshots() {
 // Auto-Fill select with available Cell datasets
 function fill_list_of_datasets() {
   var selected_cell_name = $("select.cell_names").val();
-  console.log("fill_list_of_datasets(): ".concat(selected_cell_name));
+  console.log("fill_list_of_datasets() for cell: ".concat(selected_cell_name));
   if (selected_cell_name != undefined && selected_cell_name != "") {
     $.ajax({
       type: "GET",
@@ -76,29 +76,11 @@ function fill_list_of_datasets() {
         for (var i = data.list.length - 1; i >= 0; i--) {
           var dataset = data.list[i];
           if (dataset != undefined && dataset != "") {
-            $.ajax({
-              type: "GET",
-              url: "/datasets/".concat(selected_cell_name),
-              dataType: "json",
-              contentType : "application/json",
-              success: function(datasets) {
-                for (var j = datasets.list.length - 1; j >= 0; j--) {
-                  var dataset_and_snapshot = datasets.list[j];
-                  if (dataset_and_snapshot != undefined && dataset_and_snapshot != "") {
-                    if (j == datasets.list.length - 1) {
-                      $('select.datasets_names').append("<option disabled selected hidden value=\"\">Pick a Dataset</option>");
-                    } else {
-                      $('select.datasets_names').append("<option>".concat(dataset_and_snapshot).concat("</option>"));
-                    }
-                  } else {
-                    $("select.datasets_names").addClass("is-invalid");
-                  }
-                }
-              },
-              error: function(doc, err) {
-                $("select.datasets_names").addClass("is-invalid");
-              }
-            });
+            if (i == datasets.list.length - 1) {
+              $('select.datasets_names').append("<option disabled selected hidden value=\"\">Pick a Dataset</option>");
+            } else {
+              $('select.datasets_names').append("<option>".concat(dataset).concat("</option>"));
+            }
           }
         }
       }
