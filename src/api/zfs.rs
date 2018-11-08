@@ -288,7 +288,7 @@ impl Snapshot {
                     let string_list = String::from_utf8_lossy(&after_snap.stdout)
                         .split("\n")
                         .filter(|elem| {
-                            !elem.contains(&format!("/{}/", cell_name))
+                            elem.contains(&format!("{}", cell_name))
                         })
                         .map(|elem| {
                             format!("\"{}\"", elem)
