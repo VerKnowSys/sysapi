@@ -84,7 +84,11 @@ function fill_list_of_datasets() {
               for (var j = datasets.list.length - 1; j >= 0; j--) {
                 var dataset_and_snapshot = datasets.list[j];
                 if (dataset_and_snapshot != undefined && dataset_and_snapshot != "") {
-                  $('select.datasets_names').append("<option disabled selected hidden value=\"\">Pick a Dataset</option>");
+                  if (j == datasets.list.length - 1) {
+                    $('select.datasets_names').append("<option disabled selected hidden value=\"\">Pick a Dataset</option>");
+                  } else {
+                    $('select.datasets_names').append("<option>".concat(dataset_and_snapshot).concat("</option>"));
+                  }
                 } else {
                   $("select.datasets_names").addClass("is-invalid");
                 }
