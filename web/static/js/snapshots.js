@@ -12,18 +12,23 @@ function render_snapshots() {
       dataType: "json",
       contentType : "application/json",
       success: function(data) {
+        console.log("Got: " + JSON.stringify(data.list.length) + " object cells.");
         for (var i = data.list.length - 1; i >= 0; i--) {
           var cell = data.list[i];
+          var url = "/snapshot/list/".concat(cell.name);
           if (cell.name != undefined && cell.name != "") {
             $.ajax({
               type: "GET",
-              url: "/snapshot/list/".concat(cell.name),
+              url: url,
               dataType: "json",
               contentType : "application/json",
               success: function(snaps) {
+                console.log("Got: " + snaps.list.length + " snapshots.");
                 for (var j = snaps.list.length - 1; j >= 0; j--) {
                   var dataset_and_snap = snaps.list[j];
                   var snapshot_name = dataset_and_snap.split("@")[1];
+                  console.log("Got: '" + snapshot_name + "' snapshot name.");
+
                   if (snapshot_name != undefined && snapshot_name != "") {
                     $.ajax({
                       type: "GET",
@@ -39,10 +44,10 @@ function render_snapshots() {
   <td>__DATASET_PATH__</td> \
   <td>__TIMESTAMP__</td> \
 </tr> \
-                        ";
+";
+                        snapshot_template = snapshot_template.replace(/__SNAPSHOT_NAME__/g, snapshot_obj.name);
                         snapshot_template = snapshot_template.replace(/__CELL_NAME__/g, snapshot_obj.cell_name);
                         snapshot_template = snapshot_template.replace(/__DATASET_PATH__/g, snapshot_obj.dataset_path);
-                        snapshot_template = snapshot_template.replace(/__SNAPSHOT_NAME__/g, snapshot_obj.name);
                         snapshot_template = snapshot_template.replace(/__TIMESTAMP__/g, snapshot_obj.timestamp);
                         console.log("Snapshot template: ".concat(snapshot_template));
                         $("tbody.snapshots_list").append(snapshot_template);
