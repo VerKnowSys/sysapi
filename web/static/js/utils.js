@@ -9,7 +9,11 @@ function fill_list_of_cells() {
     success: function(data) {
       for (var i = data.list.length - 1; i >= 0; i--) {
         var cell = data.list[i];
-        $('select.cell_names').append("<option>".concat(cell.name).concat("</option>"));
+        if (i == data.list.length - 1) {
+          $('select.cell_names').append("<option selected value=\"\">Pick a Cell</option>");
+        } else {
+          $('select.cell_names').append("<option>".concat(cell.name).concat("</option>"));
+        }
       }
     }
   });
@@ -38,7 +42,11 @@ function fill_list_of_snapshots() {
                 var dataset_and_snapshot = snap_data.list[j];
                 console.log("dataset_and_snapshot: ".concat(dataset_and_snapshot));
                 if (dataset_and_snapshot != undefined && dataset_and_snapshot != "") {
-                  $('select.snapshot_names').append("<option>".concat(dataset_and_snapshot).concat("</option>"));
+                  if (j == snap_data.list.length - 1) {
+                    $('select.snapshot_names').append("<option disabled selected hidden value=\"\">Pick a Cell</option>");
+                  } else {
+                    $('select.snapshot_names').append("<option>".concat(dataset_and_snapshot).concat("</option>"));
+                  }
                 } else {
                   $("select#snapshot_name").addClass("is-invalid");
                 }
@@ -77,9 +85,9 @@ function fill_list_of_datasets() {
               for (var i = data.list.length - 1; i >= 0; i--) {
                 var dataset_and_snapshot = data.list[i];
                 if (dataset_and_snapshot != undefined && dataset_and_snapshot != "") {
-                  $('select#snapshot_dataset_path').append("<option>".concat(dataset_and_snapshot).concat("</option>"));
+                  $('select.datasets_names').append("<option disabled selected hidden value=\"\">Pick a Cell</option>");
                 } else {
-                  $("select#snapshot_dataset_path").addClass("is-invalid");
+                  $("select.datasets_names").addClass("is-invalid");
                 }
               }
             },
