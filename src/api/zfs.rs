@@ -340,8 +340,7 @@ impl Snapshot {
                             elem.contains(&format!("@{}", snapshot_name))
                         })
                         .map(|elem| {
-                            let mod_elem = elem.replace("\"", "");
-                            format!("\"{}\", ", mod_elem)
+                            format!("\"{}\", ", elem)
                         })
                         .collect();
                     let matching_line = &CUT_LAST_COMMA.replace(&pre_line, "");
@@ -393,7 +392,7 @@ impl Rollback {
                     Ok(
                        Rollback {
                            name: Some(snapshot_name.to_owned()),
-                           dataset_path: Some(dataset_path.to_owned()),
+                           dataset_path: Some(dataset_path.replace("\"", "").to_owned()),
                            cell_name: Some(cell_name.to_owned()),
                            timestamp: Some(Local::now().format("%y-%m-%d_%H%M%S").to_string()),
                        }
