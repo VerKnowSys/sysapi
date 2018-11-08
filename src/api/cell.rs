@@ -376,11 +376,5 @@ pub fn destroy_cell(name: &String) -> Result<(), Error> {
                 Err(Error::new(ErrorKind::Other, format!("Couldn't destroy_cell(): {}", name)))
             }
         })
-        .map_err(|err| {
-            let error_msg = format!("Failure: {}", err);
-            error!("ERROR: {}", error_msg);
-            debug!("DEBUG(err): {:?}", err);
-            err
-        })
 }
 

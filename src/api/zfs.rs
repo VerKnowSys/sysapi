@@ -245,11 +245,6 @@ impl Snapshot {
                             )
                         }
                     })
-                    .map_err(|err| {
-                        let error_msg = format!("Unable to create snapshot: {}@{}. Error cause: {}", dataset_path, snapshot_name, err);
-                        error!("{}", error_msg);
-                        Error::new(ErrorKind::Other, error_msg)
-                    })
             })
     }
 
