@@ -296,7 +296,7 @@ impl Snapshot {
                         })
                         .collect();
                     let final_list = &CUT_LAST_COMMA.replace(&string_list, "");
-                    debug!("List of ZFS snapshots of cell: {}: {}", &cell_name, &final_list);
+                    debug!("List of ZFS snapshots of cell: {}: [{}]", &cell_name, &final_list);
                     Ok(final_list.to_string())
                 } else {
                     let error_msg = format!("ZFS snapshot listing failed!");
