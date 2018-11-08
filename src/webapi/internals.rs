@@ -38,21 +38,22 @@ pub fn api_systat_get_handler(state: State) -> (State, String) {
         Err(x) => warn!("Mounts: error: {}", x)
     }
 
-    match sys.block_device_statistics() {
-        Ok(stats) => {
-            let all: List = stats
-                .values()
-                .map(|stat| {
-                    format!("{}='{:?}'", stat.name, stat) // TODO: wrap it around structures
-                })
-                .collect();
-            systat.insert(
-                "Block Statistics".to_string(),
-                format!("{}", all.join(" ")),
-            );
-        }
-        Err(x) => warn!("Block statistics error: {}", x.to_string())
-    }
+    // NOTE: this is not supported for FreeBSD hosts ATM:
+    // match sys.block_device_statistics() {
+    //     Ok(stats) => {
+    //         let all: List = stats
+    //             .values()
+    //             .map(|stat| {
+    //                 format!("{}='{:?}'", stat.name, stat) // TODO: wrap it around structures
+    //             })
+    //             .collect();
+    //         systat.insert(
+    //             "Block Statistics".to_string(),
+    //             format!("{}", all.join(" ")),
+    //         );
+    //     }
+    //     Err(x) => warn!("Block statistics error: {}", x.to_string())
+    // }
 
     match sys.networks() {
         Ok(orig_netifs) => {
