@@ -174,11 +174,17 @@ impl Default for SystatCPU {
 }
 
 
+lazy_static! {
+
+    /// System handle for Systat
+    pub static ref SYSTEM: System = System::new();
+
+}
+
+
 impl Default for Systat {
     fn default() -> Systat {
-        let system = System::new();
-
-        let mounts_stat = system
+        let mounts_stat = SYSTEM
             .mounts()
             .and_then(|mounts| {
                 mounts
@@ -210,7 +216,7 @@ impl Default for Systat {
             })
             .unwrap_or(vec!());
 
-        let networks_stat = system
+        let networks_stat = SYSTEM
             .networks()
             .and_then(|orig_netifs| {
                 orig_netifs
@@ -249,7 +255,7 @@ impl Default for Systat {
             })
             .unwrap_or(vec!());
 
-        let memory_stat = system
+        let memory_stat = SYSTEM
             .memory()
             .and_then(|mem| {
                 debug!("Memory total: {}. Memory used: {}. Memory free: {}",
@@ -268,7 +274,7 @@ impl Default for Systat {
             })
             .unwrap_or(SystatMemory::default());
 
-        let loadavg_stat = system
+        let loadavg_stat = SYSTEM
             .load_average()
             .and_then(|loadavg| {
                 debug!("Load average: 1min: {},  5min: {},  15min: {}",
@@ -287,7 +293,7 @@ impl Default for Systat {
             })
             .unwrap_or(SystatSysLoad::default());
 
-        let uptime_stat = system
+        let uptime_stat = SYSTEM
             .uptime()
             .and_then(|uptime| {
                 let duration = Duration::from(uptime);
@@ -304,7 +310,7 @@ impl Default for Systat {
 
         let utc_now = Local::now().naive_local();
         let rfc_date_now = DateTime::<Utc>::from_utc(utc_now, Utc).to_rfc2822();
-        let boottime_stat = system
+        let boottime_stat = SYSTEM
             .boot_time()
             .and_then(|boot_time| {
                 let rfc_date = DateTime::from(boot_time).to_rfc2822();
@@ -319,7 +325,7 @@ impl Default for Systat {
             })
             .unwrap_or(rfc_date_now);
 
-        let cputemp_stat = system
+        let cputemp_stat = SYSTEM
             .cpu_temp()
             .and_then(|cpu_temp| {
                 debug!("CPU Temperature: {}", cpu_temp);
@@ -330,7 +336,7 @@ impl Default for Systat {
             })
             .unwrap_or(0.0);
 
-        let cpu_stat = system
+        let cpu_stat = SYSTEM
             .cpu_load_aggregate()
             .and_then(|main_cpu| {
                 debug!("CPU Load - Measure in progress…");
