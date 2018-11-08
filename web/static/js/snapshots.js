@@ -14,21 +14,21 @@ function render_snapshots() {
       dataType: "json",
       contentType : "application/json",
       success: function(snaps) {
-        console.log("Got: " + snaps.list.length + " snapshots.");
+        // console.log("Got: " + snaps.list.length + " snapshots.");
         for (var j = snaps.list.length - 1; j >= 0; j--) {
           var dataset_and_snap = snaps.list[j];
           var snapshot_name = dataset_and_snap.split("@")[1];
           if (snapshot_name == "origin" || snapshot_name == "after_export")
             continue;
 
-          console.log("Got: '" + dataset_and_snap + "' - 'dataset@snapshot'");
+          // console.log("Got: '" + dataset_and_snap + "' - 'dataset@snapshot'");
           $.ajax({
             type: "GET",
             url: "/snapshot/".concat(cell_name).concat("/").concat(snapshot_name),
             dataType: "json",
             contentType : "application/json",
             success: function(snapshot_obj) {
-              console.log("SNAPSHOT_OBJECT: " + JSON.stringify(snapshot_obj));
+              // console.log("SNAPSHOT_OBJECT: " + JSON.stringify(snapshot_obj));
               var snapshot_template = "\
 <tr class=\"delete_snapshot\" cell_name=\"__CELL_NAME__\" snapshot_name=\"__SNAPSHOT_NAME__\" dataset_path=\"__DATASET_PATH__\"> \
   <td>__CELL_NAME__</td> \
