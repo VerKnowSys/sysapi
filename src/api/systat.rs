@@ -229,6 +229,7 @@ impl Default for Systat {
                                     },
                                 }
                             })
+                            .filter(|ref nif| !nif.is_empty())
                             .collect::<List>();
                         Ok(
                             SystatNetif {
