@@ -43,7 +43,7 @@ function create_snapshot() {
 // Delete Snapshot:
 function delete_snapshot(cell_name, dataset_path, snapshot_name) {
   if (cell_name != undefined && cell_name != "" && snapshot_name != undefined && snapshot_name != "" && snapshot_name != undefined && snapshot_name != "") {
-      var url = "/cell/".concat(cell_name).concat("/").concat(snapshot_name);
+      var url = "/snapshot/".concat(cell_name).concat("/").concat(snapshot_name);
       $.ajax({
           type: "DELETE",
           url: url,
