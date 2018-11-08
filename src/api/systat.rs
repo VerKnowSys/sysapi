@@ -46,31 +46,6 @@ pub struct Systat {
     /// Active Networks
     networks: Option<ListNetifs>,
 
-    /// Active Network Statistics
-    network_stats: Option<SystatNetstats>,
-
-}
-
-
-/// System SystatNetstats Stat
-#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
-pub struct SystatNetstats {
-
-    /// tcp_sockets in use
-    tcp_sockets_in_use: Option<usize>,
-
-    /// tcp_sockets_o ph ned
-    tcp_sockets_orphaned: Option<usize>,
-
-    /// udp_sockets in use
-    udp_sockets_in_use: Option<usize>,
-
-    /// tcp6_sockets in use
-    tcp6_sockets_in_use: Option<usize>,
-
-    /// udp6_sockets in use
-    udp6_sockets_in_use: Option<usize>,
-
 }
 
 
@@ -193,19 +168,6 @@ impl Default for SystatCPU {
             interrupt: None,
             idle: None,
             temperature: None,
-        }
-    }
-}
-
-
-impl Default for SystatNetstats {
-    fn default() -> SystatNetstats {
-        SystatNetstats {
-            tcp_sockets_in_use: None,
-            tcp_sockets_orphaned: None,
-            udp_sockets_in_use: None,
-            tcp6_sockets_in_use: None,
-            udp6_sockets_in_use: None,
         }
     }
 }
@@ -380,26 +342,6 @@ impl Default for Systat {
             })
             .unwrap_or(SystatCPU::default());
 
-        let network_stats = system
-            .socket_stats()
-            .and_then(|stats| {
-                debug!("System socket statistics: {:?}", stats);
-                Ok(
-                    SystatNetstats {
-                       tcp_sockets_in_use: Some(stats.tcp_sockets_in_use),
-                       tcp_sockets_orphaned: Some(stats.tcp_sockets_orphaned),
-                       udp_sockets_in_use: Some(stats.udp_sockets_in_use),
-                       tcp6_sockets_in_use: Some(stats.tcp6_sockets_in_use),
-                       udp6_sockets_in_use: Some(stats.udp6_sockets_in_use),
-                   }
-                )
-            })
-            .map_err(|err| {
-                warn!("Netstats Failure: {}", err);
-                err
-            })
-            .unwrap_or(SystatNetstats::default());
-
         // Now wrap everything with a single structure:
         Systat {
             loadavg: Some(loadavg_stat),
@@ -409,7 +351,6 @@ impl Default for Systat {
             memory: Some(memory_stat),
             mounts: Some(mounts_stat),
             networks: Some(networks_stat),
-            network_stats: Some(network_stats),
         }
     }
 }
