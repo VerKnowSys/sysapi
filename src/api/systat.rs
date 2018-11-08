@@ -182,6 +182,11 @@ impl Default for Systat {
             .and_then(|mounts| {
                 mounts
                     .iter()
+                    .filter(|mount| {
+                        mount.fs_type == "zfs"
+                            && mount.fs_mounted_from != "zroot"
+                            && mount.fs_mounted_from != "zroot/ROOT"
+                    })
                     .map(|mount| {
                         Ok(
                             SystatMount {
