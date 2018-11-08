@@ -144,12 +144,6 @@ impl ToString for Proxy {
 impl Proxy {
 
 
-    /// Empty proxy
-    pub fn empty() -> Result<Proxy, Error> {
-        Ok(Proxy::default())
-    }
-
-
     /// Generate proxy entry (validation pass for: from/to is required)
     pub fn new(cell_name: &String, from: &String, to: &String) -> Result<Proxy, Error> {
         Zone::validate_domain_addresses(from, to)
