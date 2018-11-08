@@ -161,7 +161,7 @@ pub fn zfs_snapshot_get_handler(state: State) -> (State, Snapshot) {
         snapshot => {
             let dataset_path: &String = &snapshot.split("@").take(1).collect();
             let snapshot_obj = Snapshot::new(&cell_name,
-                                             &dataset_path.replace("\\\"", "").replace("\"", ""),
+                                             &dataset_path.replace("\\\"", "").replace("\"", "").replace('"', ""),
                                              &snapshot_name).unwrap();
             debug!("zfs_snapshot_get_handler(): Dataset path: '{}'. Full snapshot: '{}'. Snapshot object: '{}'",
                    dataset_path, snapshot, snapshot_obj.to_string());
