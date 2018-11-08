@@ -340,7 +340,7 @@ impl Default for Systat {
             .cpu_load_aggregate()
             .and_then(|main_cpu| {
                 debug!("CPU Load - Measure in progress…");
-                thread::sleep(Duration::from_secs(1)); // XXX: TODO: make a future from it and process async timeout:
+                // thread::sleep(Duration::from_secs(1)); // XXX: TODO: make a future from it and process async timeout:
                 main_cpu
                     .done()
                     .and_then(|cpu| {
