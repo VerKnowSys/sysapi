@@ -76,7 +76,7 @@ function fill_list_of_datasets() {
         for (var i = data.list.length - 1; i >= 0; i--) {
           var dataset = data.list[i];
           if (dataset != undefined && dataset != "") {
-            if (i == datasets.list.length - 1) {
+            if (i == data.list.length - 1) {
               $('select.datasets_names').append("<option disabled selected hidden value=\"\">Pick a Dataset</option>");
             } else {
               $('select.datasets_names').append("<option>".concat(dataset).concat("</option>"));
