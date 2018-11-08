@@ -115,7 +115,7 @@ pub fn zfs_snapshot_list_handler(state: State) -> (State, Response<Body>) {
 
     let pre_list = Snapshot::list(&cell_name)
         .and_then(|string_list| {
-            debug!("zfs_snapshot_list_handler(): Cell name: {}, string_list: {}", cell_name, string_list);
+            debug!("zfs_snapshot_list_handler(): Cell name: {}, string_list: [{}]", cell_name, string_list);
             Ok(string_list)
         })
         .map_err(|err| {
