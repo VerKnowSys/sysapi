@@ -82,3 +82,6 @@ pub mod zfs;
 
 /// Internal SysAPI module with local DNS management:
 pub mod zone;
+
+/// Cell Systat module:
+pub mod systat;
