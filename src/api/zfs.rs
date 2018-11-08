@@ -285,9 +285,17 @@ impl Snapshot {
             .output()
             .and_then(|after_snap| {
                 if after_snap.status.success() {
-                    let strng = String::from_utf8_lossy(&after_snap.stdout);
-                    debug!("List of ZFS snapshots: {}", strng);
-                    Ok(strng.to_string())
+                    let string_list = String::from_utf8_lossy(&after_snap.stdout)
+                        .split("\n")
+                        .filter(|elem| {
+                            !elem.contains(&format!("/{}/", cell_name))
+                        })
+                        .map(|elem| {
+                            format!("\"{}\"", elem)
+                        })
+                        .collect();
+                    debug!("List of ZFS snapshots of cell: {}: {}", cell_name, string_list);
+                    Ok(string_list)
                 } else {
                     let error_msg = format!("ZFS snapshot listing failed!");
                     error!("{}", error_msg);
