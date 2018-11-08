@@ -30,8 +30,7 @@ function fill_list_of_snapshots() {
     success: function(data) {
       for (var i = data.list.length - 1; i >= 0; i--) {
         var cell = data.list[i];
-        console.log("fill_list_of_snapshots(): Cell: ".concat(JSON.stringify(cell)))
-        if (cell != undefined && cell != "") {
+        if (cell.name != undefined && cell.name != "") {
           $.ajax({
             type: "GET",
             url: "/snapshot/list/".concat(cell.name),
@@ -48,12 +47,12 @@ function fill_list_of_snapshots() {
                     $('select.snapshot_names').append("<option>".concat(dataset_and_snapshot).concat("</option>"));
                   }
                 } else {
-                  $("select#snapshot_name").addClass("is-invalid");
+                  $("select.snapshot_names").addClass("is-invalid");
                 }
               }
             },
             error: function(doc, err) {
-              $("select#snapshot_name").addClass("is-invalid");
+              $("select.snapshot_names").addClass("is-invalid");
             }
           });
         }
@@ -65,7 +64,7 @@ function fill_list_of_snapshots() {
 
 // Auto-Fill select with available Cell datasets
 function fill_list_of_datasets() {
-  var selected_cell_name = $("select#cell_name").val();
+  var selected_cell_name = $("select.cell_names").val();
   console.log("fill_list_of_datasets(): ".concat(selected_cell_name));
   if (selected_cell_name != undefined && selected_cell_name != "") {
     $.ajax({
@@ -81,9 +80,9 @@ function fill_list_of_datasets() {
             url: "/datasets/".concat(cell.cell_name),
             dataType: "json",
             contentType : "application/json",
-            success: function(data) {
-              for (var i = data.list.length - 1; i >= 0; i--) {
-                var dataset_and_snapshot = data.list[i];
+            success: function(datasets) {
+              for (var j = datasets.list.length - 1; j >= 0; j--) {
+                var dataset_and_snapshot = datasets.list[j];
                 if (dataset_and_snapshot != undefined && dataset_and_snapshot != "") {
                   $('select.datasets_names').append("<option disabled selected hidden value=\"\">Pick a Cell</option>");
                 } else {
@@ -92,7 +91,7 @@ function fill_list_of_datasets() {
               }
             },
             error: function(doc, err) {
-              $("select#snapshot_dataset_path").addClass("is-invalid");
+              $("select.datasets_names").addClass("is-invalid");
             }
           });
         }
