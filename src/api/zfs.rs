@@ -233,7 +233,7 @@ impl Snapshot {
                                Snapshot {
                                     name: Some(snapshot_name.to_owned()),
                                     cell_name: Some(cell_name.to_owned()),
-                                    dataset_path: Some(dataset_path.to_owned()),
+                                    dataset_path: Some(dataset_path.replace("\"", "").to_owned()),
                                     timestamp: Some(Local::now().format("%y-%m-%d_%H%M%S-%s").to_string()),
                                 }
                             )
