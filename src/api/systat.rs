@@ -215,6 +215,9 @@ impl Default for Systat {
             .and_then(|orig_netifs| {
                 orig_netifs
                     .values()
+                    .filter(|netif| {
+                        ! netif.name.starts_with("epair")
+                    })
                     .map(|netif| {
                         let addrs = netif
                             .addrs
@@ -233,7 +236,7 @@ impl Default for Systat {
                                     },
                                 }
                             })
-                            .filter(|ref nif| !nif.is_empty())
+                            .filter(|ref nif| ! nif.is_empty())
                             .collect::<List>();
                         Ok(
                             SystatNetif {
