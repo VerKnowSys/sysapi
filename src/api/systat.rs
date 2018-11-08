@@ -4,9 +4,9 @@ use hyper::{StatusCode, Body, Response};
 use serde_json;
 use gotham::helpers::http::response::create_response;
 use mime::*;
-use std::time::Duration;
-use chrono::Timelike;
 use std::thread; // XXX: temporary
+use std::time::Duration;
+use chrono::{Local, DateTime, Utc};
 use systemstat::*;
 use systemstat::ByteSize;
 
@@ -31,8 +31,8 @@ pub struct Systat {
     /// Uptime in seconds
     uptime: Option<u64>,
 
-    /// Boot Time in seconds
-    boot_time: Option<u64>,
+    /// Boot Time - DateTime String with RFC2822 format
+    boot_time: Option<String>,
 
     /// CPU Usage
     cpu: Option<SystatCPU>,
@@ -295,20 +295,22 @@ impl Default for Systat {
             })
             .unwrap_or(0);
 
+        let utc_now = Local::now().naive_local();
+        let rfc_date_now = DateTime::<Utc>::from_utc(utc_now, Utc).to_rfc2822();
         let boottime_stat = system
             .boot_time()
             .and_then(|boot_time| {
-                let duration = DateTime::from(boot_time);
-                debug!("BootTime: {}s", duration.second());
+                let rfc_date = DateTime::from(boot_time).to_rfc2822();
+                debug!("BootTime: {}", rfc_date);
                 Ok(
-                   duration.second()
+                   rfc_date
                 )
             })
             .map_err(|err| {
                 warn!("BootTime: Failure: {}", err);
                 err
             })
-            .unwrap_or(0);
+            .unwrap_or(rfc_date_now);
 
         let cputemp_stat = system
             .cpu_temp()
