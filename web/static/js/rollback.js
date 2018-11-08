@@ -1,7 +1,7 @@
 // Rollback to snapshot:
 function create_rollback() {
-    var cell_name = $("select#cell_name").val();
-    var snapshot_and_dataset = $("select#snapshot_name").val();
+    var cell_name = $("select.cell_names").val();
+    var snapshot_and_dataset = $("select.snapshot_names").val();
     if (snapshot_and_dataset != undefined && snapshot_and_dataset != "") {
         var dataset_path = snapshot_and_dataset.split("@")[0];
         var snapshot_name = snapshot_and_dataset.split("@")[1];
@@ -17,23 +17,23 @@ function create_rollback() {
                 contentType : "application/json",
                 statusCode: {
                   406: function() { // not allowed
-                    $("select#snapshot_name").addClass("is-invalid");
+                    $("select.snapshot_names").addClass("is-invalid");
                   }
                 },
                 success: function(){
-                    $("select#cell_name").removeClass("is-invalid");
-                    $("select#snapshot_name").removeClass("is-invalid");
+                    $("select.cell_names").removeClass("is-invalid");
+                    $("select.snapshot_names").removeClass("is-invalid");
                     $("div.valid-feedback").show();
                 }
             });
         } else {
             if (cell_name == "" || cell_name == undefined) {
-                $("select#cell_name").addClass("is-invalid");
+                $("select.cell_names").addClass("is-invalid");
             } else {
-                $("select#cell_name").removeClass("is-invalid");
-                $("select#cell_name").addClass("is-valid");
+                $("select.cell_names").removeClass("is-invalid");
+                $("select.cell_names").addClass("is-valid");
             }
-            $("select#snapshot_name").addClass("is-invalid");
+            $("select.snapshot_names").addClass("is-invalid");
         }
     }
 }
