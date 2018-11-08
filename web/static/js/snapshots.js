@@ -15,6 +15,7 @@ function render_snapshots() {
         console.log("Got: " + JSON.stringify(data.list.length) + " object cells.");
         for (var i = data.list.length - 1; i >= 0; i--) {
           var cell = data.list[i];
+          var cell_name = cell.name;
           var url = "/snapshot/list/".concat(cell.name);
           if (cell.name != undefined && cell.name != "") {
             $.ajax({
@@ -35,7 +36,7 @@ function render_snapshots() {
                   if (snapshot_name != undefined && snapshot_name != "") {
                     $.ajax({
                       type: "GET",
-                      url: "/snapshot/".concat(cell.name).concat("/").concat(snapshot_name),
+                      url: "/snapshot/".concat(cell_name).concat("/").concat(snapshot_name),
                       dataType: "json",
                       contentType : "application/json",
                       success: function(snapshot_obj) {
