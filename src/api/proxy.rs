@@ -196,10 +196,6 @@ impl Proxy {
                         Error::new(ErrorKind::Other, err_msg)
                     })
             })
-            .map_err(|err| {
-                error!("{}", err);
-                Error::new(ErrorKind::Other, err)
-            })
     }
 
 
