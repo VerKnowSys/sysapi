@@ -27,6 +27,9 @@ function render_snapshots() {
                 for (var j = snaps.list.length - 1; j >= 0; j--) {
                   var dataset_and_snap = snaps.list[j];
                   var snapshot_name = dataset_and_snap.split("@")[1];
+                  if (snapshot_name == "origin" || snapshot_name == "after_export")
+                    continue;
+
                   console.log("Got: '" + snapshot_name + "' snapshot name.");
 
                   if (snapshot_name != undefined && snapshot_name != "") {
