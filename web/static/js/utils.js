@@ -30,7 +30,8 @@ function fill_list_of_snapshots() {
     success: function(data) {
       for (var i = data.length - 1; i >= 0; i--) {
         var cell = data[i];
-        if (cell.name != undefined && cell.name != "") {
+        console.log("fill_list_of_snapshots(): ".concat(JSON.stringify(cell)));
+        if (cell != undefined && cell.name != "") {
           $.ajax({
             type: "GET",
             url: "/snapshot/list/".concat(cell.name),
