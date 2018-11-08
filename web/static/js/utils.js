@@ -28,10 +28,10 @@ function fill_list_of_snapshots() {
     dataType: "json",
     contentType : "application/json",
     success: function(data) {
-      for (var i = data.length - 1; i >= 0; i--) {
-        var cell = data[i];
+      for (var i = data.list.length - 1; i >= 0; i--) {
+        var cell = data.list[i];
         console.log("fill_list_of_snapshots(): ".concat(JSON.stringify(cell)));
-        if (cell != undefined && cell.name != "") {
+        if (cell.name != undefined && cell.name != "") {
           $.ajax({
             type: "GET",
             url: "/snapshot/list/".concat(cell.name),
