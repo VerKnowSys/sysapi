@@ -173,9 +173,18 @@ impl Datasets {
             .output()
             .and_then(|after_snap| {
                 if after_snap.status.success() {
-                    let strng = String::from_utf8_lossy(&after_snap.stdout);
-                    debug!("List of ZFS snapshots: {}", strng);
-                    Ok(strng.to_string())
+                    let string_list: String = String::from_utf8_lossy(&after_snap.stdout)
+                        .split("\n")
+                        .filter(|elem| {
+                            elem.contains(cell_name)
+                        })
+                        .map(|elem| {
+                            format!("\"{}\", ", elem)
+                        })
+                        .collect();
+                    let final_list = &CUT_LAST_COMMA.replace(&string_list, "");
+                    debug!("List of ZFS snapshots of cell: {}: {}", cell_name, final_list);
+                    Ok(final_list.to_string())
                 } else {
                     let error_msg = format!("ZFS snapshot listing failed!");
                     error!("{}", error_msg);
