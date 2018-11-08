@@ -75,29 +75,31 @@ function fill_list_of_datasets() {
       success: function(data) {
         for (var i = data.list.length - 1; i >= 0; i--) {
           var cell = data.list[i];
-          $.ajax({
-            type: "GET",
-            url: "/datasets/".concat(cell.cell_name),
-            dataType: "json",
-            contentType : "application/json",
-            success: function(datasets) {
-              for (var j = datasets.list.length - 1; j >= 0; j--) {
-                var dataset_and_snapshot = datasets.list[j];
-                if (dataset_and_snapshot != undefined && dataset_and_snapshot != "") {
-                  if (j == datasets.list.length - 1) {
-                    $('select.datasets_names').append("<option disabled selected hidden value=\"\">Pick a Dataset</option>");
+          if (cell.name != undefined && cell.name != "") {
+            $.ajax({
+              type: "GET",
+              url: "/datasets/".concat(cell.name),
+              dataType: "json",
+              contentType : "application/json",
+              success: function(datasets) {
+                for (var j = datasets.list.length - 1; j >= 0; j--) {
+                  var dataset_and_snapshot = datasets.list[j];
+                  if (dataset_and_snapshot != undefined && dataset_and_snapshot != "") {
+                    if (j == datasets.list.length - 1) {
+                      $('select.datasets_names').append("<option disabled selected hidden value=\"\">Pick a Dataset</option>");
+                    } else {
+                      $('select.datasets_names').append("<option>".concat(dataset_and_snapshot).concat("</option>"));
+                    }
                   } else {
-                    $('select.datasets_names').append("<option>".concat(dataset_and_snapshot).concat("</option>"));
+                    $("select.datasets_names").addClass("is-invalid");
                   }
-                } else {
-                  $("select.datasets_names").addClass("is-invalid");
                 }
+              },
+              error: function(doc, err) {
+                $("select.datasets_names").addClass("is-invalid");
               }
-            },
-            error: function(doc, err) {
-              $("select.datasets_names").addClass("is-invalid");
-            }
-          });
+            });
+          }
         }
       }
     });
