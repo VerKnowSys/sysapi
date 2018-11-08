@@ -334,15 +334,16 @@ impl Snapshot {
             .and_then(|after_snap| {
                 if after_snap.status.success() {
                     let stdout = String::from_utf8_lossy(&after_snap.stdout);
-                    let matching_line: String = stdout
+                    let pre_line: String = stdout
                         .split("\n")
                         .filter(|elem| {
                             elem.contains(&format!("@{}", snapshot_name))
                         })
                         .map(|elem| {
-                            format!("\"{}\"", elem)
+                            format!("\"{}\", ", elem)
                         })
                         .collect();
+                    let matching_line = &CUT_LAST_COMMA.replace(&pre_line, "");
                     match matching_line.as_ref() {
                         "" => {
                             let error_msg = format!("No such snapshot: {}!", snapshot_name);
@@ -351,10 +352,9 @@ impl Snapshot {
                                 Error::new(ErrorKind::Other, error_msg)
                             )
                         },
-                        line => {
-                            let entry = line.replace("\"", "");
-                            debug!("ZFS snapshot matching pattern: {} is present. Output matched to: {}", snapshot_name, entry);
-                            Ok(entry)
+                        entry => {
+                            debug!("ZFS snapshot matching pattern: '{}' is present. Output matched to: '{}'", snapshot_name, entry);
+                            Ok(entry.to_string())
                         }
                     }
                 } else {

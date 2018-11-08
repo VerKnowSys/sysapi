@@ -146,14 +146,13 @@ pub fn zfs_snapshot_get_handler(state: State) -> (State, Snapshot) {
     let cell_name: String = cell_and_snapshot_name.split("/").take(1).collect();
     let snapshot_name: String = cell_and_snapshot_name.split("/").skip(1).take(1).collect();
 
-    let pre_list = Snapshot::state(&cell_name, &snapshot_name)
+    let list = Snapshot::state(&cell_name, &snapshot_name)
         .and_then(|snapshot| Ok(snapshot))
         .map_err(|err| {
             error!("Snapshot state check error: {}", err);
             err
         })
         .unwrap_or(String::from(""));
-    let list = &CUT_LAST_COMMA.replace(&pre_list, "");
     match list.as_ref() {
         "" => {
             debug!("Empty snapshot - Not found: @{}", snapshot_name);
