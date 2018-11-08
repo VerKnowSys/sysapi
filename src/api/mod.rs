@@ -25,6 +25,9 @@ pub const DEFAULT_DNS: &'static str = "172.16.3.1";
 /// Default listen address to listen on:
 pub const DEFAULT_ADDRESS: &'static str = "172.16.3.1:80";
 
+/// Default path to Prison root dir:
+pub const PRISON_PATH: &'static str = "/Shared/Prison";
+
 /// Default path to cells data dirs:
 pub const CELLS_PATH: &'static str = "/Shared/Prison/Cells";
 

@@ -11,6 +11,7 @@ use systemstat::*;
 use systemstat::ByteSize;
 
 
+use api::PRISON_PATH;
 use api::cell::List;
 
 
@@ -184,8 +185,11 @@ impl Default for Systat {
                     .iter()
                     .filter(|mount| {
                         mount.fs_type == "zfs"
-                            && mount.fs_mounted_from != "zroot"
-                            && mount.fs_mounted_from != "zroot/ROOT"
+                        && mount.fs_mounted_from != "zroot"
+                        && mount.fs_mounted_from != "zroot/ROOT"
+                        && ! mount // filter out all Prison datasets from Systat
+                                .fs_mounted_on
+                                .contains(PRISON_PATH)
                     })
                     .map(|mount| {
                         Ok(
