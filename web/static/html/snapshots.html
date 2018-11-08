@@ -2,8 +2,14 @@
 <script type="text/javascript" src="/static/js/snapshot.js"></script>
 <script type="text/javascript" src="/static/js/snapshots.js"></script>
 
-<a href="#" class="badge badge-primary" onclick="clean_snapshots(); render_snapshots();">Refresh the list</a>
+<div>
+  <select onchange="clean_snapshots(); render_snapshots();" class="w-25 cell_names form-control small" id="cell_name" required>
+    <!-- <option></option> -->
+  </select>
+</div>
+
 <hr>
+
 <table class="table table-dark">
   <thead>
     <tr>
