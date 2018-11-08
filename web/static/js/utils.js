@@ -74,11 +74,11 @@ function fill_list_of_datasets() {
       contentType : "application/json",
       success: function(data) {
         for (var i = data.list.length - 1; i >= 0; i--) {
-          var cell = data.list[i];
-          if (cell.name != undefined && cell.name != "") {
+          var dataset = data.list[i];
+          if (dataset != undefined && dataset != "") {
             $.ajax({
               type: "GET",
-              url: "/datasets/".concat(cell.name),
+              url: "/datasets/".concat(selected_cell_name),
               dataType: "json",
               contentType : "application/json",
               success: function(datasets) {
