@@ -42,5 +42,4 @@ function create_rollback() {
 $( document ).ready(function() {
   $('li.location_info').text("System Management Interface - New ZFS Rollback");
   fill_list_of_cells();
-  // fill_list_of_snapshots();
 });

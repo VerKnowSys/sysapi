@@ -70,7 +70,6 @@ function delete_snapshot(cell_name, dataset_path, snapshot_name) {
 $( document ).ready(function() {
   $('li.location_info').text("System Management Interface - New ZFS Snapshot");
   fill_list_of_cells();
-  // fill_list_of_datasets();
 
   // Handle delete cell (once):
   $(document).off("click",".delete_snapshot");
