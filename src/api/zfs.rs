@@ -340,7 +340,8 @@ impl Snapshot {
                             elem.contains(&format!("@{}", snapshot_name))
                         })
                         .map(|elem| {
-                            format!("\"{}\", ", elem)
+                            let mod_elem = elem.replace("\"", "");
+                            format!("\"{}\", ", mod_elem)
                         })
                         .collect();
                     let matching_line = &CUT_LAST_COMMA.replace(&pre_line, "");
