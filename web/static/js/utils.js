@@ -42,7 +42,7 @@ function fill_list_of_snapshots() {
                 console.log("dataset_and_snapshot: ".concat(dataset_and_snapshot));
                 if (dataset_and_snapshot != undefined && dataset_and_snapshot != "") {
                   if (j == snap_data.list.length - 1) {
-                    $('select.snapshot_names').append("<option disabled selected hidden value=\"\">Pick a Cell</option>");
+                    $('select.snapshot_names').append("<option disabled selected hidden value=\"\">Pick a Snapshot</option>");
                   } else {
                     $('select.snapshot_names').append("<option>".concat(dataset_and_snapshot).concat("</option>"));
                   }
@@ -84,7 +84,7 @@ function fill_list_of_datasets() {
               for (var j = datasets.list.length - 1; j >= 0; j--) {
                 var dataset_and_snapshot = datasets.list[j];
                 if (dataset_and_snapshot != undefined && dataset_and_snapshot != "") {
-                  $('select.datasets_names').append("<option disabled selected hidden value=\"\">Pick a Cell</option>");
+                  $('select.datasets_names').append("<option disabled selected hidden value=\"\">Pick a Dataset</option>");
                 } else {
                   $("select.datasets_names").addClass("is-invalid");
                 }
