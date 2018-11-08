@@ -82,14 +82,8 @@ pub fn zfs_dataset_list_handler(state: State) -> (State, Response<Body>) {
     let cell_name: String = cell_and_snapshot_name.split("/").skip(1).take(1).collect(); // first is "list", second "cell_name"
 
     let pre_list = Datasets::list(&cell_name)
-        .and_then(|datasets| {
-            let string_list: String = datasets
-                .trim()
-                .split("\n")
-                .filter(|e| e.len() > 1)
-                .map(|e| format!("\"{}\", ", e))
-                .collect();
-            debug!("zfs_dataset_list_handler(): Cell name: {}, string_list: {}", cell_name, string_list);
+        .and_then(|string_list| {
+            debug!("zfs_dataset_list_handler(): Cell name: {}, string_list: [{}]", cell_name, string_list);
             Ok(string_list)
         })
         .map_err(|err| {
@@ -97,8 +91,7 @@ pub fn zfs_dataset_list_handler(state: State) -> (State, Response<Body>) {
             err
         })
         .unwrap_or(String::from(""));
-    let list = &CUT_LAST_COMMA.replace(&pre_list, "");
-    match list.as_ref() {
+    match pre_list.as_ref() {
         "" => {
             let res = create_response(&state, StatusCode::NOT_FOUND, APPLICATION_JSON,
                                       Body::from("{\"status\": \"No ZFS Datasets.\", \"list\": []}"));
