@@ -29,9 +29,6 @@ extern crate regex;
 #[macro_use]
 extern crate serde_derive;
 extern crate tokio;
-// extern crate tokio_core;
-// extern crate tokio_reactor;
-// extern crate tokio_current_thread;
 extern crate abstract_ns;
 // extern crate ns_dns_tokio;
 extern crate ns_std_threaded;
