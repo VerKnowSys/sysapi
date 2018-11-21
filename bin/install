@@ -1,11 +1,28 @@
 #!/bin/sh
 
 
-SYSTEM_NAME="$(uname 2>/dev/null)"
+_uname="$(uname 2>/dev/null)"
+_cwd="${PWD}"
 
 
-case "${SYSTEM_NAME}" in
+case "${_uname}" in
     FreeBSD)
+        echo "Building library: kvmpro"
+        if [ ! -d ../kvmpro ]; then
+            git clone https://github.com/VerKnowSys/kvmpro.git
+            cd kvmpro
+            bin/build
+            cd "${_cwd}"
+        else
+            cd ../kvmpro
+            git pull
+            bin/build
+            cd "${_cwd}"
+        fi
+        mkdir -p "${_cwd}/lib"
+        install -v "../kvmpro/lib/libkvmpro.a" "${_cwd}/lib" || exit 3
+
+        echo
         echo "Building and installing: SysAPI"
         git pull --jobs 4 && \
             cargo build --release && \
@@ -17,7 +34,7 @@ case "${SYSTEM_NAME}" in
         ;;
 
     *)
-        echo "Platform not supported: ${SYSTEM_NAME}" && \
+        echo "Platform not supported: ${_uname}" && \
             exit 1
         ;;
 
