@@ -43,6 +43,7 @@ extern crate hostname;
 extern crate domain;
 extern crate atomicwrites;
 extern crate systemstat;
+extern crate libc;
 
 
 /// Public sysapi modules:
