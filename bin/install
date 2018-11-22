@@ -43,8 +43,7 @@ case "${_uname}" in
         echo "Strip and Install: SysAPI"
         strip -s -d "target/${_release_type}/${_bin_name}"
         install -v "target/${_release_type}/${_bin_name}" "${_sysapi_dest_bin}" && \
-            echo "Successfully installed: SysAPI" && \
-            exit 0
+            echo "Successfully installed: SysAPI"
         ;;
 
     *)
