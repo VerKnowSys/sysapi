@@ -127,6 +127,12 @@ pub fn main() {
     // Define gotham server Future:
     runtime.spawn(future::lazy(|| {
         info!("Example async-lazy-worker-thread… Yay!");
+
+    unsafe {
+        let processes = get_process_usage(0 as size_t).as_ref().unwrap();
+        warn!("PS USAGE: {:?}", processes);
+    };
+
         Ok(())
     }));
 
