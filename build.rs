@@ -30,5 +30,5 @@ fn main() {
         .static_flag(false)
         .shared_flag(true)
         .cpp_link_stdlib("c++")
-        .compile("libkvmpro.so");
+        .compile("kvmpro");
 }
