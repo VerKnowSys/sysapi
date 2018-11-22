@@ -1,34 +1,45 @@
 #!/bin/sh
+# blame: @dmilith
+# 2018-11-22-0129-1542846591
 
 
+_kvmpro_repo="https://github.com/VerKnowSys/kvmpro.git"
+_sysapi_dest_bin="/usr/bin/sysapi"
 _uname="$(uname 2>/dev/null)"
 _cwd="${PWD}"
+_cargo_release_flag="--release"
+_release_type="${1:-release}"
+if [ "release" != "${_release_type}" ]; then
+    unset _cargo_release_flag
+fi
 
 
 case "${_uname}" in
     FreeBSD)
-        echo "Building library: kvmpro"
         if [ ! -d ../kvmpro ]; then
-            git clone https://github.com/VerKnowSys/kvmpro.git
+            echo "Fetch repository: kvmpro"
+            cd ..
+            git clone --jobs=4 "${_kvmpro_repo}"
             cd kvmpro
-            bin/build
-            cd "${_cwd}"
         else
+            echo "Update repository: kvmpro"
             cd ../kvmpro
-            git pull
-            bin/build
-            cd "${_cwd}"
+            git pull --jobs=4
         fi
-        mkdir -p "${_cwd}/lib"
-        install -v "../kvmpro/lib/libkvmpro.a" "${_cwd}/lib" || exit 3
-
+        bin/clean
+        bin/install
+        cd "${_cwd}"
         echo
-        echo "Building and installing: SysAPI"
+
+        echo "Build: SysAPI"
         git pull --jobs 4 && \
-            cargo build --release && \
-            killall sysapi 2>/dev/null
-        strip -s -d target/release/sysapi
-        install -v target/release/sysapi /usr/bin/sysapi && \
+            RUSTFLAGS="-lkvm -lprocstat" \
+                cargo build ${_cargo_release_flag} && \
+                    killall sysapi 2>/dev/null
+
+        echo "Strip and Install: SysAPI"
+        strip -s -d "target/${_release_type}/sysapi"
+        install -v "target/${_release_type}/sysapi" "${_sysapi_dest_bin}" && \
             echo "Successfully installed: SysAPI" && \
                 exit 0
         ;;
