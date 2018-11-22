@@ -37,29 +37,10 @@ use std::path::Path;
 use futures::future;
 use tokio::runtime::Runtime;
 use libc::*;
-use std::ffi::CStr;
-use std::str;
 
 use sysapi::*;
+use sysapi::utils::*;
 use sysapi::router;
-
-
-#[link(name = "kvmpro")]
-#[link(name = "kvm")]
-#[link(name = "procstat")]
-#[link(name = "kvmpro")]
-
-/// Extern functions from kvmpro library
-extern "C" {
-
-    /// Get processes + network connections - directly from kernel
-    fn get_process_usage(user_uid: uid_t) -> *const c_char;
-
-    /// Get processes - directly from kernel
-    fn get_process_usage_short(user_uid: uid_t) -> *const c_char;
-
-}
-
 
 
 /// Start a server and use a `Router` to dispatch requests
@@ -130,19 +111,15 @@ pub fn main() {
     runtime.spawn(future::lazy(|| {
         info!("Example async-lazy-worker-thread… Yay!");
 
-        // TODO: wrap it up as utility function:
-        let c_buf: *const c_char = unsafe { get_process_usage(0 as uid_t) };
-        let c_str: &CStr = unsafe { CStr::from_ptr(c_buf) };
-        let a_slice: &str = c_str.to_str().unwrap_or("");
-        let str_buf: String = a_slice.to_owned();
-        warn!("PS USAGE JSON: '{}'", str_buf);
+        let ps_full = processes_of_pid(0);
+        warn!("PS USAGE JSON: '{}'", ps_full);
+
 
         Ok(())
     }));
 
     // NOTE: Use runtime.spawn(_) to launch future services like this:
     let gotham = gotham::init_server(listen_address, router::router());
-
     // Spawn the server task
     runtime
         .block_on_all(gotham) // Block forever on "serving duties"

@@ -1,7 +1,38 @@
 use glob::glob;
+use libc::*;
+use std::ffi::CStr;
+use std::str;
 
 
 use api::SENTRY_PATH;
+
+
+// Link with core FreeBSD system libraries:
+// #[link(name = "kvmpro")]
+#[link(name = "kvm")]
+#[link(name = "procstat")]
+#[link(name = "kvmpro")]
+
+/// Extern functions from kvmpro C++ library
+extern "C" {
+
+    /// Get processes + network connections - directly from kernel
+    fn get_process_usage(user_uid: uid_t) -> *const c_char;
+
+    /// Get processes - directly from kernel
+    fn get_process_usage_short(user_uid: uid_t) -> *const c_char;
+
+}
+
+
+/// Call kernel directly through C++ function from libkvmpro library:
+#[allow(unsafe_code)]
+pub fn processes_of_pid(uid: uid_t) -> String {
+    let c_buf: *const c_char = unsafe { get_process_usage(uid) };
+    let c_str: &CStr = unsafe { CStr::from_ptr(c_buf) };
+    let a_slice: &str = c_str.to_str().unwrap_or("");
+    a_slice.to_owned()
+}
 
 
 /// Produce list of dirs/files matching given glob pattern:
