@@ -35,6 +35,16 @@ pub fn processes_of_pid(uid: uid_t) -> String {
 }
 
 
+/// Call kernel directly through C++ function from libkvmpro library:
+#[allow(unsafe_code)]
+pub fn processes_of_pid_short(uid: uid_t) -> String {
+    let c_buf: *const c_char = unsafe { get_process_usage_short(uid) };
+    let c_str: &CStr = unsafe { CStr::from_ptr(c_buf) };
+    let a_slice: &str = c_str.to_str().unwrap_or("");
+    a_slice.to_owned()
+}
+
+
 /// Produce list of dirs/files matching given glob pattern:
 pub fn produce_list(glob_pattern: &String) -> Vec<String> {
     let mut list = vec!();
