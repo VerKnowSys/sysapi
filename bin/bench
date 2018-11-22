@@ -41,9 +41,9 @@ case "${_uname}" in
             killall -TERM ${_bin_name} 2>/dev/null
 
         echo "Bench: SysAPI: kernelbench() * 3:"
-        RUSTFLAGS="-lkvm -lprocstat" cargo --bin kernelbench ${_cargo_release_flag}
-        RUSTFLAGS="-lkvm -lprocstat" cargo --bin kernelbench ${_cargo_release_flag}
-        RUSTFLAGS="-lkvm -lprocstat" cargo --bin kernelbench ${_cargo_release_flag}
+        RUSTFLAGS="-lkvm -lprocstat" cargo run --bin kernelbench ${_cargo_release_flag}
+        RUSTFLAGS="-lkvm -lprocstat" cargo run --bin kernelbench ${_cargo_release_flag}
+        RUSTFLAGS="-lkvm -lprocstat" cargo run --bin kernelbench ${_cargo_release_flag}
         ;;
 
     *)
