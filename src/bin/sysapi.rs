@@ -36,7 +36,6 @@ use hostname::get_hostname;
 use std::path::Path;
 use futures::future;
 use tokio::runtime::Runtime;
-use libc::*;
 
 use sysapi::*;
 use sysapi::utils::*;
