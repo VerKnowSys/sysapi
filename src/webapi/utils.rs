@@ -7,12 +7,6 @@ use std::str;
 use api::SENTRY_PATH;
 
 
-// Link with core FreeBSD system libraries:
-// #[link(name = "kvmpro")]
-// #[link(name = "kvm")] // XXX: comment this out?
-// #[link(name = "procstat")] // XXX: comment this out?
-// #[link(name = "kvmpro")]
-
 /// Extern functions from kvmpro C++ library
 extern "C" {
 
