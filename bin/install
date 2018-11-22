@@ -4,9 +4,11 @@
 
 
 _kvmpro_repo="https://github.com/VerKnowSys/kvmpro.git"
-_sysapi_dest_bin="/usr/bin/sysapi"
+
+_bin_name="sysapi"
+_sysapi_dest_bin="/usr/bin/${_bin_name}"
 _uname="$(uname 2>/dev/null)"
-_cwd="${PWD}"
+_cargo_project_dir="$(pwd 2>/dev/null)"
 _cargo_release_flag="--release"
 _release_type="${1:-release}"
 if [ "release" != "${_release_type}" ]; then
@@ -28,20 +30,21 @@ case "${_uname}" in
         fi
         bin/clean
         bin/install
-        cd "${_cwd}"
         echo
 
+        cd "${_cargo_project_dir}"
+        git pull --jobs 4
+
+        bin/clean
         echo "Build: SysAPI"
-        git pull --jobs 4 && \
-            RUSTFLAGS="-lkvm -lprocstat" \
-                cargo build ${_cargo_release_flag} && \
-                    killall sysapi 2>/dev/null
+        RUSTFLAGS="-lkvm -lprocstat" cargo build --jobs=4 ${_cargo_release_flag} && \
+            killall -TERM ${_bin_name} 2>/dev/null
 
         echo "Strip and Install: SysAPI"
-        strip -s -d "target/${_release_type}/sysapi"
-        install -v "target/${_release_type}/sysapi" "${_sysapi_dest_bin}" && \
+        strip -s -d "target/${_release_type}/${_bin_name}"
+        install -v "target/${_release_type}/${_bin_name}" "${_sysapi_dest_bin}" && \
             echo "Successfully installed: SysAPI" && \
-                exit 0
+            exit 0
         ;;
 
     *)
