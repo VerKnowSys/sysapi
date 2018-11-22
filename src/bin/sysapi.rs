@@ -36,10 +36,28 @@ use hostname::get_hostname;
 use std::path::Path;
 use futures::future;
 use tokio::runtime::Runtime;
+use libc::*;
 
-
-use sysapi::router;
 use sysapi::*;
+use sysapi::router;
+
+
+#[link(name = "kvmpro")]
+#[link(name = "kvm")]
+#[link(name = "procstat")]
+#[link(name = "kvmpro")]
+
+/// Extern functions from kvmpro library
+extern "C" {
+
+    /// Get processes + network connections - directly from kernel
+    fn get_process_usage(user_uid: size_t) -> *const c_char;
+
+    /// Get processes - directly from kernel
+    fn get_process_usage_short(user_uid: size_t) -> *const c_char;
+
+}
+
 
 
 /// Start a server and use a `Router` to dispatch requests
