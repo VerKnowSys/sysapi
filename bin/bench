@@ -1,0 +1,54 @@
+#!/bin/sh
+# blame: @dmilith
+# 2018-11-22-0129-1542846591
+
+
+_kvmpro_repo="https://github.com/VerKnowSys/kvmpro.git"
+
+_bin_name="sysapi"
+_sysapi_dest_bin="/usr/bin/${_bin_name}"
+_uname="$(uname 2>/dev/null)"
+_cargo_project_dir="$(pwd 2>/dev/null)"
+_cargo_release_flag="--release"
+_release_type="${1:-release}"
+if [ "release" != "${_release_type}" ]; then
+    unset _cargo_release_flag
+fi
+
+
+case "${_uname}" in
+    FreeBSD)
+        if [ ! -d ../kvmpro ]; then
+            echo "Fetch repository: kvmpro"
+            cd ..
+            git clone --jobs=4 "${_kvmpro_repo}"
+            cd kvmpro
+        else
+            echo "Update repository: kvmpro"
+            cd ../kvmpro
+            git pull --jobs=4
+        fi
+        bin/clean
+        bin/install
+        echo
+
+        cd "${_cargo_project_dir}"
+        git pull --jobs 4
+
+        bin/clean
+        echo "Build: SysAPI"
+        RUSTFLAGS="-lkvm -lprocstat" cargo build --jobs=4 ${_cargo_release_flag} && \
+            killall -TERM ${_bin_name} 2>/dev/null
+
+        echo "Bench: SysAPI: kernelbench() * 3:"
+        RUSTFLAGS="-lkvm -lprocstat" cargo --bin kernelbench ${_cargo_release_flag}
+        RUSTFLAGS="-lkvm -lprocstat" cargo --bin kernelbench ${_cargo_release_flag}
+        RUSTFLAGS="-lkvm -lprocstat" cargo --bin kernelbench ${_cargo_release_flag}
+        ;;
+
+    *)
+        echo "Platform not supported: ${_uname}" && \
+            exit 1
+        ;;
+
+esac
