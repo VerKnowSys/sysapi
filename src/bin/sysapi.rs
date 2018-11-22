@@ -37,6 +37,8 @@ use std::path::Path;
 use futures::future;
 use tokio::runtime::Runtime;
 use libc::*;
+use std::ffi::CStr;
+use std::str;
 
 use sysapi::*;
 use sysapi::router;
@@ -128,10 +130,11 @@ pub fn main() {
     runtime.spawn(future::lazy(|| {
         info!("Example async-lazy-worker-thread… Yay!");
 
-    unsafe {
-        let processes = get_process_usage(0 as size_t).as_ref().unwrap();
-        warn!("PS USAGE: {:?}", processes);
-    };
+        let c_buf: *const c_char = unsafe { get_process_usage(0 as size_t) };
+        let c_str: &CStr = unsafe { CStr::from_ptr(c_buf) };
+        let a_slice: &str = c_str.to_str().unwrap();
+        let str_buf: String = a_slice.to_owned();
+        warn!("PS USAGE JSON: '{}'", str_buf);
 
         Ok(())
     }));
