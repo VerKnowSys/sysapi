@@ -53,10 +53,10 @@ use sysapi::router;
 extern "C" {
 
     /// Get processes + network connections - directly from kernel
-    fn get_process_usage(user_uid: size_t) -> *const c_char;
+    fn get_process_usage(user_uid: uid_t) -> *const c_char;
 
     /// Get processes - directly from kernel
-    fn get_process_usage_short(user_uid: size_t) -> *const c_char;
+    fn get_process_usage_short(user_uid: uid_t) -> *const c_char;
 
 }
 
@@ -130,9 +130,10 @@ pub fn main() {
     runtime.spawn(future::lazy(|| {
         info!("Example async-lazy-worker-thread… Yay!");
 
-        let c_buf: *const c_char = unsafe { get_process_usage(0 as size_t) };
+        // TODO: wrap it up as utility function:
+        let c_buf: *const c_char = unsafe { get_process_usage(0 as uid_t) };
         let c_str: &CStr = unsafe { CStr::from_ptr(c_buf) };
-        let a_slice: &str = c_str.to_str().unwrap();
+        let a_slice: &str = c_str.to_str().unwrap_or("");
         let str_buf: String = a_slice.to_owned();
         warn!("PS USAGE JSON: '{}'", str_buf);
 
