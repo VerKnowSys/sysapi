@@ -28,22 +28,28 @@ case "${_uname}" in
             cd ../kvmpro
             git pull --jobs=4
         fi
-        bin/clean
+        if [ "release" = "${_release_type}" ]; then
+            bin/clean
+        fi
         bin/install
         echo
 
         cd "${_cargo_project_dir}"
         git pull --jobs 4
 
-        bin/clean
+        if [ "release" = "${_release_type}" ]; then
+            bin/clean
+        fi
         echo "Build: SysAPI"
         RUSTFLAGS="-lkvm -lprocstat" cargo build --jobs=4 ${_cargo_release_flag} && \
             killall -TERM ${_bin_name} 2>/dev/null
 
-        echo "Strip and Install: SysAPI"
-        strip -s -d "target/${_release_type}/${_bin_name}"
-        install -v "target/${_release_type}/${_bin_name}" "${_sysapi_dest_bin}" && \
-            echo "Successfully installed: SysAPI"
+        if [ "release" = "${_release_type}" ]; then
+            echo "Strip and Install: SysAPI"
+            strip -s -d "target/${_release_type}/${_bin_name}"
+            install -v "target/${_release_type}/${_bin_name}" "${_sysapi_dest_bin}" && \
+                echo "Successfully installed: SysAPI"
+        fi
         ;;
 
     *)
