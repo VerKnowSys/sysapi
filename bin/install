@@ -41,20 +41,23 @@ case "${_uname}" in
             bin/clean
         fi
         echo "Build: SysAPI"
-        RUSTFLAGS="-lkvm -lprocstat" cargo build --jobs=4 ${_cargo_release_flag} && \
-            killall -TERM ${_bin_name} 2>/dev/null
-
-        if [ "release" = "${_release_type}" ]; then
-            echo "Strip and Install: SysAPI"
-            strip -s -d "target/${_release_type}/${_bin_name}"
-            install -v "target/${_release_type}/${_bin_name}" "${_sysapi_dest_bin}" && \
-                echo "Successfully installed: SysAPI"
+        eval "RUSTFLAGS=\"-lkvm -lprocstat\" cargo build ${_cargo_release_flag}"
+        if [ "0" = "${?}" ]; then
+            killall -TERM "${_bin_name}" 2>/dev/null
+            echo "Strip and Install: SysAPI" \
+                && strip -s -d "target/${_release_type}/${_bin_name}" \
+                && install -v "target/${_release_type}/${_bin_name}" "${_sysapi_dest_bin}" \
+                    && echo "Successfully installed: SysAPI" \
+                    && exit
+        else
+            echo "Build failed!" \
+                && exit 1
         fi
         ;;
 
     *)
-        echo "Platform not supported: ${_uname}" && \
-            exit 1
+        echo "Platform not supported: ${_uname}" \
+            && exit 1
         ;;
 
 esac
