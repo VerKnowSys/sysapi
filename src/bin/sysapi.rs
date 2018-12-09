@@ -36,9 +36,10 @@ use hostname::get_hostname;
 use std::path::Path;
 use futures::future;
 use tokio::runtime::Runtime;
+use libc::*;
 
 use sysapi::*;
-use sysapi::utils::*;
+use sysapi::status::*;
 use sysapi::router;
 
 
@@ -110,9 +111,17 @@ pub fn main() {
     runtime.spawn(future::lazy(|| {
         info!("Example async-lazy-worker-thread… Yay!");
 
-        let ps_full = processes_of_uid(0);
-        warn!("PS USAGE JSON: '{}'", ps_full);
-
+        CellProcesses::of_uid(0 as uid_t)
+            .and_then(|ps_full| {
+                debug!("PSes_DBG: {:#?}", ps_full);
+                warn!("PS USAGE JSON: '{}'", ps_full.to_string());
+                Ok(ps_full)
+            })
+            .map_err(|err| {
+                error!("CellProcesses::of_uid({}) has failed! Error: {}", 0, err.to_string());
+                err
+            })
+            .unwrap_or_default();
 
         Ok(())
     }));
