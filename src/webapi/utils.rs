@@ -24,7 +24,7 @@ extern "C" {
 pub fn processes_of_uid(uid: uid_t) -> String {
     let c_buf: *const c_char = unsafe { get_process_usage(uid) };
     let c_str: &CStr = unsafe { CStr::from_ptr(c_buf) };
-    let a_slice: &str = c_str.to_str().unwrap_or("");
+    let a_slice: &str = c_str.to_str().unwrap_or("[]");
     a_slice.to_owned()
 }
 
@@ -34,7 +34,7 @@ pub fn processes_of_uid(uid: uid_t) -> String {
 pub fn processes_of_uid_short(uid: uid_t) -> String {
     let c_buf: *const c_char = unsafe { get_process_usage_short(uid) };
     let c_str: &CStr = unsafe { CStr::from_ptr(c_buf) };
-    let a_slice: &str = c_str.to_str().unwrap_or("");
+    let a_slice: &str = c_str.to_str().unwrap_or("[]");
     a_slice.to_owned()
 }
 
