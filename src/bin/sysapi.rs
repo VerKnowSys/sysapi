@@ -110,7 +110,7 @@ pub fn main() {
     runtime.spawn(future::lazy(|| {
         info!("Example async-lazy-worker-thread… Yay!");
 
-        let ps_full = processes_of_pid(0);
+        let ps_full = processes_of_uid(0);
         warn!("PS USAGE JSON: '{}'", ps_full);
 
 

@@ -7,16 +7,16 @@ use sysapi::utils::*;
 
 
 // #[bench]
-fn bench_processes_of_pid_full(b: &mut Bencher) {
-    b.iter(|| processes_of_pid(0))
+fn bench_processes_of_uid_full(b: &mut Bencher) {
+    b.iter(|| processes_of_uid(0))
 }
 
 
 // #[bench]
-fn bench_processes_of_pid_short(b: &mut Bencher) {
-    b.iter(|| processes_of_pid_short(0))
+fn bench_processes_of_uid_short(b: &mut Bencher) {
+    b.iter(|| processes_of_uid_short(0))
 }
 
 
-benchmark_group!(benches, bench_processes_of_pid_full, bench_processes_of_pid_short);
+benchmark_group!(benches, bench_processes_of_uid_full, bench_processes_of_uid_short);
 benchmark_main!(benches);
