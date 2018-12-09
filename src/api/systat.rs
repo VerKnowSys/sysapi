@@ -27,25 +27,25 @@ pub type ListNetifs = Vec<SystatNetif>;
 pub struct Systat {
 
     /// Average System Load
-    loadavg: Option<SystatSysLoad>,
+    pub loadavg: Option<SystatSysLoad>,
 
     /// Uptime in seconds
-    uptime: Option<u64>,
+    pub uptime: Option<u64>,
 
     /// Boot Time - DateTime String with RFC2822 format
-    boot_time: Option<String>,
+    pub boot_time: Option<String>,
 
     /// CPU Usage
-    cpu: Option<SystatCPU>,
+    pub cpu: Option<SystatCPU>,
 
     /// Memory Usage
-    memory: Option<SystatMemory>,
+    pub memory: Option<SystatMemory>,
 
     /// Mounted filesystems
-    mounts: Option<ListMounts>,
+    pub mounts: Option<ListMounts>,
 
     /// Active Networks
-    networks: Option<ListNetifs>,
+    pub networks: Option<ListNetifs>,
 
 }
 
@@ -55,19 +55,19 @@ pub struct Systat {
 pub struct SystatMount {
 
     /// Mounted From
-    fs_mounted_from: Option<String>,
+    pub fs_mounted_from: Option<String>,
 
     /// Mounted Filesystem Type
-    fs_type: Option<String>,
+    pub fs_type: Option<String>,
 
     /// Mounted On
-    fs_mounted_on: Option<String>,
+    pub fs_mounted_on: Option<String>,
 
     /// Mount Avail
-    avail: Option<String>,
+    pub avail: Option<String>,
 
     /// Mount Total
-    total: Option<String>,
+    pub total: Option<String>,
 
 }
 
@@ -77,13 +77,13 @@ pub struct SystatMount {
 pub struct SystatSysLoad {
 
     /// 1 Minute Load
-    one: Option<f64>,
+    pub one: Option<f64>,
 
     /// 5 Minutes Load
-    five: Option<f64>,
+    pub five: Option<f64>,
 
     /// 15 Minutes Load
-    fifteen: Option<f64>,
+    pub fifteen: Option<f64>,
 
 }
 
@@ -93,10 +93,10 @@ pub struct SystatSysLoad {
 pub struct SystatNetif {
 
     /// Name of interface
-    name: Option<String>,
+    pub name: Option<String>,
 
     /// Addresses of interface
-    addrs: Option<List>,
+    pub addrs: Option<List>,
 
 }
 
@@ -106,19 +106,19 @@ pub struct SystatNetif {
 pub struct SystatCPU {
 
     /// CPU User
-    user: Option<f64>,
+    pub user: Option<f64>,
 
     /// CPU System
-    system: Option<f64>,
+    pub system: Option<f64>,
 
     /// CPU Interrupts
-    interrupt: Option<f64>,
+    pub interrupt: Option<f64>,
 
     /// CPU Idle
-    idle: Option<f64>,
+    pub idle: Option<f64>,
 
     /// CPU Temperature
-    temperature: Option<f64>,
+    pub temperature: Option<f64>,
 
 }
 
@@ -128,13 +128,13 @@ pub struct SystatCPU {
 pub struct SystatMemory {
 
     /// Memory Total
-    total: Option<usize>,
+    pub total: Option<usize>,
 
     /// Memory Used
-    used: Option<usize>,
+    pub used: Option<usize>,
 
     /// Memory Free
-    free: Option<usize>,
+    pub free: Option<usize>,
 
 }
 
