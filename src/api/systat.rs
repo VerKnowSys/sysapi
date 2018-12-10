@@ -49,7 +49,7 @@ pub struct Systat {
     pub networks: Option<ListNetifs>,
 
     /// Ressident Processes list:
-    pub list: Option<CellProcesses>,
+    pub processes: Option<CellProcesses>,
 
 }
 
@@ -382,7 +382,7 @@ impl Default for Systat {
             memory: Some(memory_stat),
             mounts: Some(mounts_stat),
             networks: Some(networks_stat),
-            list: Some(superuser_processes),
+            processes: Some(superuser_processes),
         }
     }
 }
