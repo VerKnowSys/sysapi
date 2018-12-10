@@ -15,7 +15,8 @@ impl CellProcesses {
             Ok(all_processes) => {
                 Ok(
                     CellProcesses {
-                        list: all_processes
+                        list: all_processes,
+                        status: Some(String::From("OK"))
                     }
                 )
             },
