@@ -10,7 +10,6 @@ echo
 echo
 echo "Project directory: ${_cargo_project_dir}"
 echo "Project product: ${_bin_name}"
-echo
 echo "Project release type: ${_release_type}"
 echo "System type: ${_uname}"
 echo
@@ -19,28 +18,20 @@ echo
 
 case "${_uname}" in
     FreeBSD)
-        if [ ! -d ../kvmpro ]; then
-            echo "Fetch remote repository: kvmpro from: ${_kvmpro_repo}"
-            cd ..
-            git clone --jobs=2 "${_kvmpro_repo}"
-            cd kvmpro
-        else
-            echo "Update repository: kvmpro"
-            cd ../kvmpro
-            git pull --jobs=2
-        fi
-        if [ "release" = "${_release_type}" ]; then
-            bin/clean
-        fi
-
         cd "${_cargo_project_dir}"
-        git pull --jobs 2
+        git pull \
+            --depth 1 \
+            --recurse-submodules
+        git pull \
+            --jobs 2
 
         if [ "release" = "${_release_type}" ]; then
             bin/clean
         fi
-        echo "Build: SysAPI"
-        eval "RUSTFLAGS=\"-lkvm -lprocstat\" cargo build ${_cargo_release_flag}"
+
+        echo "Building: SysAPI"
+        RUSTFLAGS="-lkvm -lprocstat" \
+            cargo build ${_cargo_release_flag}
         if [ "0" != "${?}" ]; then
             echo "Build: Failed!" \
                 && exit 1
