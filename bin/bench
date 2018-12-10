@@ -5,7 +5,9 @@
 
 . bin/build
 
-echo "Bench: SysAPI: kernelbench() * 3:"
-RUSTFLAGS="-lkvm -lprocstat" cargo run --bin kernelbench ${_cargo_release_flag}
-RUSTFLAGS="-lkvm -lprocstat" cargo run --bin kernelbench ${_cargo_release_flag}
-RUSTFLAGS="-lkvm -lprocstat" cargo run --bin kernelbench ${_cargo_release_flag}
+
+_times=10
+echo "Bench: SysAPI: Running measurement ${_times} times (sequentially one by one)."
+for i in $(seq 0 ${_times}); do
+    RUSTFLAGS="-lkvm -lprocstat" cargo run --bin kernelbench ${_cargo_release_flag}
+done
