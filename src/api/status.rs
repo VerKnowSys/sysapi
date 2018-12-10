@@ -160,6 +160,30 @@ impl ToString for CellProcesses {
 
 
 /// Implement response for GETs:
+impl IntoResponse for CellProcess {
+    fn into_response(self, state: &State) -> Response<Body> {
+        match self.pid {
+            Some(_) =>
+                create_response(
+                    state,
+                    StatusCode::OK,
+                    APPLICATION_JSON,
+                    serde_json::to_string(&self)
+                        .unwrap_or(String::from("{\"status\": \"SerializationFailure: CellProcess\"}")),
+                ),
+            None =>
+                create_response(
+                    state,
+                    StatusCode::NOT_FOUND,
+                    APPLICATION_JSON,
+                    Body::from("{\"status\": \"CellProcess: None\"}"),
+                )
+        }
+    }
+}
+
+
+/// Implement response for GETs:
 impl IntoResponse for CellProcesses {
     fn into_response(self, state: &State) -> Response<Body> {
         match self.list {
