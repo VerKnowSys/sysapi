@@ -35,6 +35,9 @@ impl CellProcesses {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CellProcess {
 
+    /// Job status:
+    pub status: Option<String>,
+
     /// Process-IDentifier:
     pub pid: Option<usize>,
 
