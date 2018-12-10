@@ -32,8 +32,6 @@ case "${_uname}" in
         if [ "release" = "${_release_type}" ]; then
             bin/clean
         fi
-        bin/install
-        echo
 
         cd "${_cargo_project_dir}"
         git pull --jobs 2
