@@ -111,9 +111,8 @@ pub fn main() {
     runtime.spawn(future::lazy(|| {
         info!("Example async-lazy-worker-thread… Yay!");
 
-        CellProcesses::of_uid(0 as uid_t)
+        CellProcesses::of_uid(0)
             .and_then(|ps_full| {
-                debug!("PSes_DBG: {:#?}", ps_full);
                 warn!("PS USAGE JSON: '{}'", ps_full.to_string());
                 Ok(ps_full)
             })
