@@ -46,7 +46,7 @@ impl CellProcesses {
         let cell_uid = cell_net_id_and_uid
             .parse::<usize>()
             .unwrap_or(0);
-        debug!("CellProcesses::of_cell(uid: {})}", cell_uid);
+        debug!("CellProcesses::of_cell(uid: {})", cell_uid);
         CellProcesses::of_uid(cell_uid)
            .and_then(|ps_full| {
                warn!("PS USAGE of cell: {} JSON: '{}'", &a_name, ps_full.to_string());
