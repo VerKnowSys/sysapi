@@ -12,6 +12,7 @@ fn main() {
         .pic(true)
         .warnings(true)
         .flag("-Ofast")
+        .flag("-fPIE")
         .flag("-std=c++11")
         .flag("-ftrapv")
         .flag("-fstack-protector")
