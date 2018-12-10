@@ -19,11 +19,7 @@ echo
 case "${_uname}" in
     FreeBSD)
         cd "${_cargo_project_dir}"
-        git pull \
-            --depth 1 \
-            --recurse-submodules
-        git pull \
-            --jobs 2
+        bin/update
 
         printf "\n\nBuilding: SysAPI\n"
         RUSTFLAGS="-lkvm -lprocstat" \
