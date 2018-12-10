@@ -38,7 +38,6 @@ use futures::future;
 use tokio::runtime::Runtime;
 
 use sysapi::*;
-use sysapi::status::*;
 use sysapi::router;
 
 
@@ -109,13 +108,6 @@ pub fn main() {
     // Define gotham server Future:
     runtime.spawn(future::lazy(|| {
         info!("Example async-lazy-worker-thread… Yay!");
-
-        CellProcesses::of_uid(0)
-            .and_then(|ps_full| {
-                warn!("PS USAGE JSON: '{}'", ps_full.to_string());
-                Ok(ps_full)
-            })
-            .unwrap_or_default();
 
         Ok(())
     }));
