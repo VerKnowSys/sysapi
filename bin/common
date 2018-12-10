@@ -3,6 +3,8 @@
 # 2018-12-10-0139-1544402355
 
 
+clear
+
 _params="${*}"
 
 _kvmpro_repo="https://github.com/VerKnowSys/kvmpro.git"
@@ -17,5 +19,3 @@ _cargo_release_flag="--release"
 if [ "release" != "${_release_type}" ]; then
     unset _cargo_release_flag
 fi
-
-clear
