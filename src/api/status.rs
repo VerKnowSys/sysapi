@@ -62,8 +62,10 @@ pub struct CellProcess {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CellProcesses {
 
-    /// Job status:
-    pub status: Option<String>,
+    /// Cell processes list:
+    pub list: Option<ListCellProcesses>,
+
+}
 
 
 /// Default CellProcesses implementation:
@@ -130,7 +132,7 @@ impl CellProcesses {
 impl Default for CellProcesses {
     fn default() -> CellProcesses {
         CellProcesses {
-            list: vec!()
+            list: None
         }
     }
 }
@@ -157,22 +159,21 @@ impl ToString for CellProcesses {
 /// Implement response for GETs:
 impl IntoResponse for CellProcesses {
     fn into_response(self, state: &State) -> Response<Body> {
-        // serialize only if name is set - so CellProcesses is initialized/ exists
-        match self.name {
+        match self.list {
             Some(_) =>
                 create_response(
                     state,
                     StatusCode::OK,
                     APPLICATION_JSON,
                     serde_json::to_string(&self)
-                        .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
+                        .unwrap_or(String::from("{\"status\": \"SerializationFailure: CellProcesses\"}")),
                 ),
             None =>
                 create_response(
                     state,
                     StatusCode::NOT_FOUND,
                     APPLICATION_JSON,
-                    Body::from("{\"status\": \"NotFound\"}"),
+                    Body::from("{\"status\": \"CellProcesses: None\"}"),
                 )
         }
     }
