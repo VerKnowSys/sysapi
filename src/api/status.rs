@@ -28,6 +28,33 @@ impl CellProcesses {
     }
 
 
+    /// Status of all ressident processes of given cell:
+    pub fn of_cell(a_name: &String) -> Result<Self, serde_json::Error> {
+        let sentry_dir = format!("{}/{}", SENTRY_PATH, a_name);
+        let netid_file = format!("{}/{}", sentry_dir, "cell.vlan.number");
+        let cell_net_id_and_uid = File::open(&netid_file)
+            .and_then(|file| {
+                let mut line = String::new();
+                BufReader::new(file)
+                    .read_line(&mut line)
+                    .and_then(|_| {
+                        // trim newlines and other whitespaces:
+                        Ok(str::trim(&line).to_string())
+                    })
+            })
+            .unwrap_or("0".to_string());
+        let cell_uid = cell_net_id_and_uid
+            .parse::<usize>()
+            .unwrap_or(0);
+        debug!("CellProcesses::of_cell(uid: {})}", cell_uid);
+        CellProcesses::of_uid(cell_uid)
+           .and_then(|ps_full| {
+               warn!("PS USAGE of cell: {} JSON: '{}'", &a_name, ps_full.to_string());
+               Ok(ps_full)
+           })
+    }
+
+
 }
 
 
