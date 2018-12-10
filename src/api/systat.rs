@@ -48,8 +48,8 @@ pub struct Systat {
     /// Active Networks
     pub networks: Option<ListNetifs>,
 
-    /// Ressident Processes:
-    pub processes: Option<ListCellProcesses>,
+    /// Ressident Processes list:
+    pub list: Option<CellProcesses>,
 
 }
 
@@ -188,8 +188,6 @@ lazy_static! {
 
 impl Default for Systat {
     fn default() -> Systat {
-        let superuser_processes = CellProcesses::of_uid(0)
-            .unwrap_or_default();
         let mounts_stat = SYSTEM
             .mounts()
             .and_then(|mounts| {
@@ -369,6 +367,12 @@ impl Default for Systat {
             })
             .unwrap_or(SystatCPU::default());
 
+        let superuser_processes = CellProcesses::of_uid(0)
+            .and_then(|processes| {
+                Ok(processes)
+            })
+            .unwrap_or_default();
+
         // Now wrap everything with a single structure:
         Systat {
             loadavg: Some(loadavg_stat),
@@ -378,7 +382,7 @@ impl Default for Systat {
             memory: Some(memory_stat),
             mounts: Some(mounts_stat),
             networks: Some(networks_stat),
-            processes: Some(superuser_processes),
+            list: Some(superuser_processes),
         }
     }
 }
