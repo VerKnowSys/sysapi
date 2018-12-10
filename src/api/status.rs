@@ -15,8 +15,7 @@ impl CellProcesses {
             Ok(all_processes) => {
                 Ok(
                     CellProcesses {
-                        list: all_processes,
-                        status: Some(String::From("OK"))
+                        list: all_processes
                     }
                 )
             },
@@ -81,9 +80,6 @@ pub struct CellProcesses {
 
     /// Job status:
     pub status: Option<String>,
-
-    /// List of all processes
-    pub list: Vec<CellProcess>
 
 }
 
