@@ -3,7 +3,7 @@
 # 2018-11-22-0129-1542846591
 
 
-. bin/install
+. bin/build
 
 echo "Bench: SysAPI: kernelbench() * 3:"
 RUSTFLAGS="-lkvm -lprocstat" cargo run --bin kernelbench ${_cargo_release_flag}
