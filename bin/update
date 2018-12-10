@@ -13,18 +13,18 @@ reset_module_state () {
 
 update_all_repos () {
     git pull \
-        --recurse-submodules >/dev/null
+        --recurse-submodules
 
     if [ -f "${PWD}/.gitmodules" ]; then
         git submodule foreach \
             git pull \
                 --jobs 4 \
-                "origin" "${_branch}" >/dev/null
+                "origin" "${_branch}"
 
         git submodule update \
             --jobs 4 \
             --remote \
-            --recursive >/dev/null
+            --recursive
     fi
 }
 
