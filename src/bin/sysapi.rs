@@ -85,7 +85,7 @@ pub fn main() {
             ))
         })
         .level(loglevel)
-        .chain(log_file("/var/log/sysapi.log")
+        .chain(log_file(DEFAULT_LOG_FILE)
                     .unwrap_or(File::open("/dev/stdout")
                     .expect("FATAL: No /dev/stdout!?")))
         .apply()

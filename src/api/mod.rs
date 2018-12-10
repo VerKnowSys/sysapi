@@ -3,6 +3,8 @@
 /// Project directory (for static files access for router):
 pub const PROJECT_DIRECTORY: &'static str = "/Projects/sysapi";
 
+/// Default log output file:
+pub const DEFAULT_LOG_FILE: &str = "/var/log/sysapi.log";
 
 /// svdOS cell governor:
 pub const GVR_BIN: &'static str = "/usr/bin/gvr";
