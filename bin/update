@@ -30,13 +30,11 @@ update_all_repos () {
 
 
 failure () {
-    echo
-    error "FAILURE: ${*}!"
+    printf "\nFAILURE: %s!\n\n" "${*}"
 }
 
 
 success () {
-    echo
     exit
 }
 
@@ -48,7 +46,7 @@ main () {
         success
 
     # or else - run failure handler that something went wrong:
-    failure "$(diste "bin/update") has failed!"
+    failure "bin/update has failed!"
 }
 
 
