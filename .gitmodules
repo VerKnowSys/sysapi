@@ -1,3 +1,3 @@
-[submodule "src/kvmpro"]
-	path = src/kvmpro
+[submodule "lib/kvmpro"]
+	path = lib/kvmpro
 	url = https://github.com/VerKnowSys/kvmpro.git
