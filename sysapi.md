@@ -47,6 +47,10 @@
                      GET    > returns domain to proxy to
                      DELETE > destroys domain proxy
 
+     - "/status/:cellname":
+
+                  ✅ GET    > returns JSON list of processes status for :cellname
+
 
     - "/cell/:cellname/some_key":
 
@@ -75,11 +79,6 @@
     - "/zone/:cellname/CNAME/my.some.domain.local":
 
                     POST   > defines new A record for cell 'cellname' with IPv4 or name taken from the body
-
-
-    - "/status/:cellname":
-
-                    GET    > returns JSON metadata, limits and status for all services under 'cellname' cell.
 
 
     - "/status/:cellname/Php72":

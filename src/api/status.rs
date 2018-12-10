@@ -96,7 +96,7 @@ impl CellProcesses {
     }
 
 
-    /// Status of all ressident processes of given cell:
+    /// Status of all ressident processes of cell by a_name
     pub fn of_cell(a_name: &String) -> Result<Self, Error> {
         let sentry_dir = format!("{}/{}", SENTRY_PATH, a_name);
         let netid_file = format!("{}/{}", sentry_dir, "cell.vlan.number");
