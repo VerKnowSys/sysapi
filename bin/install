@@ -14,8 +14,7 @@ else
 fi
 
 
-kill_and_strip () {
-    killall -TERM "${_bin_name}" 2>/dev/null
+strip_product () {
     echo "Strip: SysAPI: ${_bin_product_target}" \
         && strip -s -d "${_bin_product_target}" \
         && return 0
@@ -24,8 +23,24 @@ kill_and_strip () {
 }
 
 
+disable_hardening_features () {
+    echo "Setting up explicit hardening for: SysAPI"
+    hbsdcontrol pax enable aslr "${_sysapi_dest_bin}" \
+        && hbsdcontrol pax disable mprotect "${_sysapi_dest_bin}" \
+        && hbsdcontrol pax disable pageexec "${_sysapi_dest_bin}" \
+        && hbsdcontrol pax disable shlibrandom "${_sysapi_dest_bin}" \
+        && hbsdcontrol pax enable segvguard "${_sysapi_dest_bin}" \
+        && hbsdcontrol pax enable disallow_map32bit "${_sysapi_dest_bin}" \
+        && return 0
+
+    return 1
+}
+
+
 install_product () {
+    killall -TERM "${_bin_name}" 2>/dev/null
     install -v "${_bin_product_target}" "${_sysapi_dest_bin}" \
+        && disable_hardening_features \
         && echo "Installed: SysAPI binary: ${_bin_product_target}" \
         && return 0
 
@@ -35,7 +50,7 @@ install_product () {
 
 # Strip and Install product:
 bin/build "${_rel_type}" \
-    && kill_and_strip \
+    && strip_product \
     && install_product \
     && exit 0
 
