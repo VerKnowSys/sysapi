@@ -84,6 +84,16 @@ pub struct CellProcesses {
 }
 
 
+/// An empty CellProcesses as default:
+impl Default for CellProcesses {
+    fn default() -> CellProcesses {
+        CellProcesses {
+            list: vec!()
+        }
+    }
+}
+
+
 /// Serialize to JSON on .to_string()
 impl ToString for CellProcess {
     fn to_string(&self) -> String {
