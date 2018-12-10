@@ -1,0 +1,46 @@
+#!/bin/sh
+# blame: @dmilith
+# 2018-11-22-0129-1542846591
+
+
+. bin/common "${*}"
+
+
+case "${_uname}" in
+    FreeBSD)
+        if [ ! -d ../kvmpro ]; then
+            echo "Fetch remote repository: kvmpro from: ${_kvmpro_repo}"
+            cd ..
+            git clone --jobs=2 "${_kvmpro_repo}"
+            cd kvmpro
+        else
+            echo "Update repository: kvmpro"
+            cd ../kvmpro
+            git pull --jobs=2
+        fi
+        if [ "release" = "${_release_type}" ]; then
+            bin/clean
+        fi
+        bin/install
+        echo
+
+        cd "${_cargo_project_dir}"
+        git pull --jobs 2
+
+        if [ "release" = "${_release_type}" ]; then
+            bin/clean
+        fi
+        echo "Build: SysAPI"
+        eval "RUSTFLAGS=\"-lkvm -lprocstat\" cargo build ${_cargo_release_flag}"
+        if [ "0" != "${?}" ]; then
+            echo "Build: Failed!" \
+                && exit 1
+        fi
+        ;;
+
+    *)
+        echo "Platform not supported: ${_uname}" \
+            && exit 1
+        ;;
+
+esac

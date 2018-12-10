@@ -1,0 +1,31 @@
+#!/bin/sh
+# blame: @dmilith
+# 2018-12-10-0139-1544402355
+
+
+_params="${*}"
+
+_kvmpro_repo="https://github.com/VerKnowSys/kvmpro.git"
+_uname="$(uname 2>/dev/null)"
+_cargo_project_dir="$(pwd 2>/dev/null)"
+_release_type="${1:-release}"
+_bin_name="sysapi"
+_sysapi_dest_bin="/usr/bin/${_bin_name}"
+_bin_product_target="target/${_release_type}/${_bin_name}"
+
+_cargo_release_flag="--release"
+if [ "release" != "${_release_type}" ]; then
+    unset _cargo_release_flag
+fi
+
+clear
+
+echo
+echo
+echo "Project directory: ${_cargo_project_dir}"
+echo "Project product: ${_bin_name}"
+echo
+echo "Project release type: ${_release_type}"
+echo "System type: ${_uname}"
+echo
+echo

@@ -1,64 +1,36 @@
 #!/bin/sh
 # blame: @dmilith
-# 2018-11-22-0129-1542846591
-
-clear
-
-_kvmpro_repo="https://github.com/VerKnowSys/kvmpro.git"
-
-_bin_name="sysapi"
-_sysapi_dest_bin="/usr/bin/${_bin_name}"
-_uname="$(uname 2>/dev/null)"
-_cargo_project_dir="$(pwd 2>/dev/null)"
-_cargo_release_flag="--release"
-_release_type="${1:-release}"
-if [ "release" != "${_release_type}" ]; then
-    unset _cargo_release_flag
-fi
+# 2018-12-10-0127-1544401657
 
 
-case "${_uname}" in
-    FreeBSD)
-        if [ ! -d ../kvmpro ]; then
-            echo "Fetch repository: kvmpro"
-            cd ..
-            git clone --jobs=4 "${_kvmpro_repo}"
-            cd kvmpro
-        else
-            echo "Update repository: kvmpro"
-            cd ../kvmpro
-            git pull --jobs=4
-        fi
-        if [ "release" = "${_release_type}" ]; then
-            bin/clean
-        fi
-        bin/install
-        echo
+_params="${1:-release}"
 
-        cd "${_cargo_project_dir}"
-        git pull --jobs 4
 
-        if [ "release" = "${_release_type}" ]; then
-            bin/clean
-        fi
-        echo "Build: SysAPI"
-        eval "RUSTFLAGS=\"-lkvm -lprocstat\" cargo build ${_cargo_release_flag}"
-        if [ "0" = "${?}" ]; then
-            killall -TERM "${_bin_name}" 2>/dev/null
-            echo "Strip and Install: SysAPI" \
-                && strip -s -d "target/${_release_type}/${_bin_name}" \
-                && install -v "target/${_release_type}/${_bin_name}" "${_sysapi_dest_bin}" \
-                    && echo "Successfully installed: SysAPI" \
-                    && exit
-        else
-            echo "Build failed!" \
-                && exit 1
-        fi
-        ;;
+. bin/common "${_params}"
 
-    *)
-        echo "Platform not supported: ${_uname}" \
-            && exit 1
-        ;;
 
-esac
+kill_and_strip () {
+    killall -TERM "${_bin_name}" 2>/dev/null
+    echo "Strip: SysAPI: ${_bin_product_target}" \
+        && strip -s -d "${_bin_product_target}" \
+        && return 0
+    return 1
+}
+
+
+install_product () {
+    install -v "${_bin_product_target}" "${_sysapi_dest_bin}" \
+        && echo "Installed: SysAPI binary: ${_bin_product_target}" \
+        && return 0
+
+    return 1
+}
+
+
+# install - main():
+bin/build "${_params}" \
+    && kill_and_strip \
+    && install_product \
+    && exit 0
+
+exit 1
