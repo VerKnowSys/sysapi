@@ -25,10 +25,6 @@ case "${_uname}" in
         git pull \
             --jobs 2
 
-        if [ "release" = "${_release_type}" ]; then
-            bin/clean
-        fi
-
         printf "\n\nBuilding: SysAPI\n"
         RUSTFLAGS="-lkvm -lprocstat" \
             cargo build ${_cargo_release_flag}

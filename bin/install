@@ -7,6 +7,11 @@
 _rel_type="${1:-release}"
 
 . bin/common "${_rel_type}"
+if [ "release" = "${_rel_type}" ]; then
+    bin/clean purge
+else
+    bin/clean
+fi
 
 
 kill_and_strip () {
