@@ -2,10 +2,10 @@
 
 
 reset_module_state () {
-    if [ -d "${PWD}/lib/kvmpro" ]; then
-        cd ./lib/kvmpro \
-            && git reset --hard >/dev/null
-        cd ..
+    if [ -d "lib/kvmpro" ]; then
+        cd lib/kvmpro \
+            && git reset --hard
+        cd ../..
     fi
     return 0
 }
@@ -13,19 +13,23 @@ reset_module_state () {
 
 update_all_repos () {
     git pull \
-        --recurse-submodules
+        --recurse-submodules \
+            || failure "Failed to pull submodules recursively!"
 
     if [ -f "${PWD}/.gitmodules" ]; then
         git submodule foreach \
             git pull \
-                --jobs 4 \
-                "origin" "${_branch}"
+                --jobs 2 \
+                "origin" "master" \
+                    || failure "Failed to pull submodules from: 'origin master'!"
 
         git submodule update \
-            --jobs 4 \
+            --jobs 2 \
             --remote \
-            --recursive
+            --recursive \
+                || failure "Failed to update submodule!"
     fi
+    return 0
 }
 
 
