@@ -2,7 +2,6 @@ use gotham::state::State;
 
 
 use api::systat::*;
-use api::status::*;
 
 
 /// handle GET for /version
