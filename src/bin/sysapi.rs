@@ -115,10 +115,6 @@ pub fn main() {
                 warn!("PS USAGE JSON: '{}'", ps_full.to_string());
                 Ok(ps_full)
             })
-            .map_err(|err| {
-                error!("CellProcesses::of_uid({}) has failed! Error: {}", 0, err.to_string());
-                err
-            })
             .unwrap_or_default();
 
         Ok(())
