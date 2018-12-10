@@ -9,6 +9,7 @@ use mime::*;
 
 // Load all internal modules:
 use api::*;
+use api::status::*;
 use api::cell::*;
 
 
