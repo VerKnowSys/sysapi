@@ -32,8 +32,4 @@ fn main() {
         .cpp(true)
         .cpp_link_stdlib("c++")
         .compile("kvmpro");
-
-        // .flag("-fuse-ld=lld")
-        // .flag("-Wl,-z,relro,-z,now,-z,retpolineplt")
-        // .flag("-w")
 }
