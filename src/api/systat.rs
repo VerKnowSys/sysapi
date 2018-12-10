@@ -13,6 +13,7 @@ use systemstat::ByteSize;
 
 use api::PRISON_PATH;
 use api::cell::List;
+use api::status::*;
 
 
 /// List Mounts type alias
@@ -46,6 +47,9 @@ pub struct Systat {
 
     /// Active Networks
     pub networks: Option<ListNetifs>,
+
+    /// Ressident Processes:
+    pub processes: Option<ListCellProcesses>,
 
 }
 
@@ -184,6 +188,8 @@ lazy_static! {
 
 impl Default for Systat {
     fn default() -> Systat {
+        let superuser_processes = CellProcesses::of_uid(0)
+            .unwrap_or_default();
         let mounts_stat = SYSTEM
             .mounts()
             .and_then(|mounts| {
@@ -372,6 +378,7 @@ impl Default for Systat {
             memory: Some(memory_stat),
             mounts: Some(mounts_stat),
             networks: Some(networks_stat),
+            processes: Some(superuser_processes),
         }
     }
 }
