@@ -106,7 +106,7 @@ impl ToString for CellProcess {
 /// Serialize to JSON on .to_string()
 impl ToString for CellProcesses {
     fn to_string(&self) -> String {
-        serde_json::to_string(&self.list)
+        serde_json::to_string(&self)
             .unwrap_or(String::from("{\"status\": \"SerializationFailure: CellProcesses\"}"))
     }
 }
