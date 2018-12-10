@@ -2,6 +2,7 @@
 # blame: @dmilith
 # 2018-11-22-0129-1542846591
 
+clear
 
 _kvmpro_repo="https://github.com/VerKnowSys/kvmpro.git"
 
