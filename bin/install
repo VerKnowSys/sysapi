@@ -3,7 +3,10 @@
 # 2018-12-10-0127-1544401657
 
 
-_params="${1:-release}"
+# NOTE: Explicitly set "release" as default release type:
+_rel_type="${1:-release}"
+
+. bin/common "${_rel_type}"
 
 
 kill_and_strip () {
@@ -11,6 +14,7 @@ kill_and_strip () {
     echo "Strip: SysAPI: ${_bin_product_target}" \
         && strip -s -d "${_bin_product_target}" \
         && return 0
+
     return 1
 }
 
@@ -24,8 +28,8 @@ install_product () {
 }
 
 
-# install - main():
-bin/build "${_params}" \
+# Strip and Install product:
+bin/build "${_rel_type}" \
     && kill_and_strip \
     && install_product \
     && exit 0
