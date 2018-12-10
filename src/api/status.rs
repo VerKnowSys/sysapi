@@ -36,40 +36,40 @@ impl CellProcesses {
 pub struct CellProcess {
 
     /// Process-IDentifier:
-    pid: Option<usize>,
+    pub pid: Option<usize>,
 
     /// Parent Process-IDentifier:
-    ppid: Option<usize>,
+    pub ppid: Option<usize>,
 
     /// Process-name:
-    name: Option<String>,
+    pub name: Option<String>,
 
     /// Process-command:
-    cmd: Option<String>,
+    pub cmd: Option<String>,
 
     /// Process-RSS (Ressident Set Size - ressident memory allocated by the process):
-    rss: Option<usize>,
+    pub rss: Option<usize>,
 
     /// Process-MRSS (Max Ressident Set Size - maximum amount of virtual memory process can allocate)
-    mrss: Option<usize>,
+    pub mrss: Option<usize>,
 
     /// Process-run time:
-    runtime: Option<usize>,
+    pub runtime: Option<usize>,
 
     /// Blocks written by Cell:
-    blk_in: Option<usize>,
+    pub blk_in: Option<usize>,
 
     /// Blocks read by Cell:
-    blk_out: Option<usize>,
+    pub blk_out: Option<usize>,
 
     /// Process threads count:
-    nthr: Option<usize>,
+    pub nthr: Option<usize>,
 
     /// Process priority:
-    pri_level: Option<usize>,
+    pub pri_level: Option<usize>,
 
     /// Process stats including bound UDP or TCP ports/addresses and other info:
-    stat_info: Option<String>,
+    pub stat_info: Option<String>,
 
 }
 
