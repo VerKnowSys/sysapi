@@ -29,7 +29,7 @@ case "${_uname}" in
             bin/clean
         fi
 
-        echo "Building: SysAPI"
+        printf "\n\nBuilding: SysAPI\n"
         RUSTFLAGS="-lkvm -lprocstat" \
             cargo build ${_cargo_release_flag}
         if [ "0" != "${?}" ]; then
