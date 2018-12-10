@@ -58,6 +58,13 @@ pub fn router() -> Router {
                     handler.get().to(api_systat_get_handler);
                 });
 
+        // …/status/:cell
+        route
+            .associate(
+                &format!("/status/:cell"), |handler| {
+                    handler.get().to(cell_status_get_handler);
+                });
+
         // …/cells/list
         route
             .associate(

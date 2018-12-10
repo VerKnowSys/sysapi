@@ -76,6 +76,14 @@ pub fn cell_get_handler(state: State) -> (State, Cell) {
 }
 
 
+/// handle GET for /status/:cell (name given) - list processes of a single cell
+pub fn cell_status_get_handler(state: State) -> (State, CellProcesses) {
+    let uri = Uri::borrow_from(&state).to_string();
+    let name = uri.replace(STATUS_RESOURCE, "");
+    (state, CellProcesses::of_cell(&name).unwrap_or_default())
+}
+
+
 /// Handle POSTs
 pub fn cell_post_handler(mut state: State) -> Box<HandlerFuture> {
     let f = Body::take_from(&mut state)
