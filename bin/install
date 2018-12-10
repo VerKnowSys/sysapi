@@ -6,9 +6,6 @@
 _params="${1:-release}"
 
 
-. bin/common "${_params}"
-
-
 kill_and_strip () {
     killall -TERM "${_bin_name}" 2>/dev/null
     echo "Strip: SysAPI: ${_bin_product_target}" \
