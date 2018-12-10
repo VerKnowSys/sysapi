@@ -3,15 +3,16 @@
 extern crate cc;
 
 
+// ??? NOTE: This process fails on svdOS builds older or than #131
+
+
 fn main() {
     cc::Build::new()
-        .include("/usr/include/c++/v1")
-        .include("/usr/include")
-        .include("../kvmpro/src/")
-        .file("../kvmpro/src/kvm.cc")
-        .file("../kvmpro/src/procstat.cc")
-        .file("../kvmpro/src/utils.cc")
-        .flag("-O3")
+        .cpp(true)
+        .pic(true)
+        .warnings(true)
+        .flag("-Ofast")
+        .flag("-std=c++11")
         .flag("-ftrapv")
         .flag("-fstack-protector")
         .flag("-fstack-protector-strong")
@@ -20,10 +21,11 @@ fn main() {
         .flag("-Wformat-security")
         .flag("-fno-strict-overflow")
         .flag("-mretpoline")
-        .static_flag(false)
-        .shared_flag(false)
-        .pic(true)
-        .cpp(true)
+        .cpp_set_stdlib("c++")
         .cpp_link_stdlib("c++")
-        .compile("kvmpro");
+        .file("lib/kvmpro/src/kvmpro.h")
+        .file("lib/kvmpro/src/kvm.cc")
+        .file("lib/kvmpro/src/procstat.cc")
+        .file("lib/kvmpro/src/utils.cc")
+        .compile("kvmpro.so");
 }
