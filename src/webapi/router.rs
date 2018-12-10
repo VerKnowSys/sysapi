@@ -61,7 +61,7 @@ pub fn router() -> Router {
         // …/status/:cell
         route
             .associate(
-                &format!("/status/:cell"), |handler| {
+                &format!("{}:cell", STATUS_RESOURCE), |handler| {
                     handler.get().to(cell_status_get_handler);
                 });
 
