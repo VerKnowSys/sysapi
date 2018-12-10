@@ -19,13 +19,3 @@ if [ "release" != "${_release_type}" ]; then
 fi
 
 clear
-
-echo
-echo
-echo "Project directory: ${_cargo_project_dir}"
-echo "Project product: ${_bin_name}"
-echo
-echo "Project release type: ${_release_type}"
-echo "System type: ${_uname}"
-echo
-echo
