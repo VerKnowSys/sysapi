@@ -12,6 +12,7 @@ fn main() {
         .file("../kvmpro/src/procstat.cc")
         .file("../kvmpro/src/utils.cc")
         .flag("-O3")
+        .flag("-std=c++11")
         .flag("-fPIC")
         .flag("-fPIE")
         .flag("-ftrapv")
