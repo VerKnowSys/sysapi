@@ -23,6 +23,8 @@ fn main() {
         .flag("-Wformat")
         .flag("-Wformat-security")
         .flag("-D_FORTIFY_SOURCE=2")
+        .flag("--param")
+        .flag("ssp-buffer-size=4")
         .static_flag(false)
         .shared_flag(false)
         .pic(true)
