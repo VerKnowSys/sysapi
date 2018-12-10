@@ -77,22 +77,9 @@ impl CellProcesses {
 
     /// Status of all ressident processes running as UID:
     pub fn of_uid(an_uid: uid_t) -> Result<Self, serde_json::Error> {
-        // Deserialize JSON to CellProcesses structure:
-        let procs_json = processes_of_uid(an_uid);
-        match serde_json::from_str(&procs_json) {
-            Ok(all_processes) => {
-                Ok(
-                    CellProcesses {
-                        list: all_processes
-                    }
-                )
-            },
-
-            Err(err) => {
-                error!("CellProcesses::of_uid({}) has failed! Error: {:?}", an_uid, err);
-                Err(err)
-            }
-        }
+        let procs_json = processes_of_uid(an_uid); // Deserialize JSON to CellProcesses structure
+        serde_json::from_str(&procs_json)
+            .and_then(|cell_processes| Ok(cell_processes))
     }
 
 
