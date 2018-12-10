@@ -34,7 +34,6 @@ lazy_static = "1.1"
 
 uuid = { version = "0.6", features = ["v4"] }
 rand = "0.4"
-num_cpus = "1.2"
 regex = "0.2"
 chrono = "0.4"
 glob = "0.2"
