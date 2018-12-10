@@ -35,9 +35,6 @@ impl CellProcesses {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CellProcess {
 
-    /// Job status:
-    pub status: Option<String>,
-
     /// Process-IDentifier:
     pub pid: Option<usize>,
 
@@ -80,6 +77,9 @@ pub struct CellProcess {
 /// Status of all processes running in a cell:
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CellProcesses {
+
+    /// Job status:
+    pub status: Option<String>,
 
     /// List of all processes
     pub list: Vec<CellProcess>
