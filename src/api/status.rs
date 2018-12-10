@@ -11,59 +11,8 @@ use libc::*;
 use utils::*;
 
 
-/// Default CellProcesses implementation:
-impl CellProcesses {
-
-
-    /// Status of all ressident processes running as UID:
-    pub fn of_uid(an_uid: uid_t) -> Result<Self, serde_json::Error> {
-        // Deserialize JSON to CellProcesses structure:
-        let procs_json = processes_of_uid(an_uid);
-        match serde_json::from_str(&procs_json) {
-            Ok(all_processes) => {
-                Ok(
-                    CellProcesses {
-                        list: all_processes
-                    }
-                )
-            },
-
-            Err(err) => {
-                error!("CellProcesses::of_uid({}) has failed! Error: {:?}", an_uid, err);
-                Err(err)
-            }
-        }
-    }
-
-
-    /// Status of all ressident processes of given cell:
-    pub fn of_cell(a_name: &String) -> Result<Self, serde_json::Error> {
-        let sentry_dir = format!("{}/{}", SENTRY_PATH, a_name);
-        let netid_file = format!("{}/{}", sentry_dir, "cell.vlan.number");
-        let cell_net_id_and_uid = File::open(&netid_file)
-            .and_then(|file| {
-                let mut line = String::new();
-                BufReader::new(file)
-                    .read_line(&mut line)
-                    .and_then(|_| {
-                        // trim newlines and other whitespaces:
-                        Ok(str::trim(&line).to_string())
-                    })
-            })
-            .unwrap_or("0".to_string());
-        let cell_uid = cell_net_id_and_uid
-            .parse::<usize>()
-            .unwrap_or(0);
-        debug!("CellProcesses::of_cell(uid: {})", cell_uid);
-        CellProcesses::of_uid(cell_uid)
-           .and_then(|ps_full| {
-               warn!("PS USAGE of cell: {} JSON: '{}'", &a_name, ps_full.to_string());
-               Ok(ps_full)
-           })
-    }
-
-
-}
+/// List CellProcess type alias:
+pub type ListCellProcesses = Vec<CellProcess>;
 
 
 /// A single cell process status:
@@ -116,6 +65,64 @@ pub struct CellProcesses {
     /// Job status:
     pub status: Option<String>,
 
+
+/// Default CellProcesses implementation:
+impl CellProcesses {
+
+
+    /// Status of all ressident processes running as UID:
+    pub fn of_uid(an_uid: uid_t) -> Result<Self, serde_json::Error> {
+        // Deserialize JSON to CellProcesses structure:
+        let procs_json = processes_of_uid(an_uid);
+        match serde_json::from_str(&procs_json) {
+            Ok(all_processes) => {
+                Ok(
+                    CellProcesses {
+                        list: all_processes
+                    }
+                )
+            },
+
+            Err(err) => {
+                error!("CellProcesses::of_uid({}) has failed! Error: {:?}", an_uid, err);
+                Err(err)
+            }
+        }
+    }
+
+
+    /// Status of all ressident processes of given cell:
+    pub fn of_cell(a_name: &String) -> Result<Self, Error> {
+        let sentry_dir = format!("{}/{}", SENTRY_PATH, a_name);
+        let netid_file = format!("{}/{}", sentry_dir, "cell.vlan.number");
+        File::open(&netid_file)
+            .and_then(|file| {
+                let mut line = String::new();
+                BufReader::new(file)
+                    .read_line(&mut line)
+                    .and_then(|_| Ok(str::trim(&line).to_string()))
+            })
+            .and_then(|uid_line| {
+                uid_line
+                    .parse::<u32>()
+                    .and_then(|cell_uid| Ok(cell_uid))
+                    .map_err(|err| Error::new(ErrorKind::Other, err.to_string()))
+            })
+            .and_then(|cell_uid| {
+                if cell_uid > 0 {
+                    CellProcesses::of_uid(cell_uid)
+                       .and_then(|ps_full| {
+                           debug!("CellProcesses::of_cell(cell_uid: {}): {} JSON: '{}'", cell_uid, a_name, ps_full.to_string());
+                           Ok(ps_full)
+                       })
+                       .map_err(|err| Error::new(ErrorKind::Other, err.to_string()))
+                } else {
+                    // NOTE: We can't return 0 for security reasons, so this is to explicitly return no data for "0":
+                    warn!("CellProcesses::of_cell(cell_uid: 0). Using uid 0 (super-user) is disallowed for security reasons!");
+                    Ok(CellProcesses::default())
+                }
+            })
+    }
 }
 
 
