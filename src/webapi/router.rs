@@ -3,11 +3,11 @@ use gotham::router::builder::{build_simple_router, DefineSingleRoute, DrawRoutes
 use gotham::handler::assets::*;
 
 
-use api::*;
-use webapi::internals::*;
-use webapi::cells::*;
-use webapi::datasets::*;
-use webapi::proxies::*;
+use self::common::*;
+use self::internals::*;
+use self::cells::*;
+use self::datasets::*;
+use self::proxies::*;
 
 
 /// Define router

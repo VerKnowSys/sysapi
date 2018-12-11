@@ -9,9 +9,9 @@ use chrono::Local;
 use mime::*;
 
 
-use api::*;
-use api::cell::*;
-use webapi::datasets::CUT_LAST_COMMA;
+use self::common::*;
+use self::cell::*;
+use self::datasets::CUT_LAST_COMMA;
 
 
 /// ZFS Rollback wrapper

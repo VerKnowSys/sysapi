@@ -11,9 +11,9 @@ use systemstat::*;
 use systemstat::ByteSize;
 
 
-use api::*;
-use api::cell::*;
-use api::status::*;
+use self::common::*;
+use self::cell::*;
+use self::status::*;
 
 
 /// List Mounts type alias

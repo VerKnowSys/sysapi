@@ -13,9 +13,9 @@ use std::io::{Write, Error, ErrorKind};
 use atomicwrites::{AtomicFile,AllowOverwrite};
 
 
-use api::*;
-use zone::*;
-use webapi::utils::list_proxies;
+use self::common::*;
+use self::zone::*;
+use self::utils::list_proxies;
 
 
 use regex::Regex;

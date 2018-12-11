@@ -1,7 +1,7 @@
 use glob::glob;
 use libloading::*;
 
-use api::*;
+use self::common::*;
 
 
 #[link(name = "kvm")]

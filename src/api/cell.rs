@@ -13,8 +13,8 @@ use mime::*;
 
 
 // Load all internal modules:
-use api::*;
-use utils::*;
+use self::common::*;
+use self::utils::*;
 
 
 use regex::Regex;

@@ -10,8 +10,8 @@ use std::fs::File;
 use mime::*;
 use libc::*;
 
-use api::*;
-use utils::*;
+use self::common::*;
+use self::utils::*;
 
 
 /// List CellProcess type alias:

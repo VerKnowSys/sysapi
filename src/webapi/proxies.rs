@@ -7,8 +7,8 @@ use mime::*;
 
 
 // Load all internal modules:
-use api::*;
-use api::proxy::*;
+use self::common::*;
+use self::proxy::*;
 
 
 /// Handle POSTs /proxy/:cell/:from/:to
