@@ -1,41 +1,5 @@
 use glob::glob;
-use libloading::*;
-
 use self::common::*;
-
-
-#[link(name = "kvm")]
-#[link(name = "procstat")]
-#[link(name = "kvmpro", kind = "dylib")]
-
-/// Call kernel directly through C++ function from libkvmpro library:
-#[allow(unsafe_code)]
-pub fn processes_of_uid(uid: uid_t) -> String {
-    Library::new("/usr/lib/libkvmpro.so")
-        .and_then(|lib| {
-            unsafe {
-                let cpp_processes_of_uid: Symbol<unsafe extern fn(uid_t) -> String> =
-                lib.get(b"get_process_usage\0").unwrap();
-                Ok(cpp_processes_of_uid(uid))
-            }
-        })
-        .unwrap()
-}
-
-
-/// Call kernel directly through C++ function from libkvmpro library:
-#[allow(unsafe_code)]
-pub fn processes_of_uid_short(uid: uid_t) -> String {
-    Library::new("/usr/lib/libkvmpro.so")
-        .and_then(|lib| {
-            unsafe {
-                let cpp_processes_of_uid_short: Symbol<unsafe extern fn(uid_t) -> String> =
-                lib.get(b"get_process_usage_short\0").unwrap();
-                Ok(cpp_processes_of_uid_short(uid))
-            }
-        })
-        .unwrap()
-}
 
 
 /// Produce list of dirs/files matching given glob pattern:

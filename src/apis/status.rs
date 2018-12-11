@@ -11,7 +11,6 @@ use mime::*;
 use libc::*;
 
 use self::common::*;
-use self::utils::*;
 
 
 /// List CellProcess type alias:

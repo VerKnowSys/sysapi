@@ -14,7 +14,6 @@ use mime::*;
 
 // Load all internal modules:
 use self::common::*;
-use self::utils::*;
 
 
 use regex::Regex;

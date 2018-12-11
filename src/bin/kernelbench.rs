@@ -1,9 +1,9 @@
 #[macro_use]
 extern crate bencher;
-extern crate sysapi;
+
 
 use bencher::Bencher;
-use utils::{processes_of_uid, processes_of_uid_short};
+use self::common::utils::{processes_of_uid, processes_of_uid_short};
 
 
 fn bench_processes_of_uid_full(b: &mut Bencher) {
