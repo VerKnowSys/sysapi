@@ -10,5 +10,5 @@ _cycles=10
 
 printf "\n\nBench: SysAPI: Running measurement ${_cycles} times (sequentially one by one)\n\n"
 for i in $(seq 0 ${_cycles}); do
-    RUSTFLAGS="-lkvm -lprocstat" cargo run --bin kernelbench ${_cargo_release_flag}
+    cargo run --bin kernelbench ${_cargo_release_flag}
 done
