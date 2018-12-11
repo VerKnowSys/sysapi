@@ -15,9 +15,25 @@
         unused_qualifications)]
 
 
+#[allow(unused_imports)]
+#[macro_use]
+extern crate log;
 
+
+#[allow(unused_imports)]
+#[macro_use]
+extern crate lazy_static;
+
+
+#[allow(unused_imports)]
+#[macro_use]
+extern crate serde_derive;
+
+
+#[allow(unused_imports)]
 #[cfg(test)]
 mod tests {
+
     // Load all internal modules:
     use hyper::*;
     use gotham::test::TestServer;
