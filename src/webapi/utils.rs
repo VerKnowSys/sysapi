@@ -11,20 +11,30 @@ use api::*;
 /// Call kernel directly through C++ function from libkvmpro library:
 #[allow(unsafe_code)]
 pub fn processes_of_uid(uid: uid_t) -> String {
-    let c_buf: *const c_char = unsafe { get_process_usage(uid) };
-    let c_str: &CStr = unsafe { CStr::from_ptr(c_buf) };
-    let a_slice: &str = c_str.to_str().unwrap_or("[]");
-    a_slice.to_string()
+    Library::new("/usr/lib/libkvmpro.so")
+        .and_then(|lib| {
+            unsafe {
+                let cpp_processes_of_uid: Symbol<unsafe extern fn(uid_t) -> String> =
+                lib.get(b"get_process_usage\0").unwrap();
+                Ok(cpp_processes_of_uid(uid))
+            }
+        })
+        .unwrap()
 }
 
 
 /// Call kernel directly through C++ function from libkvmpro library:
 #[allow(unsafe_code)]
 pub fn processes_of_uid_short(uid: uid_t) -> String {
-    let c_buf: *const c_char = unsafe { get_process_usage_short(uid) };
-    let c_str: &CStr = unsafe { CStr::from_ptr(c_buf) };
-    let a_slice: &str = c_str.to_str().unwrap_or("[]");
-    a_slice.to_string()
+    Library::new("/usr/lib/libkvmpro.so")
+        .and_then(|lib| {
+            unsafe {
+                let cpp_processes_of_uid_short: Symbol<unsafe extern fn(uid_t) -> String> =
+                lib.get(b"get_process_usage_short\0").unwrap();
+                Ok(cpp_processes_of_uid_short(uid))
+            }
+        })
+        .unwrap()
 }
 
 
