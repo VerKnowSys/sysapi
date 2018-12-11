@@ -1,33 +1,12 @@
 use glob::glob;
-use libc::*;
-use std::ffi::*;
-use std::str;
-use std::os::raw::c_char;
+use libloading::*;
 
-use api::SENTRY_PATH;
+use api::*;
 
-
-//
-// External C++ functions provided by "kvmpro" library:
 
 #[link(name = "kvm")]
 #[link(name = "procstat")]
-extern "stdcall" {
-
-    /// Get processes + network connections - directly from kernel
-    #[no_mangle]
-    pub fn get_process_usage(user_uid: uid_t) -> *const c_char;
-
-
-    /// Get processes - directly from kernel
-    #[no_mangle]
-    pub fn get_process_usage_short(user_uid: uid_t) -> *const c_char;
-
-}
-
-// External C++ functions. EOF
-//
-
+#[link(name = "kvmpro", kind = "dylib")]
 
 /// Call kernel directly through C++ function from libkvmpro library:
 #[allow(unsafe_code)]
