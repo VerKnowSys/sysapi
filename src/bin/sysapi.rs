@@ -1,6 +1,15 @@
 
 
-//! SysAPI Dashboard Server
+//! SysAPI Dashboard Web Server
+
+
+#[allow(unused_imports)]
+#[macro_use]
+extern crate log;
+
+#[allow(unused_imports)]
+#[macro_use]
+extern crate serde_derive;
 
 
 use std::env;
