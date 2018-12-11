@@ -11,6 +11,7 @@ fn main() {
         .flag("-O2")
         .flag("-fPIE")
         .flag("-std=c++11")
+        .flag("-Wno-return-type-c-linkage")
         .cpp_set_stdlib("c++")
         .cpp_link_stdlib("c++")
         .file("lib/kvmpro/src/kvm.cc")
