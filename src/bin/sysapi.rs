@@ -3,28 +3,6 @@
 //! SysAPI Dashboard Server
 
 
-extern crate log;
-extern crate fern;
-extern crate colored;
-extern crate lazy_static;
-extern crate chrono;
-extern crate futures;
-extern crate gotham;
-extern crate mime;
-extern crate regex;
-extern crate serde;
-extern crate serde_json;
-extern crate hostname;
-extern crate domain;
-extern crate tokio;
-extern crate abstract_ns;
-extern crate ns_std_threaded;
-extern crate systemstat;
-extern crate libc;
-
-extern crate sysapi;
-
-
 use std::env;
 use log::*;
 use fern::*;
@@ -36,9 +14,6 @@ use hostname::get_hostname;
 use std::path::Path;
 use futures::future;
 use tokio::runtime::Runtime;
-
-use sysapi::*;
-use sysapi::router;
 
 
 /// Start a server and use a `Router` to dispatch requests

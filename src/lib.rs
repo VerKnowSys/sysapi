@@ -15,48 +15,8 @@
         unused_qualifications)]
 
 
-#[macro_use]
-extern crate log;
-extern crate fern;
-extern crate chrono;
-#[macro_use]
-extern crate lazy_static;
-extern crate futures;
-extern crate gotham;
-extern crate hyper;
-extern crate mime;
-extern crate regex;
-#[macro_use]
-extern crate serde_derive;
-extern crate tokio;
-extern crate abstract_ns;
-// extern crate ns_dns_tokio;
-extern crate ns_std_threaded;
-
-extern crate serde;
-extern crate serde_json;
-extern crate glob;
-extern crate hostname;
-extern crate domain;
-extern crate atomicwrites;
-extern crate systemstat;
-extern crate libc;
 
 
-/// Public sysapi modules:
-pub mod api;
-
-/// Public webapi modules:
-pub mod webapi;
-
-
-// use std::sync::RwLock;
-// use tokio_core::reactor::{Core, Remote};
-pub use fern::colors::{Color, ColoredLevelConfig};
-
-pub use api::*;
-pub use webapi::*;
-pub use webapi::cells::*;
 
 
 #[cfg(test)]
