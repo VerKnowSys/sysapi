@@ -13,7 +13,6 @@ fn main() {
         .flag("-std=c++11")
         .cpp_set_stdlib("c++")
         .cpp_link_stdlib("c++")
-        .file("lib/kvmpro/src/kvmpro.h")
         .file("lib/kvmpro/src/kvm.cc")
         .file("lib/kvmpro/src/procstat.cc")
         .file("lib/kvmpro/src/utils.cc")
