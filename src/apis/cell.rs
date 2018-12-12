@@ -12,8 +12,8 @@ use std::fs::File;
 use mime::*;
 
 
-// Load all internal modules:
-use self::common::*;
+use crate::*;
+use crate::helpers::*;
 
 
 use regex::Regex;
@@ -307,7 +307,7 @@ impl Cell {
 
 
 /// Add SSH pubkey to a cell
-pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<(), Error> {
+pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<()> {
     Command::new(GVR_BIN)
         .arg("set")
         .arg(name)
@@ -327,7 +327,7 @@ pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<(), 
 
 
 /// Create cell
-pub fn create_cell(name: &String) -> Result<(), Error> {
+pub fn create_cell(name: &String) -> Result<()> {
     Command::new(GVR_BIN)
         .arg("create")
         .arg(name)
@@ -346,7 +346,7 @@ pub fn create_cell(name: &String) -> Result<(), Error> {
 
 
 /// Destroy cell
-pub fn destroy_cell(name: &String) -> Result<(), Error> {
+pub fn destroy_cell(name: &String) -> Result<()> {
     Command::new(GVR_BIN)
         .arg("destroy")
         .arg(name)

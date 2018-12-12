@@ -8,12 +8,11 @@ use std::thread; // XXX: temporary
 use std::time::Duration;
 use chrono::{Local, DateTime, Utc};
 use systemstat::*;
-use systemstat::ByteSize;
 
 
-use self::common::*;
-use self::cell::*;
-use self::status::*;
+use crate::*;
+use crate::apis::status::*;
+use crate::apis::cell::*;
 
 
 /// List Mounts type alias

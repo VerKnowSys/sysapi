@@ -9,9 +9,9 @@ use chrono::Local;
 use mime::*;
 
 
-use self::common::*;
-use self::cell::*;
-use self::datasets::CUT_LAST_COMMA;
+use crate::*;
+use crate::apis::cell::*;
+use crate::processors::datasets::CUT_LAST_COMMA;
 
 
 /// ZFS Rollback wrapper
@@ -159,7 +159,7 @@ impl Datasets {
 
 
     /// List all datasets of a cell:
-    pub fn list(cell_name: &String) -> Result<String, Error> {
+    pub fn list(cell_name: &String) -> Result<String> {
         Command::new(JEXEC_BIN)
             .arg("-U")
             .arg(CELL_USERNAME)
@@ -203,7 +203,7 @@ impl Snapshot {
 
 
     /// Create snapshot of dataset with given name:
-    pub fn new(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<Snapshot, Error> {
+    pub fn new(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<Snapshot> {
         Ok(Snapshot {
             name: Some(snapshot_name.to_owned()),
             cell_name: Some(cell_name.to_owned()),
@@ -214,7 +214,7 @@ impl Snapshot {
 
 
     /// Create snapshot of dataset with given name:
-    pub fn create(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<Snapshot, Error> {
+    pub fn create(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<Snapshot> {
         Snapshot::new(&cell_name, &dataset_path, &snapshot_name)
             .and_then(|_new_cell| {
                 Command::new(JEXEC_BIN)
@@ -250,7 +250,7 @@ impl Snapshot {
 
 
     /// Destroy existing snapshot with given name:
-    pub fn destroy(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<(), Error> {
+    pub fn destroy(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<()> {
         Command::new(JEXEC_BIN)
             .arg("-U")
             .arg(CELL_USERNAME)
@@ -276,7 +276,7 @@ impl Snapshot {
 
 
     /// List all snapshots of a cell:
-    pub fn list(cell_name: &String) -> Result<String, Error> {
+    pub fn list(cell_name: &String) -> Result<String> {
         Command::new(JEXEC_BIN)
             .arg("-U")
             .arg(CELL_USERNAME)
@@ -314,7 +314,7 @@ impl Snapshot {
 
 
     /// Check snapshot state under a cell:
-    pub fn state(cell_name: &String, snapshot_name: &String) -> Result<String, Error> {
+    pub fn state(cell_name: &String, snapshot_name: &String) -> Result<String> {
         Command::new(JEXEC_BIN)
             .arg("-U")
             .arg(CELL_USERNAME)
@@ -370,7 +370,7 @@ impl Rollback {
 
 
     /// Rollback dataset to given snapshot name:
-    pub fn new(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<Rollback, Error> {
+    pub fn new(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<Rollback> {
         Command::new(JEXEC_BIN)
             .arg("-U")
             .arg(CELL_USERNAME)
@@ -400,11 +400,7 @@ impl Rollback {
                     )
                 }
             })
-
     }
 
 
-
 }
-
-

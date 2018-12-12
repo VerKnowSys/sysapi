@@ -13,9 +13,9 @@ use std::io::{Write, Error, ErrorKind};
 use atomicwrites::{AtomicFile,AllowOverwrite};
 
 
-use self::common::*;
-use self::zone::*;
-use self::utils::list_proxies;
+use crate::*;
+use crate::apis::zone::*;
+use crate::helpers::list_proxies;
 
 
 use regex::Regex;
@@ -145,7 +145,7 @@ impl Proxy {
 
 
     /// Generate proxy entry (validation pass for: from/to is required)
-    pub fn new(cell_name: &String, from: &String, to: &String) -> Result<Proxy, Error> {
+    pub fn new(cell_name: &String, from: &String, to: &String) -> Result<Proxy> {
         Zone::validate_domain_addresses(from, to)
             .and_then(|(valid_ipv4_from, valid_ipv4_to)| {
                 // When both domains are valid, create Proxy object:
@@ -166,7 +166,7 @@ impl Proxy {
 
 
     /// Create new Web Proxy configuration:
-    pub fn create(cell_name: &String, from: &String, to: &String) -> Result<Proxy, Error> {
+    pub fn create(cell_name: &String, from: &String, to: &String) -> Result<Proxy> {
         Proxy::new(cell_name, from, to)
             .and_then(|proxy| {
                 // Write Nginx proxy object to local file under dir: /Shared/Prison/Sentry/CELLNAME/cell-webconfs/*.conf:
@@ -200,7 +200,7 @@ impl Proxy {
 
 
     /// Destroy Web Proxy configuration:
-    pub fn destroy(cell_name: &String, from: &String, to: &String) -> Result<(), Error> {
+    pub fn destroy(cell_name: &String, from: &String, to: &String) -> Result<()> {
         let proxy_file_name = format!("{}_proxyfrom_{}_proxyto_{}.conf", cell_name, from.replace(".", "_"), to.replace(".", "_"));
         let proxy_dest_dir = format!("{}/{}/cell-webconfs", SENTRY_PATH, cell_name);
         let proxy_dest_file = format!("{}/{}", proxy_dest_dir, proxy_file_name);
