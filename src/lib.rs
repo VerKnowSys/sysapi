@@ -147,27 +147,23 @@ pub mod soload {
         // a_slice.to_string()
 
 
-    #[allow(unsafe_code)]
     /// Call kernel directly through C++ function from kvmpro library:
+    #[allow(unsafe_code)]
     pub fn processes_of_uid(uid: uid_t) -> String {
         Library::new(DEFAULT_LIBKVMPRO_SHARED)
             .and_then(|lib| {
                 debug!("loadso::processes_of_uid({})", uid);
-                let func_symbol: Symbol<extern "C" fn(uid_t) -> *const c_char> = unsafe {
-                    lib.get(b"get_process_usage\0")
-                }.unwrap();
-                let func_handler = *func_symbol;
+                let func_sym: Symbol<extern "C" fn(uid_t) -> *const c_char> = unsafe { lib.get(b"get_process_usage\0") }?;
+                let func_handler = *func_sym;
                 let ptr_to_value = func_handler(uid);
-                let cstr_value: &CStr = unsafe {
-                    CStr::from_ptr(ptr_to_value)
-                };
+                let cstr_value: &CStr = unsafe { CStr::from_ptr(ptr_to_value) };
                 let a_slice: &str = cstr_value.to_str().unwrap_or("[]");
                 Ok(a_slice.to_string())
             })
             .map_err(|err| {
-                panic!("CRITICAL: processes_of_uid(): Unable to load shared library! Error: {:?}", err);
+                error!("FAILURE: processes_of_uid(): Unable to load shared library! Error: {:?}", err);
             })
-            .unwrap()
+            .unwrap_or("[]".to_string())
     }
 
 
@@ -177,21 +173,17 @@ pub mod soload {
         Library::new(DEFAULT_LIBKVMPRO_SHARED)
             .and_then(|lib| {
                 debug!("loadso::processes_of_uid_short({})", uid);
-                let func_symbol: Symbol<extern "C" fn(uid_t) -> *const c_char> = unsafe {
-                    lib.get(b"get_process_usage_short\0")
-                }.unwrap();
-                let func_handler = *func_symbol;
+                let func_sym: Symbol<extern "C" fn(uid_t) -> *const c_char> = unsafe { lib.get(b"get_process_usage_short\0") }?;
+                let func_handler = *func_sym;
                 let ptr_to_value = func_handler(uid);
-                let cstr_value: &CStr = unsafe {
-                    CStr::from_ptr(ptr_to_value)
-                };
+                let cstr_value: &CStr = unsafe { CStr::from_ptr(ptr_to_value) };
                 let a_slice: &str = cstr_value.to_str().unwrap_or("[]");
                 Ok(a_slice.to_string())
             })
             .map_err(|err| {
-                panic!("CRITICAL: processes_of_uid_short(): Unable to load shared library! Error: {:?}", err);
+                error!("FAILURE: processes_of_uid_short(): Unable to load shared library! Error: {:?}", err);
             })
-            .unwrap()
+            .unwrap_or("[]".to_string())
     }
 
 
