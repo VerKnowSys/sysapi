@@ -12,7 +12,7 @@ use libc::*;
 
 
 use crate::SENTRY_PATH;
-use crate::processes_of_uid;
+use crate::soload::processes_of_uid;
 
 
 /// List CellProcess type alias:

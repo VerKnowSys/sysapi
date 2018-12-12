@@ -20,9 +20,10 @@ extern crate log;
 #[macro_use]
 extern crate serde_derive;
 
+extern crate sysapi;
 
-use sysapi::processes_of_uid;
-use sysapi::processes_of_uid_short;
+use crate::sysapi::soload::processes_of_uid;
+use crate::sysapi::soload::processes_of_uid_short;
 
 
 #[link(name = "kvmpro", kind = "dylib")]

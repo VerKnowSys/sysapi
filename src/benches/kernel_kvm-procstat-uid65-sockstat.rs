@@ -5,7 +5,7 @@ extern crate sysapi;
 
 use bencher::Bencher;
 
-use crate::soload::processes_of_uid;
+use crate::sysapi::soload::processes_of_uid;
 
 
 fn bench_processes_of_uid_full(b: &mut Bencher) {
