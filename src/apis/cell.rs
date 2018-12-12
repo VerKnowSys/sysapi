@@ -307,7 +307,7 @@ impl Cell {
 
 
 /// Add SSH pubkey to a cell
-pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<()> {
+pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<(), Error> {
     Command::new(GVR_BIN)
         .arg("set")
         .arg(name)
@@ -327,7 +327,7 @@ pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<()> 
 
 
 /// Create cell
-pub fn create_cell(name: &String) -> Result<()> {
+pub fn create_cell(name: &String) -> Result<(), Error> {
     Command::new(GVR_BIN)
         .arg("create")
         .arg(name)
@@ -346,7 +346,7 @@ pub fn create_cell(name: &String) -> Result<()> {
 
 
 /// Destroy cell
-pub fn destroy_cell(name: &String) -> Result<()> {
+pub fn destroy_cell(name: &String) -> Result<(), Error> {
     Command::new(GVR_BIN)
         .arg("destroy")
         .arg(name)
