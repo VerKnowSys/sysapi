@@ -19,13 +19,13 @@ crate-type = ["cdylib", "dylib", "rlib"]
 
 
 [[bench]]
-name = "kernel_kvm+procstat+uid65+sockstat"
-path = "src/benches/kernel_kvm+procstat+uid65+sockstat.rs"
+name = "kernel_kvm-procstat-uid65-sockstat"
+path = "src/benches/kernel_kvm-procstat-uid65-sockstat.rs"
 
 
 [[bench]]
-name = "kernel_kvm+procstat+uid65"
-path = "src/benches/kernel_kvm+procstat+uid65.rs"
+name = "kernel_kvm-procstat-uid65"
+path = "src/benches/kernel_kvm-procstat-uid65.rs"
 
 
 [[example]]
