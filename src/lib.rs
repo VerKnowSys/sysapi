@@ -122,3 +122,15 @@ pub mod processors;
 /// Main router for Web processors:
 pub mod webrouter;
 
+
+
+/// module helper for dynamic Shared-Object loading:
+pub mod soload {
+    use libc::uid_t;
+
+    use crate::DEFAULT_LIBKVMPRO_SHARED;
+
+
+
+
+}
