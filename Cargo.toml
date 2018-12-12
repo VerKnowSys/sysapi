@@ -2,7 +2,9 @@
 name = "sysapi"
 version = "0.10.4"
 authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
-edition = "2018"
+edition = '2018'
+links = "kvmpro"
+build = "build.rs"
 
 
 [[bin]]
