@@ -18,6 +18,11 @@ crate-type = ["cdylib", "dylib", "rlib"]
 
 
 
+[[example]]
+name = "psuid65tojson"
+path = "src/examples/psuid65tojson.rs"
+
+
 [dependencies]
 gotham = "0.3"
 gotham_derive = "0.3"
