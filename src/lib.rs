@@ -174,9 +174,9 @@ pub mod soload {
     /// Call kernel directly through C++ function from kvmpro library:
     #[allow(unsafe_code)]
     pub fn processes_of_uid_short(uid: uid_t) -> String {
-        debug!("loadso::processes_of_uid_short({})", uid);
         Library::new(DEFAULT_LIBKVMPRO_SHARED)
             .and_then(|lib| {
+                debug!("loadso::processes_of_uid_short({})", uid);
                 let func_symbol: Symbol<extern "C" fn(uid_t) -> *const c_char> = unsafe {
                     lib.get(b"get_process_usage_short\0")
                 }.unwrap();
