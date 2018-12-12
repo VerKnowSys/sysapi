@@ -8,8 +8,8 @@ use regex::Regex;
 
 
 // Load all internal modules:
-use self::common::*;
-use self::zfs::*;
+use crate::*;
+use crate::apis::zfs::*;
 
 
 lazy_static! {

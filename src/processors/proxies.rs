@@ -6,9 +6,8 @@ use gotham::handler::{HandlerFuture, IntoHandlerError};
 use mime::*;
 
 
-// Load all internal modules:
-use self::common::*;
-use self::proxy::*;
+use crate::*;
+use crate::apis::proxy::*;
 
 
 /// Handle POSTs /proxy/:cell/:from/:to

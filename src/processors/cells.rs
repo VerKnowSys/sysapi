@@ -8,9 +8,9 @@ use mime::*;
 
 
 // Load all internal modules:
-use self::common::*;
-use self::cell::*;
-use self::status::*;
+use crate::*;
+use crate::apis::cell::*;
+use crate::apis::status::*;
 
 
 // Precompile CELL_NAME_PATTERN only once:
