@@ -15,7 +15,7 @@ path = "src/sysapi.rs"
 [lib]
 name = "sysapi"
 path = "src/lib.rs"
-crate-type = ["cdylib", "dylib", "rlib"]
+crate-type = ["cdylib", "rlib"]
 
 
 [[bench]]
