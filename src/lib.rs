@@ -15,13 +15,14 @@
         unused_qualifications)]
 
 
-#[allow(unused_imports)]
 #[macro_use]
 extern crate lazy_static;
 
+#[macro_use]
+extern crate log;
 
-/// Project global constants:
-pub mod consts {
+#[macro_use]
+extern crate serde_derive;
 
     /// Project directory (for static files access for router):
     pub const PROJECT_DIRECTORY: &str = "/Projects/sysapi";
