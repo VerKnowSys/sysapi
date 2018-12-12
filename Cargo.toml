@@ -5,8 +5,17 @@ authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
 edition = "2018"
 
 
-# [build-dependencies]
-# cc = { version = "1.0", features = ["parallel"] }
+[[bin]]
+name = "sysapi"
+path = "src/sysapi.rs"
+
+
+[lib]
+name = "sysapi"
+path = "src/lib.rs"
+crate-type = ["cdylib", "dylib", "rlib"]
+
+
 
 
 [dependencies]
