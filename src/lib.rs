@@ -123,14 +123,76 @@ pub mod processors;
 pub mod webrouter;
 
 
-
-/// module helper for dynamic Shared-Object loading:
+/// Map C functions from a Shared-Object system library:
 pub mod soload {
-    use libc::uid_t;
-
+    use std::ffi::CStr;
+    use libc::{uid_t, c_char};
+    use libloading::*;
     use crate::DEFAULT_LIBKVMPRO_SHARED;
 
+    // NOTE: Direct load C/C++ functions approach kinda works, but it's more SEGV prone:
+        /// Defined C/C++ extern functions:
+        // extern "fastcall" {
+        //     /// Get processes + network connections - directly from kernel
+        //     #[no_mangle]
+        //     pub fn get_process_usage(user_uid: uid_t) -> *const c_char;
+        //     /// Get processes - directly from kernel
+        //     #[no_mangle]
+        //     pub fn get_process_usage_short(user_uid: uid_t) -> *const c_char;
+        // }
+    // and then "just":
+        // let c_buf: *const c_char = unsafe { get_process_usage(uid) };
+        // let c_str: &CStr = unsafe { CStr::from_ptr(c_buf) };
+        // let a_slice: &str = c_str.to_str().unwrap_or("[]");
+        // a_slice.to_string()
 
+
+    #[allow(unsafe_code)]
+    /// Call kernel directly through C++ function from kvmpro library:
+    pub fn processes_of_uid(uid: uid_t) -> String {
+        Library::new(DEFAULT_LIBKVMPRO_SHARED)
+            .and_then(|lib| {
+                debug!("loadso::processes_of_uid({})", uid);
+                let func_symbol: Symbol<extern "C" fn(uid_t) -> *const c_char> = unsafe {
+                    lib.get(b"get_process_usage\0")
+                }.unwrap();
+                let func_handler = *func_symbol;
+                let ptr_to_value = func_handler(uid);
+                let cstr_value: &CStr = unsafe {
+                    CStr::from_ptr(ptr_to_value)
+                };
+                let a_slice: &str = cstr_value.to_str().unwrap_or("[]");
+                Ok(a_slice.to_string())
+            })
+            .map_err(|err| {
+                panic!("CRITICAL: processes_of_uid(): Unable to load shared library! Error: {:?}", err);
+            })
+            .unwrap()
+    }
+
+
+    /// Call kernel directly through C++ function from kvmpro library:
+    #[allow(unsafe_code)]
+    pub fn processes_of_uid_short(uid: uid_t) -> String {
+        debug!("loadso::processes_of_uid_short({})", uid);
+        Library::new(DEFAULT_LIBKVMPRO_SHARED)
+            .and_then(|lib| {
+                let func_symbol: Symbol<extern "C" fn(uid_t) -> *const c_char> = unsafe {
+                    lib.get(b"get_process_usage_short\0")
+                }.unwrap();
+                let func_handler = *func_symbol;
+                let ptr_to_value = func_handler(uid);
+                let cstr_value: &CStr = unsafe {
+                    CStr::from_ptr(ptr_to_value)
+                };
+                let a_slice: &str = cstr_value.to_str().unwrap_or("[]");
+                Ok(a_slice.to_string())
+            })
+            .map_err(|err| {
+                panic!("CRITICAL: processes_of_uid_short(): Unable to load shared library! Error: {:?}", err);
+            })
+            .unwrap()
+    }
 
 
 }
