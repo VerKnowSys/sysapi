@@ -1,6 +1,16 @@
-
-
 //! SysAPI Dashboard Web Server
+
+
+#![deny(
+    missing_docs,
+    unstable_features,
+    unsafe_code,
+    missing_debug_implementations,
+    missing_copy_implementations,
+    trivial_casts,
+    trivial_numeric_casts,
+    unused_import_braces,
+    unused_qualifications)]
 
 
 #[allow(unused_imports)]
@@ -11,27 +21,33 @@ extern crate log;
 #[macro_use]
 extern crate serde_derive;
 
+extern crate sysapi;
 
+
+use fern::log_file;
+use colored::Colorize;
 use std::env;
-use log::*;
-use fern::*;
+use log::LevelFilter;
+use fern::Dispatch;
 use chrono::Local;
 use std::fs::File;
 use fern::colors::{Color, ColoredLevelConfig};
-use colored::*;
 use hostname::get_hostname;
 use std::path::Path;
 use futures::future;
 use tokio::runtime::Runtime;
 
 
-use self::common::*;
-use self::webapp::router;
+use crate::sysapi::{DEFAULT_ADDRESS, DEFAULT_LOG_FILE, ZFS_BIN};
+use crate::sysapi::webrouter::router;
 
+
+// #[link(name = "kvm", kind = "dylib")]
+// #[link(name = "procstat", kind = "dylib")]
+#[link(name = "kvmpro", kind = "dylib")]
 
 /// Start a server and use a `Router` to dispatch requests
 pub fn main() {
-
     // Set up ANSI colors for output:
     let default_colors = ColoredLevelConfig::new()
         .info(Color::White)
@@ -101,7 +117,7 @@ pub fn main() {
     }));
 
     // NOTE: Use runtime.spawn(_) to launch future services like this:
-    let gotham = gotham::init_server(listen_address, router::router());
+    let gotham = gotham::init_server(listen_address, router());
     // Spawn the server task
     runtime
         .block_on_all(gotham) // Block forever on "serving duties"
