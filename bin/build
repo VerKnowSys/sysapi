@@ -21,10 +21,20 @@ case "${_uname}" in
         cd "${_cargo_project_dir}"
         bin/update
 
-        printf "\n\nBuilding: SysAPI\n"
-        cargo build ${_cargo_release_flag}
+        printf "\n\nBuilding: Library: SysAPI\n"
+        cargo build \
+            --lib "${_cargo_release_flag}"
         if [ "0" != "${?}" ]; then
-            echo "Build: Failed!" \
+            echo "Build: Library: Failed!" \
+                && exit 1
+        fi
+
+        printf "\n\nBuilding: Binary: SysAPI\n"
+        cargo build \
+            --bin "${_bin_name}" \
+            "${_cargo_release_flag}"
+        if [ "0" != "${?}" ]; then
+            echo "Build: Binary: Failed!" \
                 && exit 1
         fi
         ;;
