@@ -13,5 +13,5 @@ fn bench_processes_of_uid_full(b: &mut Bencher) {
 }
 
 
-benchmark_group!(benches, bench_processes_of_uid_full, bench_processes_of_uid_short);
+benchmark_group!(benches, bench_processes_of_uid_full);
 benchmark_main!(benches);
