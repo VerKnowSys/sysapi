@@ -23,7 +23,7 @@ strip_product () {
 }
 
 
-disable_hardening_features () {
+enable_hardening_on_product () {
     echo "Explicitly enable all hardening features for: SysAPI"
     hbsdcontrol pax enable aslr "${_sysapi_dest_bin}" \
         && hbsdcontrol pax enable mprotect "${_sysapi_dest_bin}" \
@@ -40,7 +40,7 @@ disable_hardening_features () {
 install_product () {
     killall -TERM "${_bin_name}" 2>/dev/null
     install -v "${_bin_product_target}" "${_sysapi_dest_bin}" \
-        && disable_hardening_features \
+        && enable_hardening_on_product \
         && echo "Installed: SysAPI binary: ${_bin_product_target}" \
         && return 0
 
