@@ -24,11 +24,11 @@ strip_product () {
 
 
 disable_hardening_features () {
-    echo "Setting up explicit hardening for: SysAPI"
-    hbsdcontrol pax disable aslr "${_sysapi_dest_bin}" \
-        && hbsdcontrol pax disable mprotect "${_sysapi_dest_bin}" \
-        && hbsdcontrol pax disable pageexec "${_sysapi_dest_bin}" \
-        && hbsdcontrol pax disable shlibrandom "${_sysapi_dest_bin}" \
+    echo "Explicitly enable all hardening features for: SysAPI"
+    hbsdcontrol pax enable aslr "${_sysapi_dest_bin}" \
+        && hbsdcontrol pax enable mprotect "${_sysapi_dest_bin}" \
+        && hbsdcontrol pax enable pageexec "${_sysapi_dest_bin}" \
+        && hbsdcontrol pax enable shlibrandom "${_sysapi_dest_bin}" \
         && hbsdcontrol pax enable segvguard "${_sysapi_dest_bin}" \
         && hbsdcontrol pax enable disallow_map32bit "${_sysapi_dest_bin}" \
         && return 0
