@@ -12,19 +12,18 @@ path = "src/lib.rs"
 crate-type = ["rlib"]
 
 
-[lib]
+[[bin]]
 name = "sysapi"
-path = "src/lib.rs"
-crate-type = ["cdylib", "rlib"]
+path = "src/sysapi.rs"
 
 
-[[bench]]
-name = "kernel_kvm-procstat-uid65-sockstat"
+[[bin]]
+name = "sysapi_kernel_kvm-procstat-uid65-sockstat"
 path = "src/benches/kernel_kvm-procstat-uid65-sockstat.rs"
 
 
-[[bench]]
-name = "kernel_kvm-procstat-uid65"
+[[bin]]
+name = "sysapi_kernel_kvm-procstat-uid65"
 path = "src/benches/kernel_kvm-procstat-uid65.rs"
 
 
