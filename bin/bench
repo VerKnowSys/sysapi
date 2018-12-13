@@ -16,6 +16,6 @@ for _bench_path in $(find "src/benches" -type f 2>/dev/null); do
         _bench_file="${_bench_path##*/}"
         _bench_name="${_bench_file%.rs}"
         printf "SysAPI: Bench: Starting: %s: (%2d of %2d)…\n\n" "${_bench_name}" "${_index}" "${_bench_cycles}"
-        cargo run --bin "sysapi_${_bench_name}" "${_cargo_release_flag}"
+        cargo run --bin "sysapi_${_bench_name}" "${_cargo_release_flag}" --quiet
     done
 done
