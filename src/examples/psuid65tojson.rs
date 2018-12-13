@@ -26,8 +26,6 @@ use crate::sysapi::soload::processes_of_uid;
 use crate::sysapi::soload::processes_of_uid_short;
 
 
-#[link(name = "kvmpro", kind = "dylib")]
-
 /// ProcessList for uid 65 into JSON
 pub fn main() {
     println!("Process of UID 65 (LONG)  OUT: {}", processes_of_uid(65));
