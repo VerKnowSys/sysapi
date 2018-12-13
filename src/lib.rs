@@ -129,8 +129,9 @@ mod tests;
 
 /// Map C functions from a Shared-Object system library:
 pub mod soload {
+    use libc::uid_t;
     use std::ffi::CStr;
-    use libc::{uid_t, c_char};
+    use std::os::raw::c_char;
     use libloading::*;
     use crate::DEFAULT_LIBKVMPRO_SHARED;
 
@@ -156,13 +157,9 @@ pub mod soload {
     pub fn processes_of_uid(uid: uid_t) -> String {
         Library::new(DEFAULT_LIBKVMPRO_SHARED)
             .and_then(|lib| {
-                debug!("loadso::processes_of_uid({})", uid);
-                let func_sym: Symbol<extern "C" fn(uid_t) -> *const c_char> = unsafe { lib.get(b"get_process_usage\0") }?;
-                let func_handler = *func_sym;
-                let ptr_to_value = func_handler(uid);
-                let cstr_value: &CStr = unsafe { CStr::from_ptr(ptr_to_value) };
-                let a_slice: &str = cstr_value.to_str().unwrap_or("[]");
-                Ok(a_slice.to_string())
+                let func_sym: Symbol<fn(uid_t) -> *const c_char> = unsafe { lib.get(b"get_process_usage\0") }?;
+                let cstr_value = unsafe { CStr::from_ptr(func_sym(uid)).to_str().unwrap_or("[]") };
+                Ok(cstr_value.into())
             })
             .map_err(|err| {
                 error!("FAILURE: processes_of_uid(): Unable to load shared library! Error: {:?}", err);
@@ -176,13 +173,9 @@ pub mod soload {
     pub fn processes_of_uid_short(uid: uid_t) -> String {
         Library::new(DEFAULT_LIBKVMPRO_SHARED)
             .and_then(|lib| {
-                debug!("loadso::processes_of_uid_short({})", uid);
-                let func_sym: Symbol<extern "C" fn(uid_t) -> *const c_char> = unsafe { lib.get(b"get_process_usage_short\0") }?;
-                let func_handler = *func_sym;
-                let ptr_to_value = func_handler(uid);
-                let cstr_value: &CStr = unsafe { CStr::from_ptr(ptr_to_value) };
-                let a_slice: &str = cstr_value.to_str().unwrap_or("[]");
-                Ok(a_slice.to_string())
+                let func_sym: Symbol<fn(uid_t) -> *const c_char> = unsafe { lib.get(b"get_process_usage_short\0") }?;
+                let cstr_value = unsafe { CStr::from_ptr(func_sym(uid)).to_str().unwrap_or("[]") };
+                Ok(cstr_value.into())
             })
             .map_err(|err| {
                 error!("FAILURE: processes_of_uid_short(): Unable to load shared library! Error: {:?}", err);
