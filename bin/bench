@@ -6,16 +6,18 @@
 . bin/common "${1:-release}"
 
 
+_bench_cycles=5
+_benches_name_prefix="sysapi_bench_"
+
 printf "\n\nSysAPI: Bench: Building library in: %s mode…\n" "${_release_type}"
 cargo build --lib "${_cargo_release_flag}"
 
-_bench_cycles=5
 printf "\n\nSysAPI: Bench: Cycles: x%s…\n" "${_bench_cycles}"
 for _bench_path in $(find "src/benches" -type f 2>/dev/null); do
     for _index in $(seq 1 ${_bench_cycles}); do
         _bench_file="${_bench_path##*/}"
         _bench_name="${_bench_file%.rs}"
         printf "SysAPI: Bench: Starting: %s: (%2d of %2d)…\n\n" "${_bench_name}" "${_index}" "${_bench_cycles}"
-        cargo run --bin "sysapi_${_bench_name}" "${_cargo_release_flag}" --quiet
+        cargo run --bin "${_benches_name_prefix}${_bench_name}" "${_cargo_release_flag}" --quiet
     done
 done

@@ -18,12 +18,12 @@ path = "src/sysapi.rs"
 
 
 [[bin]]
-name = "sysapi_kernel_kvm-procstat-uid65-sockstat"
+name = "sysapi_bench_kernel_kvm-procstat-uid65-sockstat"
 path = "src/benches/kernel_kvm-procstat-uid65-sockstat.rs"
 
 
 [[bin]]
-name = "sysapi_kernel_kvm-procstat-uid65"
+name = "sysapi_bench_kernel_kvm-procstat-uid65"
 path = "src/benches/kernel_kvm-procstat-uid65.rs"
 
 
