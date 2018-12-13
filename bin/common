@@ -12,6 +12,8 @@ _cargo_project_dir="$(pwd 2>/dev/null)"
 _release_type="${1:-release}"
 _bin_name="sysapi"
 _sysapi_dest_bin="/usr/bin/${_bin_name}"
+_sysapi_logfile="/var/log/gvr-sysapi.log"
+_sysapi_supervisor_pidfile="/var/run/sysapi.pid"
 _bin_product_target="target/${_release_type}/${_bin_name}"
 
 _cargo_release_flag="--release"

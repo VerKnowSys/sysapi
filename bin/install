@@ -37,14 +37,45 @@ enable_hardening_on_product () {
 }
 
 
+stop_supervisor () {
+    _sysapi_supervisor_pid="$(cat "${_sysapi_supervisor_pidfile}" 2>/dev/null)"
+    if [ -n "${_sysapi_supervisor_pid}" ]; then
+        kill -0 "${_sysapi_supervisor_pid}" \
+            && kill -TERM "${_sysapi_supervisor_pid}" \
+            && echo "Stopped supervisor: SysAPI" \
+            && return 0
+    fi
+    return 1
+}
+
+
+start_supervisor () {
+    nohup \
+        daemon \
+        -R1 \
+        -o "${_sysapi_logfile}" \
+        -P "${_sysapi_supervisor_pidfile}" \
+        "${_sysapi_dest_bin}" \
+            >/dev/null 2>&1 \
+            && echo "Started SysAPI supervisor daemon" \
+            && return 0
+    return 1
+}
+
+
 install_product () {
-    killall -TERM "${_bin_name}" 2>/dev/null
+    unset _start_supervisor_after_install
+    stop_supervisor \
+        && _start_supervisor_after_install=YES
+
     install -v "${_bin_product_target}" "${_sysapi_dest_bin}" \
         && enable_hardening_on_product \
-        && echo "Installed: SysAPI binary: ${_bin_product_target}" \
-        && return 0
+        && echo "Installed: SysAPI binary: ${_bin_product_target}"
 
-    return 1
+    if [ "YES" = "${_start_supervisor_after_install}" ]; then
+        start_supervisor
+    fi
+    return 0
 }
 
 
