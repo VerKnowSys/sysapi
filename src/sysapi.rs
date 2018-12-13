@@ -42,8 +42,6 @@ use crate::sysapi::{DEFAULT_ADDRESS, DEFAULT_LOG_FILE, ZFS_BIN};
 use crate::sysapi::webrouter::router;
 
 
-// #[link(name = "kvm", kind = "dylib")]
-// #[link(name = "procstat", kind = "dylib")]
 #[link(name = "kvmpro", kind = "dylib")]
 
 /// Start a server and use a `Router` to dispatch requests
