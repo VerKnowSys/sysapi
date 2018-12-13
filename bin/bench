@@ -1,14 +1,21 @@
 #!/bin/sh
 # blame: @dmilith
-# 2018-11-22-0129-1542846591
+# 2018-12-13-0316-1544667385
 
 
-. bin/build
+. bin/common "${1:-release}"
 
 
-_cycles=10
+printf "\n\nSysAPI: Bench: Building library in: %s mode…\n" "${_release_type}"
+cargo build --lib "${_cargo_release_flag}"
 
-printf "\n\nBench: SysAPI: Running measurement ${_cycles} times (sequentially one by one)\n\n"
-for i in $(seq 0 ${_cycles}); do
-    cargo run --bin kernelbench ${_cargo_release_flag}
+_bench_cycles=5
+printf "\n\nSysAPI: Bench: Cycles: x%s…\n" "${_bench_cycles}"
+for _bench_path in $(find "src/benches" -type f 2>/dev/null); do
+    for _index in $(seq 1 ${_bench_cycles}); do
+        _bench_file="${_bench_path##*/}"
+        _bench_name="${_bench_file%.rs}"
+        printf "SysAPI: Bench: Starting: %s: (%2d of %2d)…\n\n" "${_bench_name}" "${_index}" "${_bench_cycles}"
+        cargo run --bin "sysapi_${_bench_name}" "${_cargo_release_flag}"
+    done
 done
