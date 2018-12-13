@@ -123,6 +123,10 @@ pub mod processors;
 pub mod webrouter;
 
 
+#[cfg(test)]
+mod tests;
+
+
 /// Map C functions from a Shared-Object system library:
 pub mod soload {
     use std::ffi::CStr;
