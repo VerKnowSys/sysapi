@@ -30,6 +30,6 @@ use crate::sysapi::soload::processes_of_uid_short;
 
 /// ProcessList for uid 65 into JSON
 pub fn main() {
-    println!("Process of UID 65 (LONG)  OUT: {:?}", processes_of_uid(65));
-    println!("Process of UID 65 (SHORT) OUT: {:?}", processes_of_uid_short(65));
+    println!("Process of UID 65 (LONG)  OUT: {}", processes_of_uid(65));
+    println!("Process of UID 65 (SHORT) OUT: {}", processes_of_uid_short(65));
 }
