@@ -7,9 +7,10 @@ links = "kvmpro"
 build = "build.rs"
 
 
-[[bin]]
+[lib]
 name = "sysapi"
-path = "src/sysapi.rs"
+path = "src/lib.rs"
+crate-type = ["rlib"]
 
 
 [lib]
