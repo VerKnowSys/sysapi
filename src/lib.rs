@@ -129,9 +129,7 @@ mod tests;
 
 /// Map C functions from a Shared-Object system library:
 pub mod soload {
-    use libc::uid_t;
-    use std::ffi::CStr;
-    use std::os::raw::c_char;
+    use libc::*;
     use libloading::*;
     use crate::DEFAULT_LIBKVMPRO_SHARED;
 
@@ -151,15 +149,22 @@ pub mod soload {
         // let a_slice: &str = c_str.to_str().unwrap_or("[]");
         // a_slice.to_string()
 
+    #[repr(C)]
+    struct kvmpro_t {
+        bytes: [u8; 262144],
+    }
+
 
     /// Call kernel directly through C++ function from kvmpro library:
     #[allow(unsafe_code)]
     pub fn processes_of_uid(uid: uid_t) -> String {
         Library::new(DEFAULT_LIBKVMPRO_SHARED)
             .and_then(|lib| {
-                let func_sym: Symbol<fn(uid_t) -> *const c_char> = unsafe { lib.get(b"get_process_usage\0") }?;
-                let cstr_value = unsafe { CStr::from_ptr(func_sym(uid)).to_str().unwrap_or("[]") };
-                Ok(cstr_value.into())
+                let function_from_symbol: Symbol<fn(uid_t) -> kvmpro_t> = unsafe { lib.get(b"get_process_usage_t\0") }?;
+                let data_struct = &function_from_symbol(uid); // read data and return as JSON String:
+                Ok(
+                   String::from_utf8_lossy(&data_struct.bytes[..]).to_string()
+                )
             })
             .map_err(|err| {
                 error!("FAILURE: processes_of_uid(): Unable to load shared library! Error: {:?}", err);
@@ -173,9 +178,11 @@ pub mod soload {
     pub fn processes_of_uid_short(uid: uid_t) -> String {
         Library::new(DEFAULT_LIBKVMPRO_SHARED)
             .and_then(|lib| {
-                let func_sym: Symbol<fn(uid_t) -> *const c_char> = unsafe { lib.get(b"get_process_usage_short\0") }?;
-                let cstr_value = unsafe { CStr::from_ptr(func_sym(uid)).to_str().unwrap_or("[]") };
-                Ok(cstr_value.into())
+                let function_from_symbol: Symbol<fn(uid_t) -> kvmpro_t> = unsafe { lib.get(b"get_process_usage_short_t\0") }?;
+                let data_struct = &function_from_symbol(uid); // read data and return as JSON String:
+                Ok(
+                   String::from_utf8_lossy(&data_struct.bytes[..]).to_string()
+                )
             })
             .map_err(|err| {
                 error!("FAILURE: processes_of_uid_short(): Unable to load shared library! Error: {:?}", err);
