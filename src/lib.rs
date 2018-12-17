@@ -151,6 +151,7 @@ pub mod soload {
 
     #[repr(C)]
     struct kvmpro_t {
+        length: size_t,
         bytes: [u8; 262144],
     }
 
@@ -160,10 +161,12 @@ pub mod soload {
     pub fn processes_of_uid(uid: uid_t) -> String {
         Library::new(DEFAULT_LIBKVMPRO_SHARED)
             .and_then(|lib| {
-                let function_from_symbol: Symbol<fn(uid_t) -> kvmpro_t> = unsafe { lib.get(b"get_process_usage_t\0") }?;
+                let function_from_symbol: Symbol<extern "C" fn(uid_t) -> kvmpro_t> = unsafe { lib.get(b"get_process_usage_t\0") }?;
                 let data_struct = &function_from_symbol(uid); // read data and return as JSON String:
+                debug!("DATA LENGTH: {}", data_struct.length);
+                let data = String::from_utf8(data_struct.bytes[0..data_struct.length].to_vec()).unwrap_or("[]".to_string());
                 Ok(
-                   String::from_utf8_lossy(&data_struct.bytes[..]).to_string()
+                   data.to_string()
                 )
             })
             .map_err(|err| {
@@ -178,10 +181,12 @@ pub mod soload {
     pub fn processes_of_uid_short(uid: uid_t) -> String {
         Library::new(DEFAULT_LIBKVMPRO_SHARED)
             .and_then(|lib| {
-                let function_from_symbol: Symbol<fn(uid_t) -> kvmpro_t> = unsafe { lib.get(b"get_process_usage_short_t\0") }?;
+                let function_from_symbol: Symbol<extern "C" fn(uid_t) -> kvmpro_t> = unsafe { lib.get(b"get_process_usage_short_t\0") }?;
                 let data_struct = &function_from_symbol(uid); // read data and return as JSON String:
+                debug!("DATA LENGTH: {}", data_struct.length);
+                let data = String::from_utf8(data_struct.bytes[0..data_struct.length].to_vec()).unwrap_or("[]".to_string());
                 Ok(
-                   String::from_utf8_lossy(&data_struct.bytes[..]).to_string()
+                   data.to_string()
                 )
             })
             .map_err(|err| {
