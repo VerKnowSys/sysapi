@@ -14,6 +14,12 @@ else
 fi
 
 
+if [ ! -f "/usr/lib/libkvmpro.so" ]; then
+    echo "ERROR: Required library is missing: /usr/lib/libkvmpro.so"
+    exit 1
+fi
+
+
 strip_product () {
     echo "Strip: SysAPI: ${_bin_product_target}" \
         && strip -s -d "${_bin_product_target}" \
