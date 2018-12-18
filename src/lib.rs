@@ -132,8 +132,8 @@ pub mod soload {
     // use std::ptr;
     // use std::mem;
     use libc::*;
-    use libloading::*;
-    use crate::DEFAULT_LIBKVMPRO_SHARED;
+    // use libloading::*;
+    // use crate::DEFAULT_LIBKVMPRO_SHARED;
 
 
     #[allow(missing_debug_implementations)]
