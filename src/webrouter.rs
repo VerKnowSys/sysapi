@@ -121,7 +121,7 @@ pub fn router() -> Router {
         // …/proxies/list
         route
             .associate(
-                &format!("{}:list", PROXIES_RESOURCE), |handler| {
+                &format!("{}list", PROXIES_RESOURCE), |handler| {
                     handler.get().to(web_proxies_get_handler);
                 });
     })
