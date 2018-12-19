@@ -15,6 +15,7 @@ _sysapi_dest_bin="/usr/bin/${_bin_name}"
 _sysapi_logfile="/var/log/gvr-sysapi.log"
 _sysapi_supervisor_pidfile="/var/run/sysapi.pid"
 _bin_product_target="target/${_release_type}/${_bin_name}"
+_kvmpro_sharedlib="/usr/lib/libkvmpro.so"
 
 _cargo_release_flag="--release"
 if [ "release" != "${_release_type}" ]; then

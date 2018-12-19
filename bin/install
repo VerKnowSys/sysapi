@@ -14,7 +14,7 @@ else
 fi
 
 
-if [ ! -f "/usr/lib/libkvmpro.so" ]; then
+if [ ! -f "${_kvmpro_sharedlib}" ]; then
     echo "WARN: Required library is missing: /usr/lib/libkvmpro.so, so it will be built for you :)"
     cd lib/kvmpro
     bin/install
