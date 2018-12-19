@@ -15,8 +15,10 @@ fi
 
 
 if [ ! -f "/usr/lib/libkvmpro.so" ]; then
-    echo "ERROR: Required library is missing: /usr/lib/libkvmpro.so"
-    exit 1
+    echo "WARN: Required library is missing: /usr/lib/libkvmpro.so, so it will be built for you :)"
+    cd lib/kvmpro
+    bin/install
+    cd ../..
 fi
 
 
