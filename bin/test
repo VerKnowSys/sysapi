@@ -15,22 +15,40 @@ echo
 echo
 
 
+load_default_sysctls () {
+    printf "\nLoading sysctl defaults from /etc/sysctl.conf\n"
+    sysctl -f /etc/sysctl.conf >/dev/null
+}
+
+
+failure () {
+    load_default_sysctls
+    exit 1
+}
+
+
 case "${_uname}" in
     FreeBSD)
         cd "${_cargo_project_dir}"
         bin/update
 
+        printf "\nLowering sysctl hardening features for test suite\n"
+        sysctl hardening.pax.aslr.status=1 >/dev/null
+        sysctl hardening.pax.pageexec.status=1 >/dev/null
+        sysctl hardening.pax.mprotect.status=1 >/dev/null
+
         printf "\n\nBuilding: Library: SysAPI\n"
         cargo test
         if [ "0" != "${?}" ]; then
             echo "Test: Library: Failed!" \
-                && exit 1
+                && failure
         fi
+        load_default_sysctls
         ;;
 
     *)
         echo "Platform not supported: ${_uname}" \
-            && exit 1
+            && failure
         ;;
 
 esac
