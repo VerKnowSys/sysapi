@@ -15,14 +15,8 @@ echo
 echo
 
 
-load_default_sysctls () {
-    printf "\nLoading sysctl defaults from /etc/sysctl.conf\n"
-    sysctl -f /etc/sysctl.conf >/dev/null
-}
-
-
 failure () {
-    load_default_sysctls
+    printf "FAILURE: %b\n" "${@}"
     exit 1
 }
 
@@ -32,23 +26,24 @@ case "${_uname}" in
         cd "${_cargo_project_dir}"
         bin/update
 
-        printf "\nLowering sysctl hardening features for test suite\n"
-        sysctl hardening.pax.aslr.status=1 >/dev/null
-        sysctl hardening.pax.pageexec.status=1 >/dev/null
-        sysctl hardening.pax.mprotect.status=1 >/dev/null
+        printf "\nDisabling 'mprotect' hardening feature for 'rustdoc' utility\n"
+        _rustdoc="$(which rustdoc)"
+        if [ -x "${_rustdoc}" ]; then
+            hbsdcontrol pax disable mprotect "${_rustdoc}" \
+                || failure "Couldn't disable mprotect for binary: ${_rustdoc}"
+        else
+            failure "Couldn't find 'rustdoc' in PATH! Required for bin/test!"
+        fi
 
         printf "\n\nBuilding: Library: SysAPI\n"
         cargo test
         if [ "0" != "${?}" ]; then
-            echo "Test: Library: Failed!" \
-                && failure
+            failure "Test: Library: Failed!"
         fi
-        load_default_sysctls
         ;;
 
     *)
-        echo "Platform not supported: ${_uname}" \
-            && failure
+        failure "Platform not supported: ${_uname}"
         ;;
 
 esac
