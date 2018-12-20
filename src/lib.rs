@@ -129,10 +129,10 @@ mod tests;
 
 /// Map C functions from a Shared-Object system library:
 pub mod soload {
-    use std::mem;
     use libc::*;
     use libloading::os::unix::*;
-    use crate::DEFAULT_LIBKVMPRO_SHARED;
+    use std::{mem::forget, thread::spawn, sync::{Arc, Mutex}};
+    use crate::{helpers::empty_string, DEFAULT_LIBKVMPRO_SHARED};
 
 
     #[allow(missing_debug_implementations)]
@@ -145,43 +145,69 @@ pub mod soload {
     }
 
 
-    /// Call kernel directly through C++ function from kvmpro library:
+    lazy_static! {
+        /// Global SOLOAD_MT_CALLS_SYNCHRONIZER - required when handling requests,
+        /// that call kernel APIs (which are often NOT Thread-safe):
+        pub static ref SOLOAD_MT_CALLS_SYNCHRONIZER: Arc<Mutex<u32>> = {
+            Arc::new(Mutex::new(0_u32))
+        };
+    }
+
+
+    /// Helper to dynamically call function from shared object:
     #[allow(unsafe_code)]
-    pub fn processes_of_uid(uid: uid_t) -> String {
-        // dynamic shared object loading:
-        Library::open(Some(DEFAULT_LIBKVMPRO_SHARED), RTLD_NOW)
+    pub fn string_from_native_fn(fun_symbol_name: &[u8], uid: uid_t) -> String {
+        Library::open(Some(DEFAULT_LIBKVMPRO_SHARED), RTLD_NOW) // dynamic shared object loading, using libDL
             .and_then(|lib| {
-                let function_from_symbol: Symbol<extern "C" fn(uid_t) -> kvmpro_t> = unsafe { lib.get(b"get_process_usage_t\0") }?;
+                let function_from_symbol: Symbol<extern "C" fn(uid_t) -> kvmpro_t> = unsafe { lib.get(fun_symbol_name) }?;
                 let object: kvmpro_t = function_from_symbol(uid);
-                mem::forget(lib);
+                forget(lib); // NOTE: Skipping this call causes significant memory leak per-each function call!
                 Ok(
-                   String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or("[]".to_string())
+                   String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or(empty_string())
                 )
             })
             .map_err(|err| {
-                error!("FAILURE: processes_of_uid_short(): Unable to load shared library! Error: {:?}", err);
+                let function_name = String::from_utf8(fun_symbol_name.to_vec()).unwrap_or("fn_with_no_name".to_string());
+                error!("FAILURE of: {}(): No such function-symbol found in library: {}. Details: {}.",
+                       function_name, DEFAULT_LIBKVMPRO_SHARED, err.to_string());
             })
-            .unwrap_or("[]".to_string())
-
+            .unwrap_or(empty_string())
     }
 
 
     /// Call kernel directly through C++ function from kvmpro library:
-    #[allow(unsafe_code)]
+    pub fn processes_of_uid(uid: uid_t) -> String {
+        spawn(
+            move || {
+                match SOLOAD_MT_CALLS_SYNCHRONIZER.try_lock() {
+                    Ok(_) => string_from_native_fn(b"get_process_usage_t\0", uid),
+                    Err(err) => {
+                        debug!("Failed to acquire thread lock. Details: {}", err.to_string());
+                        empty_string()
+                    }
+                }
+            }
+        )
+        .join()
+        .unwrap_or(empty_string())
+    }
+
+
+    /// Call kernel directly through C++ function from kvmpro library:
     pub fn processes_of_uid_short(uid: uid_t) -> String {
-        Library::open(Some(DEFAULT_LIBKVMPRO_SHARED), RTLD_NOW)
-            .and_then(|lib| {
-                let function_from_symbol: Symbol<extern "C" fn(uid_t) -> kvmpro_t> = unsafe { lib.get(b"get_process_usage_short_t\0") }?;
-                let object: kvmpro_t = function_from_symbol(uid);
-                mem::forget(lib);
-                Ok(
-                   String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or("[]".to_string())
-                )
-            })
-            .map_err(|err| {
-                error!("FAILURE: processes_of_uid_short(): Unable to load shared library! Error: {:?}", err);
-            })
-            .unwrap_or("[]".to_string())
+        spawn(
+            move || {
+                match SOLOAD_MT_CALLS_SYNCHRONIZER.try_lock() {
+                    Ok(_) => string_from_native_fn(b"get_process_usage_short_t\0", uid),
+                    Err(err) => {
+                        debug!("Failed to acquire thread lock. Details: {}", err.to_string());
+                        empty_string()
+                    }
+                }
+            }
+        )
+        .join()
+        .unwrap_or(empty_string())
     }
 
 
