@@ -166,7 +166,7 @@ pub mod soload {
         // let object: kvmpro_t = unsafe { get_process_usage_t(uid) };
         // String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or("[]".to_string())
 
-        // dynamic shared object loading (leaks on BSD):
+        // dynamic shared object loading:
         Library::open(Some(DEFAULT_LIBKVMPRO_SHARED), RTLD_NOW)
             .and_then(|lib| {
                 let function_from_symbol: Symbol<extern "C" fn(uid_t) -> kvmpro_t> = unsafe { lib.get(b"get_process_usage_t\0") }?;
