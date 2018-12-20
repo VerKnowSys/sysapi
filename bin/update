@@ -35,6 +35,7 @@ update_all_repos () {
 
 failure () {
     printf "\nFAILURE: %s!\n\n" "${*}"
+    exit 1
 }
 
 
