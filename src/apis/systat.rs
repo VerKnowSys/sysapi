@@ -275,7 +275,7 @@ impl Default for Systat {
                 warn!("Memory: Failure: {}", err);
                 err
             })
-            .unwrap_or(SystatMemory::default());
+            .unwrap_or_default();
 
         let loadavg_stat = SYSTEM
             .load_average()
@@ -294,7 +294,7 @@ impl Default for Systat {
                 warn!("Load average: Failure: {}", err);
                 err
             })
-            .unwrap_or(SystatSysLoad::default());
+            .unwrap_or_default();
 
         let uptime_stat = SYSTEM
             .uptime()
@@ -364,7 +364,7 @@ impl Default for Systat {
                 warn!("CPU load: Failure: {}", err);
                 err
             })
-            .unwrap_or(SystatCPU::default());
+            .unwrap_or_default();
 
         let superuser_processes = CellProcesses::of_uid(0)
             .and_then(|processes| {
