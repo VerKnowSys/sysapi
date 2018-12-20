@@ -145,27 +145,9 @@ pub mod soload {
     }
 
 
-    // NOTE: Direct load C/C++ functions approach kinda works, but it's more SEGV prone:
-    // /// Defined C/C++ extern functions:
-    // extern "C" {
-
-    //     /// Get processes + network connections - directly from kernel
-    //     #[no_mangle]
-    //     pub fn get_process_usage_t(user_uid: uid_t) -> kvmpro_t;
-
-    //     /// Get processes - directly from kernel
-    //     #[no_mangle]
-    //     pub fn get_process_usage_short_t(user_uid: uid_t) -> kvmpro_t;
-
-    // }
-
-
     /// Call kernel directly through C++ function from kvmpro library:
     #[allow(unsafe_code)]
     pub fn processes_of_uid(uid: uid_t) -> String {
-        // let object: kvmpro_t = unsafe { get_process_usage_t(uid) };
-        // String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or("[]".to_string())
-
         // dynamic shared object loading:
         Library::open(Some(DEFAULT_LIBKVMPRO_SHARED), RTLD_NOW)
             .and_then(|lib| {
@@ -187,9 +169,6 @@ pub mod soload {
     /// Call kernel directly through C++ function from kvmpro library:
     #[allow(unsafe_code)]
     pub fn processes_of_uid_short(uid: uid_t) -> String {
-        // let object: kvmpro_t = unsafe { get_process_usage_short_t(uid) };
-        // String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or("[]".to_string())
-
         Library::open(Some(DEFAULT_LIBKVMPRO_SHARED), RTLD_NOW)
             .and_then(|lib| {
                 let function_from_symbol: Symbol<extern "C" fn(uid_t) -> kvmpro_t> = unsafe { lib.get(b"get_process_usage_short_t\0") }?;
@@ -204,6 +183,28 @@ pub mod soload {
             })
             .unwrap_or("[]".to_string())
     }
+
+
+    //
+    // NOTE: Direct load C/C++ functions approach kinda works, but this approach implies
+    // that linker has to explicitly require custom library which I wish to avoid:
+    //
+    //
+    // let object: kvmpro_t = unsafe { get_process_usage_t(uid) };
+    // String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or(empty_string())
+    //
+    // let object: kvmpro_t = unsafe { get_process_usage_short_t(uid) };
+    // String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or(empty_string())
+    //
+    // extern "C" {
+    //     /// Get processes + network connections - directly from kernel
+    //     #[no_mangle]
+    //     pub fn get_process_usage_t(user_uid: uid_t) -> kvmpro_t;
+    //     /// Get processes - directly from kernel
+    //     #[no_mangle]
+    //     pub fn get_process_usage_short_t(user_uid: uid_t) -> kvmpro_t;
+    // }
+    //
 
 
 }
