@@ -53,3 +53,9 @@ pub fn list_proxies() -> Vec<String> {
     debug!("list_proxies(): {}", glob_pattern);
     produce_list(&glob_pattern)
 }
+
+
+/// Returns empty JSON list:
+pub fn empty_string() -> String {
+    "[]".to_string()
+}
