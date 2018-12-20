@@ -129,11 +129,10 @@ mod tests;
 
 /// Map C functions from a Shared-Object system library:
 pub mod soload {
-    // use std::ptr;
-    // use std::mem;
+    use std::mem;
     use libc::*;
-    // use libloading::*;
-    // use crate::DEFAULT_LIBKVMPRO_SHARED;
+    use libloading::os::unix::*;
+    use crate::DEFAULT_LIBKVMPRO_SHARED;
 
 
     #[allow(missing_debug_implementations)]
@@ -147,59 +146,64 @@ pub mod soload {
 
 
     // NOTE: Direct load C/C++ functions approach kinda works, but it's more SEGV prone:
-    /// Defined C/C++ extern functions:
-    extern "C" {
+    // /// Defined C/C++ extern functions:
+    // extern "C" {
 
-        /// Get processes + network connections - directly from kernel
-        #[no_mangle]
-        pub fn get_process_usage_t(user_uid: uid_t) -> kvmpro_t;
+    //     /// Get processes + network connections - directly from kernel
+    //     #[no_mangle]
+    //     pub fn get_process_usage_t(user_uid: uid_t) -> kvmpro_t;
 
-        /// Get processes - directly from kernel
-        #[no_mangle]
-        pub fn get_process_usage_short_t(user_uid: uid_t) -> kvmpro_t;
+    //     /// Get processes - directly from kernel
+    //     #[no_mangle]
+    //     pub fn get_process_usage_short_t(user_uid: uid_t) -> kvmpro_t;
 
-    }
+    // }
 
 
     /// Call kernel directly through C++ function from kvmpro library:
     #[allow(unsafe_code)]
     pub fn processes_of_uid(uid: uid_t) -> String {
-        let object: kvmpro_t = unsafe { get_process_usage_t(uid) };
-        String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or("[]".to_string())
+        // let object: kvmpro_t = unsafe { get_process_usage_t(uid) };
+        // String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or("[]".to_string())
+
+        // dynamic shared object loading (leaks on BSD):
+        Library::open(Some(DEFAULT_LIBKVMPRO_SHARED), RTLD_NOW)
+            .and_then(|lib| {
+                let function_from_symbol: Symbol<extern "C" fn(uid_t) -> kvmpro_t> = unsafe { lib.get(b"get_process_usage_t\0") }?;
+                let object: kvmpro_t = function_from_symbol(uid);
+                mem::forget(lib);
+                Ok(
+                   String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or("[]".to_string())
+                )
+            })
+            .map_err(|err| {
+                error!("FAILURE: processes_of_uid_short(): Unable to load shared library! Error: {:?}", err);
+            })
+            .unwrap_or("[]".to_string())
+
     }
 
 
     /// Call kernel directly through C++ function from kvmpro library:
     #[allow(unsafe_code)]
     pub fn processes_of_uid_short(uid: uid_t) -> String {
-        let object: kvmpro_t = unsafe { get_process_usage_short_t(uid) };
-        String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or("[]".to_string())
+        // let object: kvmpro_t = unsafe { get_process_usage_short_t(uid) };
+        // String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or("[]".to_string())
+
+        Library::open(Some(DEFAULT_LIBKVMPRO_SHARED), RTLD_NOW)
+            .and_then(|lib| {
+                let function_from_symbol: Symbol<extern "C" fn(uid_t) -> kvmpro_t> = unsafe { lib.get(b"get_process_usage_short_t\0") }?;
+                let object: kvmpro_t = function_from_symbol(uid);
+                mem::forget(lib);
+                Ok(
+                   String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or("[]".to_string())
+                )
+            })
+            .map_err(|err| {
+                error!("FAILURE: processes_of_uid_short(): Unable to load shared library! Error: {:?}", err);
+            })
+            .unwrap_or("[]".to_string())
     }
-
-
-    // dynamic shared object loading (leaks on BSD):
-    // Library::new(DEFAULT_LIBKVMPRO_SHARED)
-    //     .and_then(|lib| {
-    //         let function_from_symbol: Symbol<extern "C" fn(uid_t) -> kvmpro_t> = unsafe { lib.get(b"get_process_usage_short_t\0") }?;
-    //         let object: kvmpro_t = function_from_symbol(uid);
-    //         // let destroy_from_symbol: Symbol<extern "C" fn(*mut kvmpro_t) -> c_void> = unsafe { lib.get(b"destroy_kvmpro_tp\0") }?;
-    //         // let data_obj: *mut kvmpro_t = function_from_symbol(uid);
-    //         // let object = unsafe { &*data_obj };
-    //         // destroy_from_symbol(data_obj);
-    //         // unsafe {
-    //         //     ptr::drop_in_place(data_obj);
-    //         // }
-    //         // mem::forget(data_obj);
-    //         drop(function_from_symbol);
-    //         drop(lib);
-    //         Ok(
-    //            String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or("[]".to_string())
-    //         )
-    //     })
-    //     .map_err(|err| {
-    //         error!("FAILURE: processes_of_uid_short(): Unable to load shared library! Error: {:?}", err);
-    //     })
-    //     .unwrap_or("[]".to_string())
 
 
 }
