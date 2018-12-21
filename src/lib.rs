@@ -157,7 +157,7 @@ pub mod soload {
     use std::{mem::forget, thread::spawn, thread::sleep, sync::{Arc, Mutex}, sync::atomic::{AtomicUsize, Ordering}};
     use colored::Colorize;
     use std::time::Duration;
-    use crate::{helpers::empty_string, DEFAULT_LIBKVMPRO_SHARED};
+    use crate::{helpers::empty_list_string, DEFAULT_LIBKVMPRO_SHARED};
 
 
     #[allow(missing_debug_implementations)]
