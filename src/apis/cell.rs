@@ -181,9 +181,9 @@ impl Cell {
     pub fn state(name: &String) -> Option<Cell> {
         let sentry_dir = format!("{}/{}", SENTRY_PATH, name);
         let attributes_dir = format!("{}/{}", sentry_dir, "cell-attributes");
-        let status_file = format!("{}/{}", sentry_dir, "cell.running");
-        let netid_file = format!("{}/{}", sentry_dir, "cell.vlan.number");
-        let ipv4_file = format!("{}/{}", sentry_dir, "cell.ip.addresses");
+        let status_file = format!("{}/{}", sentry_dir, DEFAULT_CELL_RUNSTATE_FILE);
+        let netid_file = format!("{}/{}", sentry_dir, DEFAULT_CELL_NETID_FILE);
+        let ipv4_file = format!("{}/{}", sentry_dir, DEFAULT_CELL_IP_FILE);
         let domain_file = format!("{}/{}", sentry_dir, "cell-domains/local.conf");
         debug!("state() dirs: Sentry dir: {}, Attributes dir: {}", sentry_dir.cyan(), attributes_dir.cyan());
 

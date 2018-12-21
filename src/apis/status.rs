@@ -11,8 +11,7 @@ use mime::*;
 use libc::*;
 use colored::Colorize;
 
-use crate::SENTRY_PATH;
-use crate::soload::processes_of_uid;
+use crate::{SENTRY_PATH, DEFAULT_CELL_NETID_FILE, soload::processes_of_uid};
 
 
 /// List CellProcess type alias:
@@ -87,7 +86,7 @@ impl CellProcesses {
     /// Status of all ressident processes of cell by a_name
     pub fn of_cell(a_name: &String) -> Result<Self, Error> {
         let sentry_dir = format!("{}/{}", SENTRY_PATH, a_name);
-        let netid_file = format!("{}/{}", sentry_dir, "cell.vlan.number");
+        let netid_file = format!("{}/{}", sentry_dir, DEFAULT_CELL_NETID_FILE);
         File::open(&netid_file)
             .and_then(|file| {
                 let mut line = String::new();
