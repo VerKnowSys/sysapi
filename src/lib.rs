@@ -147,7 +147,9 @@ mod tests;
 pub mod soload {
     use libc::*;
     use libloading::os::unix::*;
-    use std::{mem::forget, thread::spawn, sync::{Arc, Mutex}};
+    use std::{mem::forget, thread::spawn, thread::sleep, sync::{Arc, Mutex}, sync::atomic::{AtomicUsize, Ordering}};
+    use colored::Colorize;
+    use std::time::Duration;
     use crate::{helpers::empty_string, DEFAULT_LIBKVMPRO_SHARED};
 
 
@@ -164,10 +166,21 @@ pub mod soload {
     lazy_static! {
         /// Global SOLOAD_MT_CALLS_SYNCHRONIZER - required when handling requests,
         /// that call kernel APIs (which are often NOT Thread-safe):
-        pub static ref SOLOAD_MT_CALLS_SYNCHRONIZER: Arc<Mutex<u32>> = {
-            Arc::new(Mutex::new(0_u32))
+        pub static ref SOLOAD_MT_CALLS_SYNCHRONIZER: Arc<Mutex<AtomicUsize>> = {
+            Arc::new(
+                Mutex::new(
+                    AtomicUsize::new(0_usize) // Atomic counter of function calls since last restart
+                )
+            )
         };
     }
+
+
+    /// Time in miliseconds to pause before calling same function again (retry):
+    pub const SOLOAD_MT_CALLS_INTERVAL: u64 = 5; /* 5 ms interval before trying to call function again (waiting for lock) */
+
+    /// Modulo this number == 0, then print info with counter state:
+    pub const SOLOAD_MT_INFO_TRIGGER_MODULO_NUM: usize = 10000; /* print info with counter state each 10000 calls */
 
 
     /// Helper to dynamically call function from shared object:
@@ -185,7 +198,7 @@ pub mod soload {
             .map_err(|err| {
                 let function_name = String::from_utf8(fun_symbol_name.to_vec()).unwrap_or("fn_with_no_name".to_string());
                 error!("FAILURE of: {}(): No such function-symbol found in library: {}. Details: {}.",
-                       function_name, DEFAULT_LIBKVMPRO_SHARED, err.to_string());
+                       function_name.cyan(), DEFAULT_LIBKVMPRO_SHARED.cyan(), err.to_string().red());
             })
             .unwrap_or(empty_string())
     }
@@ -196,10 +209,18 @@ pub mod soload {
         spawn(
             move || {
                 match SOLOAD_MT_CALLS_SYNCHRONIZER.try_lock() {
-                    Ok(_) => string_from_native_fn(b"get_process_usage_t\0", uid),
+                    Ok(locked_resource) => {
+                        locked_resource.fetch_add(1, Ordering::SeqCst); // Increment atomic counter:
+                        let value = locked_resource.load(Ordering::SeqCst);
+                        if value % SOLOAD_MT_INFO_TRIGGER_MODULO_NUM == 0 {
+                            info!("API calls-counter processed: {} calls so far.", value.to_string().cyan());
+                        }
+                        string_from_native_fn(b"get_process_usage_t\0", uid)
+                    },
                     Err(err) => {
-                        debug!("Failed to acquire thread lock. Details: {}", err.to_string());
-                        empty_string()
+                        debug!("Failed to acquire thread lock. Details: {}", err.to_string().red());
+                        sleep(Duration::from_millis(SOLOAD_MT_CALLS_INTERVAL)); // XXX: sleep is hacky…
+                        return processes_of_uid(uid)
                     }
                 }
             }
@@ -214,10 +235,18 @@ pub mod soload {
         spawn(
             move || {
                 match SOLOAD_MT_CALLS_SYNCHRONIZER.try_lock() {
-                    Ok(_) => string_from_native_fn(b"get_process_usage_short_t\0", uid),
+                    Ok(locked_resource) => {
+                        locked_resource.fetch_add(1, Ordering::SeqCst); // Increment atomic counter:
+                        let value = locked_resource.load(Ordering::SeqCst);
+                        if value % SOLOAD_MT_INFO_TRIGGER_MODULO_NUM == 0 {
+                            info!("API calls-counter processed: {} calls so far.", value.to_string().cyan());
+                        }
+                        string_from_native_fn(b"get_process_usage_short_t\0", uid)
+                    },
                     Err(err) => {
-                        debug!("Failed to acquire thread lock. Details: {}", err.to_string());
-                        empty_string()
+                        debug!("Failed to acquire thread lock. Details: {}", err.to_string().red());
+                        sleep(Duration::from_millis(SOLOAD_MT_CALLS_INTERVAL)); // XXX: sleep is hacky…
+                        return processes_of_uid_short(uid)
                     }
                 }
             }
