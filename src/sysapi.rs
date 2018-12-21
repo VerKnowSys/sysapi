@@ -96,10 +96,11 @@ pub fn main() {
         .apply()
         .and_then(|_| { // Use initialized logger to introduce itself
             info!("_______________________________________________________________________________________________________");
-            info!("SysAPI {} - design, implementation: {} - in active development since 2011…\n", format!("v{}", version).cyan(), CREATED_BY.cyan());
-            info!("  This project is only a component of the '{}' - a {}-driven, modern, open-source, production quality operating system.",
-                  "ServeD-OS project".cyan(), "HardenedBSD".cyan());
-            info!("  Project components: {}, {}, {}, {}, {}, {}.\n",
+            info!("SysAPI {} - design, implementation: {}.", format!("v{}", version).cyan(), CREATED_BY.cyan());
+            info!("               - in active development since 2011.\n");
+            info!("  This project is only a component of the '{}'.", "ServeD-OS project".cyan());
+            info!("               - a {}-driven, modern, open-source, production quality system.", "HardenedBSD".cyan());
+            info!("  Related projects: {}, {}, {}, {}, {}, {}.\n",
                   "svdOS".cyan(), "Sofin".cyan(), "Sofin-definitions".cyan(), "sysapi".cyan(), "kvmpro".cyan(), "Shable".cyan());
             info!("SysAPI: ControlPane URL: {}", format!("{}://{}", DEFAULT_CONTROLPANE_PROTOCOL, listen_address).cyan());
             Ok(())
