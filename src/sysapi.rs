@@ -38,7 +38,7 @@ use futures::future;
 use tokio::runtime::Runtime;
 
 
-use crate::sysapi::{DEFAULT_ADDRESS, DEFAULT_LOG_FILE, ZFS_BIN, GVR_BIN, DEFAULT_STDOUT_DEV};
+use crate::sysapi::{DEFAULT_ADDRESS, DEFAULT_LOG_FILE, ZFS_BIN, GVR_BIN, DEFAULT_STDOUT_DEV, DEFAULT_HOSTNAME_FALLBACK};
 use crate::sysapi::webrouter::router;
 
 
@@ -121,7 +121,7 @@ pub fn main() {
 
     runtime.spawn(future::lazy(|| {
         info!("Status: {}, working on hostname: {}",
-              "Online".green(), (get_hostname().unwrap_or("localhost".to_string())).green());
+              "Online".green(), (get_hostname().unwrap_or(DEFAULT_HOSTNAME_FALLBACK.to_string())).green());
         Ok(())
     }));
 

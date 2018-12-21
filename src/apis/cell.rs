@@ -249,7 +249,7 @@ impl Cell {
                     error!("Couldn't read domain file: {}. Reason: {}. Fallback to localhost!", domain_file, err);
                     err
                 })
-                .unwrap_or("localhost".to_string());
+                .unwrap_or(DEFAULT_HOSTNAME_FALLBACK.to_string());
 
             // status => /Shared/Prison/Sentry/CELLNAME/cell.status
             let status = File::open(&status_file)

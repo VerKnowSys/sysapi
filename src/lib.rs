@@ -42,6 +42,9 @@ pub const DEFAULT_STDOUT_DEV: &str = "/dev/stdout";
 // /// Default stderr POSIX system device:
 // pub const DEFAULT_STDERR_DEV: &str = "/dev/stderr";
 
+/// Default fallback for hostname:
+pub const DEFAULT_HOSTNAME_FALLBACK: &str = "localhost";
+
 /// svdOS cell governor:
 pub const GVR_BIN: &str = "/usr/bin/gvr";
 
