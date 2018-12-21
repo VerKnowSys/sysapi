@@ -181,7 +181,8 @@ pub mod soload {
 
 
     /// Time in miliseconds to pause before calling same function again (retry):
-    pub const SOLOAD_MT_CALLS_INTERVAL: u64 = 5; /* 5 ms interval before trying to call function again (waiting for lock) */
+    /// NOTE: Don't set this value too low, to avoid flood of the "new threads"
+    pub const SOLOAD_MT_CALLS_INTERVAL: u64 = 67; /* ms of interval before trying to call function again (waiting for lock) */
 
     /// Modulo this number == 0, then print info with counter state:
     pub const SOLOAD_MT_INFO_TRIGGER_MODULO_NUM: usize = 10000; /* print info with counter state each 10000 calls */
