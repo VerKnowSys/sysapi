@@ -89,14 +89,18 @@ pub fn main() {
                     File::open(DEFAULT_STDOUT_DEV)
                         .expect(
                             &format!("{}: STDOUT device ({}) is not available! Something is terribly wrong here!",
-                                     "FATAL ERROR".blue(), DEFAULT_STDOUT_DEV)
+                                     "FATAL ERROR".blue(), DEFAULT_STDOUT_DEV.cyan())
                         )
                 )
         )
         .apply()
-        .and_then(|_| { // Start main event loop:
-            info!("SysAPI {} - design, implementation: {}", format!("v{}", version).cyan(), CREATED_BY.cyan());
-            info!("ControlPane URL: {}", format!("http://{}", listen_address).cyan());
+        .and_then(|_| { // Use initialized logger to introduce itself
+            info!("_______________________________________________________________________________________________________");
+            info!("SysAPI {} - in active development since 2011 - design, implementation by {}", format!("v{}", version).cyan(), CREATED_BY.cyan());
+            info!("       This project is one of several projects that work together as one.");
+            info!("       The most significant projects are: [{}, {}, {}, {}, {}, {}] - known together as '{}'.",
+                  "svdOS".cyan(), "Sofin".cyan(), "Sofin-definitions".cyan(), "sysapi".cyan(), "kvmpro".cyan(), "Shable".cyan(), "ServeD-OS".cyan());
+            info!("SysAPI-ControlPane is available under: {}", format!("http://{}", listen_address).cyan());
             Ok(())
         })
         .map_err(|err| {
