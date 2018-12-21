@@ -118,6 +118,6 @@ pub fn list_proxies() -> Vec<String> {
 
 
 /// Returns empty JSON list:
-pub fn empty_string() -> String {
+pub fn empty_list_string() -> String {
     "[]".to_string()
 }

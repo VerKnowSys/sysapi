@@ -200,7 +200,7 @@ pub mod soload {
                 let object: kvmpro_t = function_from_symbol(uid);
                 forget(lib); // NOTE: Skipping this call causes significant memory leak per-each function call!
                 Ok(
-                   String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or(empty_string())
+                   String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or(empty_list_string())
                 )
             })
             .map_err(|err| {
@@ -208,7 +208,7 @@ pub mod soload {
                 error!("FAILURE of: {}(): No such function-symbol found in library: {}. Details: {}.",
                        function_name.cyan(), DEFAULT_LIBKVMPRO_SHARED.cyan(), err.to_string().red());
             })
-            .unwrap_or(empty_string())
+            .unwrap_or(empty_list_string())
     }
 
 
@@ -234,7 +234,7 @@ pub mod soload {
             }
         )
         .join()
-        .unwrap_or(empty_string())
+        .unwrap_or(empty_list_string())
     }
 
 
@@ -260,7 +260,7 @@ pub mod soload {
             }
         )
         .join()
-        .unwrap_or(empty_string())
+        .unwrap_or(empty_list_string())
     }
 
 
@@ -270,10 +270,10 @@ pub mod soload {
     //
     //
     // let object: kvmpro_t = unsafe { get_process_usage_t(uid) };
-    // String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or(empty_string())
+    // String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or(empty_list_string())
     //
     // let object: kvmpro_t = unsafe { get_process_usage_short_t(uid) };
-    // String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or(empty_string())
+    // String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or(empty_list_string())
     //
     // extern "C" {
     //     /// Get processes + network connections - directly from kernel
