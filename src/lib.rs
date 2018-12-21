@@ -85,6 +85,9 @@ pub const SENTRY_PATH: &str = "/Shared/Prison/Sentry";
 /// Default protocol for ControlPane:
 pub const DEFAULT_CONTROLPANE_PROTOCOL: &str = "http";
 
+/// CpuStat measure interval:
+pub const DEFAULT_CPUSTAT_INTERVAL: u64 = 397; /* ms of interval before CPU usage measure takes place */
+
 
 
 // EOF project constants.
