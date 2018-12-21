@@ -25,14 +25,19 @@ pub fn listen_address() -> String {
 /// Prints message pack on SysAPI service start:
 pub fn print_header() {
     let version = env!("CARGO_PKG_VERSION");
-
     info!("_______________________________________________________________________________________________________");
     info!("SysAPI {} - design, implementation: {}.", format!("v{}", version).cyan(), CREATED_BY.cyan());
-    info!("               - in active development since 2011.\n");
+    info!("               - in active development since 2011…");
     info!("  This project is only a component of the '{}'.", "ServeD-OS project".cyan());
-    info!("               - a {}-driven, modern, open-source, production quality system.", "HardenedBSD".cyan());
-    info!("  Related projects: {}, {}, {}, {}, {}, {}.\n",
-          "svdOS".cyan(), "Sofin".cyan(), "Sofin-definitions".cyan(), "sysapi".cyan(), "kvmpro".cyan(), "Shable".cyan());
+    info!("               - a {}-driven, modern but production-quality operating-system.", "HardenedBSD".cyan());
+    info!("  Other projects:");
+    info!("               - {} -> {}", "sysapi".cyan(), "https://github.com/VerKnowSys/sysapi".green());
+    info!("               - {} -> {}", "svdOS".cyan(), "https://github.com/VerKnowSys/svdOS".green());
+    info!("               - {} -> {}", "Sofin".cyan(), "https://github.com/VerKnowSys/sofin".green());
+    info!("               - {} -> {}", "Sofin-definitions".cyan(), "https://github.com/VerKnowSys/sofin-definitions".green());
+    info!("               - {} -> {}", "kvmpro".cyan(), "https://github.com/VerKnowSys/kvmpro".green());
+    info!("               - {} -> {}", "Shable".cyan(), "https://github.com/VerKnowSys/Shable".green());
+    info!("");
     info!("SysAPI: ControlPane URL: {}", format!("{}://{}", DEFAULT_CONTROLPANE_PROTOCOL, listen_address()).cyan());
 }
 
