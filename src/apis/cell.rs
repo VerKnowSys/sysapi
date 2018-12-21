@@ -10,7 +10,7 @@ use gotham::helpers::http::response::create_response;
 use std::io::BufReader;
 use std::fs::File;
 use mime::*;
-
+use colored::Colorize;
 
 use crate::*;
 use crate::helpers::*;
@@ -185,7 +185,7 @@ impl Cell {
         let netid_file = format!("{}/{}", sentry_dir, "cell.vlan.number");
         let ipv4_file = format!("{}/{}", sentry_dir, "cell.ip.addresses");
         let domain_file = format!("{}/{}", sentry_dir, "cell-domains/local.conf");
-        debug!("state() dirs: Sentry dir: {}, Attributes dir: {}", sentry_dir, attributes_dir);
+        debug!("state() dirs: Sentry dir: {}, Attributes dir: {}", sentry_dir.cyan(), attributes_dir.cyan());
 
         if Path::new(&sentry_dir).exists() {
             // ip => /Shared/Prison/Sentry/CELLNAME/cell.ip.addresses
@@ -200,7 +200,7 @@ impl Cell {
                         })
                 })
                 .map_err(|err| {
-                    error!("Couldn't read cell file: {}. Fallback to 127.1", ipv4_file);
+                    error!("Couldn't read cell file: {}. Fallback to 127.1", ipv4_file.cyan());
                     err
                 })
                 .unwrap_or("127.0.0.1".to_string());
@@ -217,7 +217,7 @@ impl Cell {
                         })
                 })
                 .map_err(|err| {
-                    error!("Couldn't read cell netid file: {}. Fallback to 0", netid_file);
+                    error!("Couldn't read cell netid file: {}. Fallback to 0", netid_file.cyan());
                     err
                 })
                 .unwrap_or("0".to_string());
@@ -238,15 +238,16 @@ impl Cell {
                                         domain => Some(domain),
                                     }
                                 });
-                            debug!("Got domain: {:?}. Full domain definition file contents: {:?}", cap, trim_line);
+                            debug!("Got domain: {}. Full domain definition file contents: {}",
+                                   cap.unwrap_or("").to_string().cyan(), trim_line.to_string().cyan());
                             match cap {
                                 Some(domain) => Ok(domain.to_string()),
-                                None => Err(Error::new(ErrorKind::Other, format!("Empty domain entry in file: {}", domain_file)))
+                                None => Err(Error::new(ErrorKind::Other, format!("Empty domain entry in file: {}", domain_file.cyan())))
                             }
                         })
                 })
                 .map_err(|err| {
-                    error!("Couldn't read domain file: {}. Reason: {}. Fallback to localhost!", domain_file, err);
+                    error!("Couldn't read domain file: {}. Reason: {}. Fallback to localhost!", domain_file.cyan(), err.to_string().cyan());
                     err
                 })
                 .unwrap_or(DEFAULT_HOSTNAME_FALLBACK.to_string());
@@ -279,7 +280,7 @@ impl Cell {
                             err
                         })
                         .unwrap_or(String::from(""));
-                    debug!("Cell: {}, attribute: {}, value: {}", name, attribute, attribute_value);
+                    debug!("Cell: {}, attribute: {}, value: {}", name.cyan(), attribute.cyan(), attribute_value.cyan());
                     format!("{}={}", attribute, attribute_value)
                 })
                 .collect();
@@ -294,7 +295,7 @@ impl Cell {
 
                 .. Cell::default()
             };
-            debug!("Get cell: {}", cell_result.to_string());
+            debug!("Get cell: {}", cell_result.to_string().cyan());
             Some(cell_result)
         } else {
             debug!("Cells list is empty!");
@@ -315,12 +316,13 @@ pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<(), 
         .output()
         .and_then(|add_ssh_pubkey| {
             if add_ssh_pubkey.status.success() {
-                debug!("add_ssh_pubkey_to_cell():\n{}", String::from_utf8_lossy(&add_ssh_pubkey.stdout));
+                debug!("add_ssh_pubkey_to_cell():\n{}", String::from_utf8_lossy(&add_ssh_pubkey.stdout).cyan());
                 Ok(())
             } else {
-                let error_msg = format!("Something went wrong and key: '{}' couldn't be set for cell: {}. Please contact administator or file a bug!", ssh_pubkey, name);
-                error!("{}", error_msg);
-                Err(Error::new(ErrorKind::Other, error_msg))
+                let errmsg = format!("Something went wrong and key: '{}' couldn't be set for cell: '{}'. Please contact administator or file a bug!",
+                                     ssh_pubkey.cyan(), name.cyan());
+                error!("{}", errmsg);
+                Err(Error::new(ErrorKind::Other, errmsg))
             }
         })
 }
@@ -334,12 +336,12 @@ pub fn create_cell(name: &String) -> Result<(), Error> {
         .output()
         .and_then(|gvr_handle| {
             debug!("create_cell():\n{}{}",
-                 String::from_utf8_lossy(&gvr_handle.stdout),
-                 String::from_utf8_lossy(&gvr_handle.stderr));
+                 String::from_utf8_lossy(&gvr_handle.stdout).blue(),
+                 String::from_utf8_lossy(&gvr_handle.stderr).white());
             if gvr_handle.status.success() {
                 Ok(())
             } else {
-                Err(Error::new(ErrorKind::Other, format!("Failed to create_cell(): {}", name)))
+                Err(Error::new(ErrorKind::Other, format!("Failed to create_cell(): {}", name.cyan())))
             }
         })
 }
@@ -355,15 +357,15 @@ pub fn destroy_cell(name: &String) -> Result<(), Error> {
         .and_then(|gvr_handle| {
             if gvr_handle.status.success() {
                 debug!("destroy_cell():\n{}{}",
-                       String::from_utf8_lossy(&gvr_handle.stdout),
-                       String::from_utf8_lossy(&gvr_handle.stderr));
+                       String::from_utf8_lossy(&gvr_handle.stdout).blue(),
+                       String::from_utf8_lossy(&gvr_handle.stderr).white());
                 Command::new(JAIL_BIN)
                     .arg("-r") // NOTE: Sometimes jail services are locking "some" resources for a very long time,
                     .arg(name) //       and will remain "started" until the-process-lock is released..
                     .output()  //       Let's make sure there's no running jail with our name after destroy command:
                     .and_then(|jail_handle| {
                         if jail_handle.status.success() {
-                            warn!("Dangling cell stopped: {}!", name);
+                            warn!("Dangling cell stopped: {}!", name.cyan());
                         }
                         Ok(())
                     })
@@ -372,7 +374,7 @@ pub fn destroy_cell(name: &String) -> Result<(), Error> {
                     //     err
                     // })
             } else {
-                Err(Error::new(ErrorKind::Other, format!("Couldn't destroy_cell(): {}", name)))
+                Err(Error::new(ErrorKind::Other, format!("Couldn't destroy_cell(): {}", name.cyan())))
             }
         })
 }
