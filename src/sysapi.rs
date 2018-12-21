@@ -42,6 +42,20 @@ use crate::sysapi::{DEFAULT_ADDRESS, DEFAULT_LOG_FILE, ZFS_BIN, GVR_BIN};
 use crate::sysapi::webrouter::router;
 
 
+/// Perform checks before starting web service:
+fn sanity_checks() {
+    // Perform sanity checks:
+    if !Path::new(ZFS_BIN).exists() {
+        error!("SysAPI requires ZFS functionality available in system!");
+        panic!("FATAL ERROR: ZFS utility is NOT available in system!");
+    }
+    if !Path::new(GVR_BIN).exists() {
+        error!("SysAPI requires 'gvr' script to be available in system!");
+        panic!("FATAL ERROR: 'ServeD-GoVeRnor' is NOT available in system!");
+    }
+}
+
+
 /// Start a server and use a `Router` to dispatch requests
 pub fn main() {
     // Set up ANSI colors for output:
@@ -85,34 +99,26 @@ pub fn main() {
         })
         .level(loglevel)
         .chain(log_file(DEFAULT_LOG_FILE)
-                    .unwrap_or(File::open("/dev/stdout")
-                    .expect("FATAL: No /dev/stdout!?")))
+            .unwrap_or(File::open("/dev/stdout")
+            .expect("FATAL ERROR: No /dev/stdout!?")))
         .apply()
-        .and_then(|_| {
-            // Start main event loop:
-            info!("ServeD-SysAPI (v{}) - started on hostname: {}: http://{}",
-                  version, get_hostname().unwrap_or(String::from("localhost")), listen_address);
+        .and_then(|_| { // Start main event loop:
+            info!("ServeD-SysAPI {}. Panel URL: {}",
+                format!("v{}", version).green(),
+                format!("http://{}", listen_address).green());
             Ok(())
         })
         .map_err(|err| {
-            error!("FATAL: Couldn't initialize SysAPI. Error details: {:?}", err);
+            error!("FATAL ERROR: Couldn't initialize SysAPI. Details: {}", err.to_string());
         })
         .unwrap();
 
-    // Last check - sysapi relies on zfs feature:
-    if !Path::new(ZFS_BIN).exists() {
-        error!("SysAPI requires ZFS functionality available in system!");
-        panic!("FATAL: ZFS feature is NOT available!");
-    }
-    if !Path::new(GVR_BIN).exists() {
-        error!("SysAPI requires 'gvr' script to be available in system!");
-        panic!("FATAL: 'ServeD-GoVeRnor' is NOT available!");
-    }
+    // Perform sanity checks:
+    sanity_checks();
 
-    // Define gotham server Future:
     runtime.spawn(future::lazy(|| {
-        info!("Example async-lazy-worker-thread… Yay!");
-
+        info!("Status: {}, working on hostname: {}",
+              "Online".green(), (get_hostname().unwrap_or("localhost".to_string())).green());
         Ok(())
     }));
 
