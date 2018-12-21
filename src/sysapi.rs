@@ -96,11 +96,12 @@ pub fn main() {
         .apply()
         .and_then(|_| { // Use initialized logger to introduce itself
             info!("_______________________________________________________________________________________________________");
-            info!("SysAPI {} - in active development since 2011 - design, implementation by {}", format!("v{}", version).cyan(), CREATED_BY.cyan());
-            info!("       This project is one of several projects that work together as one.");
-            info!("       The most significant projects are: [{}, {}, {}, {}, {}, {}] - known together as '{}'.",
-                  "svdOS".cyan(), "Sofin".cyan(), "Sofin-definitions".cyan(), "sysapi".cyan(), "kvmpro".cyan(), "Shable".cyan(), "ServeD-OS".cyan());
-            info!("SysAPI-ControlPane is available under: {}", format!("http://{}", listen_address).cyan());
+            info!("SysAPI {} - design, implementation: {} - in active development since 2011…\n", format!("v{}", version).cyan(), CREATED_BY.cyan());
+            info!("  This project is only a component of the '{}' - a {}-driven, modern, open-source, production quality operating system.",
+                  "ServeD-OS project".cyan(), "HardenedBSD".cyan());
+            info!("  Project components: {}, {}, {}, {}, {}, {}.\n",
+                  "svdOS".cyan(), "Sofin".cyan(), "Sofin-definitions".cyan(), "sysapi".cyan(), "kvmpro".cyan(), "Shable".cyan());
+            info!("SysAPI: ControlPane URL: {}", format!("{}://{}", DEFAULT_CONTROLPANE_PROTOCOL, listen_address).cyan());
             Ok(())
         })
         .map_err(|err| {
