@@ -344,7 +344,7 @@ impl Default for Systat {
                 let cpu_stat = SYSTEM
                     .cpu_load_aggregate()
                     .and_then(|main_cpu| {
-                        thread::sleep(Duration::from_millis(DEFAULT_CPUSTAT_INTERVAL));
+                        thread::sleep(Duration::from_millis(SYSTAT_CPUSTAT_INTERVAL));
                         main_cpu
                             .done()
                             .and_then(|cpu| {
