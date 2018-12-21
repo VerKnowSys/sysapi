@@ -56,19 +56,10 @@ pub fn main() {
         Err(_) => LevelFilter::Info,
     };
 
-    // Read environment values:
-    let listen_address = match env::var("LISTEN_ADDRESS") {
-        Ok(addr) => addr,
-        Err(_) => DEFAULT_ADDRESS.to_string(),
-    };
-    let version = env!("CARGO_PKG_VERSION");
-
-    // Create the runtime
+    // Create the runtime:
     let mut runtime: Runtime = match Runtime::new() {
         Ok(runtime) => runtime,
-        Err(err) => {
-            panic!("{}: SysAPI: Runtime: Assertion Failed! Details: {}", "FATAL ERROR".blue(), err);
-        }
+        Err(err) => panic!("{}: SysAPI: Runtime: Assertion Failed! Details: {}", "FATAL ERROR".blue(), err.to_string().red())
     };
 
     // Dispatch logger:
@@ -88,21 +79,14 @@ pub fn main() {
                 .unwrap_or(
                     File::open(DEFAULT_STDOUT_DEV)
                         .expect(
-                            &format!("{}: STDOUT device ({}) is not available! Something is terribly wrong here!",
+                            &format!("{}: STDOUT device '{}' is not available! Something is terribly wrong here!",
                                      "FATAL ERROR".blue(), DEFAULT_STDOUT_DEV.cyan())
                         )
                 )
         )
         .apply()
         .and_then(|_| { // Use initialized logger to introduce itself
-            info!("_______________________________________________________________________________________________________");
-            info!("SysAPI {} - design, implementation: {}.", format!("v{}", version).cyan(), CREATED_BY.cyan());
-            info!("               - in active development since 2011.\n");
-            info!("  This project is only a component of the '{}'.", "ServeD-OS project".cyan());
-            info!("               - a {}-driven, modern, open-source, production quality system.", "HardenedBSD".cyan());
-            info!("  Related projects: {}, {}, {}, {}, {}, {}.\n",
-                  "svdOS".cyan(), "Sofin".cyan(), "Sofin-definitions".cyan(), "sysapi".cyan(), "kvmpro".cyan(), "Shable".cyan());
-            info!("SysAPI: ControlPane URL: {}", format!("{}://{}", DEFAULT_CONTROLPANE_PROTOCOL, listen_address).cyan());
+            print_header();
             Ok(())
         })
         .map_err(|err| {
@@ -121,7 +105,7 @@ pub fn main() {
     }));
 
     // NOTE: Use runtime.spawn(_) to launch future services like this:
-    let gotham = gotham::init_server(listen_address, router());
+    let gotham = gotham::init_server(listen_address(), router());
     // Spawn the server task
     runtime
         .block_on_all(gotham) // Block forever on "serving duties"
