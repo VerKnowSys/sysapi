@@ -203,7 +203,7 @@ impl Cell {
                     error!("Couldn't read cell file: {}. Fallback to 127.1", ipv4_file.cyan());
                     err
                 })
-                .unwrap_or("127.0.0.1".to_string());
+                .unwrap_or(DEFAULT_IP_FALLBACK.to_string());
 
             // netid => /Shared/Prison/Sentry/CELLNAME/cell.vlan.number
             let netid = File::open(&netid_file)

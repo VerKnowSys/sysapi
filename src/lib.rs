@@ -52,6 +52,9 @@ pub const DEFAULT_STDOUT_DEV: &str = "/dev/stdout";
 /// Default fallback for hostname:
 pub const DEFAULT_HOSTNAME_FALLBACK: &str = "localhost";
 
+/// Default fallback for IPv4:
+pub const DEFAULT_IP_FALLBACK: &str = "127.0.0.1";
+
 /// svdOS cell governor:
 pub const GVR_BIN: &str = "/usr/bin/gvr";
 
