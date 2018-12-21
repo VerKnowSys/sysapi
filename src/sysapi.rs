@@ -38,7 +38,7 @@ use futures::future;
 use tokio::runtime::Runtime;
 
 
-use crate::sysapi::{DEFAULT_ADDRESS, DEFAULT_LOG_FILE, ZFS_BIN, GVR_BIN};
+use crate::sysapi::{DEFAULT_ADDRESS, DEFAULT_LOG_FILE, ZFS_BIN, GVR_BIN, DEFAULT_STDOUT_DEV};
 use crate::sysapi::webrouter::router;
 
 
@@ -98,9 +98,12 @@ pub fn main() {
             ))
         })
         .level(loglevel)
-        .chain(log_file(DEFAULT_LOG_FILE)
-            .unwrap_or(File::open("/dev/stdout")
-            .expect("FATAL ERROR: No /dev/stdout!?")))
+        .chain(
+            log_file(DEFAULT_LOG_FILE)
+                .unwrap_or(File::open(DEFAULT_STDOUT_DEV)
+                    .expect(&format!("FATAL ERROR: STDOUT device ({}) is not available! Something is terribly wrong here!", DEFAULT_STDOUT_DEV))
+                )
+        )
         .apply()
         .and_then(|_| { // Start main event loop:
             info!("ServeD-SysAPI {}. Panel URL: {}",

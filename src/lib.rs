@@ -36,6 +36,12 @@ pub const PROJECT_DIRECTORY: &str = "/Projects/sysapi";
 /// Default log output file:
 pub const DEFAULT_LOG_FILE: &str = "/var/log/sysapi.log";
 
+/// Default stdout POSIX system device:
+pub const DEFAULT_STDOUT_DEV: &str = "/dev/stdout";
+
+/// Default stderr POSIX system device:
+pub const DEFAULT_STDERR_DEV: &str = "/dev/stderr";
+
 /// svdOS cell governor:
 pub const GVR_BIN: &str = "/usr/bin/gvr";
 
