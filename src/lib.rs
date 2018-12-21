@@ -226,7 +226,7 @@ pub mod soload {
                     },
                     Err(err) => {
                         debug!("Failed to acquire thread lock. Details: {}", err.to_string().red());
-                        sleep(Duration::from_millis(SOLOAD_MT_CALLS_INTERVAL)); // XXX: sleep is hacky…
+                        sleep(Duration::from_millis(SOLOAD_MT_CALLS_INTERVAL));
                         return processes_of_uid(uid)
                     }
                 }
@@ -252,7 +252,7 @@ pub mod soload {
                     },
                     Err(err) => {
                         debug!("Failed to acquire thread lock. Details: {}", err.to_string().red());
-                        sleep(Duration::from_millis(SOLOAD_MT_CALLS_INTERVAL)); // XXX: sleep is hacky…
+                        sleep(Duration::from_millis(SOLOAD_MT_CALLS_INTERVAL));
                         return processes_of_uid_short(uid)
                     }
                 }

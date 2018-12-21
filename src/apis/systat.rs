@@ -4,7 +4,7 @@ use hyper::{StatusCode, Body, Response};
 use serde_json;
 use gotham::helpers::http::response::create_response;
 use mime::*;
-use std::thread; // XXX: temporary
+use std::thread;
 use std::time::Duration;
 use chrono::{Local, DateTime, Utc};
 use systemstat::*;
