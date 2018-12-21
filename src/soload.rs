@@ -9,7 +9,7 @@ use crate::{*, helpers::empty_list_string};
 #[allow(missing_debug_implementations)]
 #[derive(Copy, Clone)]
 #[repr(C)]
-/// libkvmpro.so:
+/// Data structure, returned by functions dynamically loaded from: libkvmpro.so:
 pub struct kvmpro_t {
     length: size_t,
     bytes: [u8; 262144],
