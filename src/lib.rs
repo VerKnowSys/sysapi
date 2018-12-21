@@ -82,6 +82,10 @@ pub const CELLS_PATH: &str = "/Shared/Prison/Cells";
 /// Default path to sentry metadata dirs:
 pub const SENTRY_PATH: &str = "/Shared/Prison/Sentry";
 
+/// Default protocol for ControlPane:
+pub const DEFAULT_CONTROLPANE_PROTOCOL: &str = "http";
+
+
 
 // EOF project constants.
 
