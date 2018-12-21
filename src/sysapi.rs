@@ -38,7 +38,7 @@ use futures::future;
 use tokio::runtime::Runtime;
 
 
-use crate::sysapi::{DEFAULT_ADDRESS, DEFAULT_LOG_FILE, ZFS_BIN};
+use crate::sysapi::{DEFAULT_ADDRESS, DEFAULT_LOG_FILE, ZFS_BIN, GVR_BIN};
 use crate::sysapi::webrouter::router;
 
 
@@ -103,6 +103,10 @@ pub fn main() {
     if !Path::new(ZFS_BIN).exists() {
         error!("SysAPI requires ZFS functionality available in system!");
         panic!("FATAL: ZFS feature is NOT available!");
+    }
+    if !Path::new(GVR_BIN).exists() {
+        error!("SysAPI requires 'gvr' script to be available in system!");
+        panic!("FATAL: 'ServeD-GoVeRnor' is NOT available!");
     }
 
     // Define gotham server Future:
