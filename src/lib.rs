@@ -27,6 +27,9 @@ extern crate serde_derive;
 
 // Library constants, used by the project:
 
+/// Software author :)
+pub const CREATED_BY: &str = "Daniel (@dmilith) Dettlaff";
+
 /// Default network device name - used by virtual network stack for cells.
 /// Link schema: Host: epairaNET_ID_NUMBER <---> Cell: epairbNET_ID_NUMBER
 pub const CELL_NET_INTERFACE: &str = "epair";
