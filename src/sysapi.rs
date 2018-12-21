@@ -32,28 +32,13 @@ use fern::Dispatch;
 use chrono::Local;
 use std::fs::File;
 use fern::colors::{Color, ColoredLevelConfig};
-use hostname::get_hostname;
-use std::path::Path;
 use futures::future;
 use tokio::runtime::Runtime;
 
 
-use crate::sysapi::{DEFAULT_ADDRESS, DEFAULT_LOG_FILE, ZFS_BIN, GVR_BIN, DEFAULT_STDOUT_DEV, DEFAULT_HOSTNAME_FALLBACK};
+use crate::sysapi::*;
+use crate::sysapi::helpers::*;
 use crate::sysapi::webrouter::router;
-
-
-/// Perform checks before starting web service:
-fn sanity_checks() {
-    // Perform sanity checks:
-    if !Path::new(ZFS_BIN).exists() {
-        error!("SysAPI requires ZFS functionality available in system!");
-        panic!("FATAL ERROR: ZFS utility is NOT available in system!");
-    }
-    if !Path::new(GVR_BIN).exists() {
-        error!("SysAPI requires 'gvr' script to be available in system!");
-        panic!("FATAL ERROR: 'ServeD-GoVeRnor' is NOT available in system!");
-    }
-}
 
 
 /// Start a server and use a `Router` to dispatch requests
@@ -82,7 +67,7 @@ pub fn main() {
     let mut runtime: Runtime = match Runtime::new() {
         Ok(runtime) => runtime,
         Err(err) => {
-            panic!("SysAPI: Runtime: Assertion Failed! Details: {}", err);
+            panic!("{}: SysAPI: Runtime: Assertion Failed! Details: {}", "FATAL ERROR".blue(), err);
         }
     };
 
@@ -100,8 +85,12 @@ pub fn main() {
         .level(loglevel)
         .chain(
             log_file(DEFAULT_LOG_FILE)
-                .unwrap_or(File::open(DEFAULT_STDOUT_DEV)
-                    .expect(&format!("FATAL ERROR: STDOUT device ({}) is not available! Something is terribly wrong here!", DEFAULT_STDOUT_DEV))
+                .unwrap_or(
+                    File::open(DEFAULT_STDOUT_DEV)
+                        .expect(
+                            &format!("{}: STDOUT device ({}) is not available! Something is terribly wrong here!",
+                                     "FATAL ERROR".blue(), DEFAULT_STDOUT_DEV)
+                        )
                 )
         )
         .apply()
@@ -112,7 +101,8 @@ pub fn main() {
             Ok(())
         })
         .map_err(|err| {
-            error!("FATAL ERROR: Couldn't initialize SysAPI. Details: {}", err.to_string());
+            error!("{}: Couldn't initialize SysAPI. Details: {}",
+                   "FATAL ERROR".blue(), err.to_string());
         })
         .unwrap();
 
@@ -121,7 +111,7 @@ pub fn main() {
 
     runtime.spawn(future::lazy(|| {
         info!("Status: {}, working on hostname: {}",
-              "Online".green(), (get_hostname().unwrap_or(DEFAULT_HOSTNAME_FALLBACK.to_string())).green());
+              "Online".green(), current_hostname().green());
         Ok(())
     }));
 
