@@ -27,6 +27,10 @@ extern crate serde_derive;
 
 // Library constants, used by the project:
 
+/// Default network device name - used by virtual network stack for cells.
+/// Link schema: Host: epairaNET_ID_NUMBER <---> Cell: epairbNET_ID_NUMBER
+pub const CELL_NET_INTERFACE: &str = "epair";
+
 /// Absolute path to libkvmpro.so shared library installed on the production system:
 pub const DEFAULT_LIBKVMPRO_SHARED: &str = "/usr/lib/libkvmpro.so";
 

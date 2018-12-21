@@ -8,7 +8,7 @@ use std::thread; // XXX: temporary
 use std::time::Duration;
 use chrono::{Local, DateTime, Utc};
 use systemstat::*;
-
+use colored::Colorize;
 
 use crate::*;
 use crate::apis::status::*;
@@ -214,7 +214,7 @@ impl Default for Systat {
                     .collect()
             })
             .map_err(|err| {
-                warn!("Mounts: Failure: {}", err);
+                warn!("Mounts: Failure: {}", err.to_string().cyan());
                 err
             })
             .unwrap_or(vec!());
@@ -225,7 +225,7 @@ impl Default for Systat {
                 orig_netifs
                     .values()
                     .filter(|netif| {
-                        ! netif.name.starts_with("epair")
+                        ! netif.name.starts_with(CELL_NET_INTERFACE)
                     })
                     .map(|netif| {
                         let addrs = netif
@@ -272,7 +272,7 @@ impl Default for Systat {
                 )
             })
             .map_err(|err| {
-                warn!("Memory: Failure: {}", err);
+                warn!("Memory: Failure: {}", err.to_string().red());
                 err
             })
             .unwrap_or_default();
@@ -281,7 +281,7 @@ impl Default for Systat {
             .load_average()
             .and_then(|loadavg| {
                 debug!("Load average: 1min: {},  5min: {},  15min: {}",
-                       loadavg.one, loadavg.five, loadavg.fifteen);
+                       loadavg.one.to_string().cyan(), loadavg.five.to_string().cyan(), loadavg.fifteen.to_string().cyan());
                 Ok(
                     SystatSysLoad {
                         one: Some(loadavg.one.into()),
@@ -291,7 +291,7 @@ impl Default for Systat {
                 )
             })
             .map_err(|err| {
-                warn!("Load average: Failure: {}", err);
+                warn!("Load average: Failure: {}", err.to_string().red());
                 err
             })
             .unwrap_or_default();
@@ -300,13 +300,13 @@ impl Default for Systat {
             .uptime()
             .and_then(|uptime| {
                 let duration = Duration::from(uptime);
-                debug!("Uptime: {}s", duration.as_secs());
+                debug!("Uptime: {}s", duration.as_secs().to_string().cyan());
                 Ok(
                    duration.as_secs()
                 )
             })
             .map_err(|err| {
-                warn!("Uptime: Failure: {}", err);
+                warn!("Uptime: Failure: {}", err.to_string().red());
                 err
             })
             .unwrap_or(0);
@@ -317,13 +317,13 @@ impl Default for Systat {
             .boot_time()
             .and_then(|boot_time| {
                 let rfc_date = DateTime::from(boot_time).to_rfc2822();
-                debug!("BootTime: {}", rfc_date);
+                debug!("BootTime: {}", rfc_date.to_string().cyan());
                 Ok(
                    rfc_date
                 )
             })
             .map_err(|err| {
-                warn!("BootTime: Failure: {}", err);
+                warn!("BootTime: Failure: {}", err.to_string().red());
                 err
             })
             .unwrap_or(rfc_date_now);
@@ -331,18 +331,17 @@ impl Default for Systat {
         let cputemp_stat = SYSTEM
             .cpu_temp()
             .and_then(|cpu_temp| {
-                debug!("CPU Temperature: {}", cpu_temp);
+                debug!("CPU Temperature: {}", cpu_temp.to_string().cyan());
                 Ok(cpu_temp)
             })
             .map_err(|err| {
-                warn!("CPU Temperature Failure: {}", err)
+                warn!("CPU Temperature Failure: {}", err.to_string().red())
             })
             .unwrap_or(0.0);
 
         let cpu_stat = SYSTEM
             .cpu_load_aggregate()
             .and_then(|main_cpu| {
-                debug!("CPU Load - Measure in progress…");
                 thread::sleep(Duration::from_millis(250)); // XXX: TODO: make a future from it and process async timeout:
                 main_cpu
                     .done()
@@ -361,7 +360,7 @@ impl Default for Systat {
                     })
             })
             .map_err(|err| {
-                warn!("CPU load: Failure: {}", err);
+                warn!("CPU load: Failure: {}", err.to_string().red());
                 err
             })
             .unwrap_or_default();
