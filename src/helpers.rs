@@ -1,6 +1,6 @@
 use glob::glob;
 use hostname::get_hostname;
-use std::path::Path;
+use std::{path::Path, env};
 use colored::Colorize;
 
 use crate::*;
@@ -10,6 +10,30 @@ use crate::*;
 pub fn current_hostname() -> String {
     get_hostname()
         .unwrap_or(DEFAULT_HOSTNAME_FALLBACK.to_string())
+}
+
+
+/// Get listen address to bind Web-Service
+pub fn listen_address() -> String {
+    match env::var("LISTEN_ADDRESS") {
+        Ok(addr) => addr,
+        Err(_) => DEFAULT_ADDRESS.to_string(),
+    }
+}
+
+
+/// Prints message pack on SysAPI service start:
+pub fn print_header() {
+    let version = env!("CARGO_PKG_VERSION");
+
+    info!("_______________________________________________________________________________________________________");
+    info!("SysAPI {} - design, implementation: {}.", format!("v{}", version).cyan(), CREATED_BY.cyan());
+    info!("               - in active development since 2011.\n");
+    info!("  This project is only a component of the '{}'.", "ServeD-OS project".cyan());
+    info!("               - a {}-driven, modern, open-source, production quality system.", "HardenedBSD".cyan());
+    info!("  Related projects: {}, {}, {}, {}, {}, {}.\n",
+          "svdOS".cyan(), "Sofin".cyan(), "Sofin-definitions".cyan(), "sysapi".cyan(), "kvmpro".cyan(), "Shable".cyan());
+    info!("SysAPI: ControlPane URL: {}", format!("{}://{}", DEFAULT_CONTROLPANE_PROTOCOL, listen_address()).cyan());
 }
 
 
