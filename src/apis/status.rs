@@ -9,7 +9,7 @@ use std::io::BufReader;
 use std::fs::File;
 use mime::*;
 use libc::*;
-
+use colored::Colorize;
 
 use crate::SENTRY_PATH;
 use crate::soload::processes_of_uid;
@@ -105,7 +105,8 @@ impl CellProcesses {
                 if cell_uid > 0 {
                     CellProcesses::of_uid(cell_uid)
                        .and_then(|ps_full| {
-                           debug!("CellProcesses::of_cell(cell_uid: {}): {} JSON: '{}'", cell_uid, a_name, ps_full.to_string());
+                           debug!("CellProcesses::of_cell(cell_uid: {}): {} JSON: '{}'",
+                                  cell_uid.to_string().cyan(), a_name.cyan(), ps_full.to_string().cyan());
                            Ok(ps_full)
                        })
                        .map_err(|err| Error::new(ErrorKind::Other, err.to_string()))
