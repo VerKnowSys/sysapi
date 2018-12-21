@@ -187,201 +187,207 @@ lazy_static! {
 
 impl Default for Systat {
     fn default() -> Systat {
-        let mounts_stat = SYSTEM
-            .mounts()
-            .and_then(|mounts| {
-                mounts
-                    .iter()
-                    .filter(|mount| {
-                        mount.fs_type == "zfs"
-                        && mount.fs_mounted_from != "zroot"
-                        && mount.fs_mounted_from != "zroot/ROOT"
-                        && ! mount // filter out all Prison datasets from Systat
-                                .fs_mounted_on
-                                .contains(PRISON_PATH)
-                    })
-                    .map(|mount| {
-                        Ok(
-                            SystatMount {
-                                fs_mounted_from: Some(mount.fs_mounted_from.to_string()),
-                                fs_type: Some(mount.fs_type.to_string()),
-                                fs_mounted_on: Some(mount.fs_mounted_on.to_string()),
-                                avail: Some(mount.avail.to_string(true)),
-                                total: Some(mount.total.to_string(true)),
-                            }
-                        )
-                    })
-                    .collect()
-            })
-            .map_err(|err| {
-                warn!("Mounts: Failure: {}", err.to_string().cyan());
-                err
-            })
-            .unwrap_or(vec!());
-
-        let networks_stat = SYSTEM
-            .networks()
-            .and_then(|orig_netifs| {
-                orig_netifs
-                    .values()
-                    .filter(|netif| {
-                        ! netif.name.starts_with(CELL_NET_INTERFACE)
-                    })
-                    .map(|netif| {
-                        let addrs = netif
-                            .addrs
+        thread::spawn(
+            move || {
+                let mounts_stat = SYSTEM
+                    .mounts()
+                    .and_then(|mounts| {
+                        mounts
                             .iter()
-                            .map(|nif| {
-                                match nif.addr {
-                                    IpAddr::V4(addr) => {
-                                        format!("{}", addr)
-                                    },
-                                    IpAddr::V6(_addr) => {
-                                        // NOTE: Skip IPv6 format!("{}", addr)
-                                        format!("")
-                                    },
-                                    IpAddr::Empty | IpAddr::Unsupported => {
-                                        format!("")
-                                    },
-                                }
+                            .filter(|mount| {
+                                mount.fs_type == "zfs"
+                                && mount.fs_mounted_from != "zroot"
+                                && mount.fs_mounted_from != "zroot/ROOT"
+                                && ! mount // filter out all Prison datasets from Systat
+                                        .fs_mounted_on
+                                        .contains(PRISON_PATH)
                             })
-                            .filter(|ref nif| ! nif.is_empty())
-                            .collect::<List>();
+                            .map(|mount| {
+                                Ok(
+                                    SystatMount {
+                                        fs_mounted_from: Some(mount.fs_mounted_from.to_string()),
+                                        fs_type: Some(mount.fs_type.to_string()),
+                                        fs_mounted_on: Some(mount.fs_mounted_on.to_string()),
+                                        avail: Some(mount.avail.to_string(true)),
+                                        total: Some(mount.total.to_string(true)),
+                                    }
+                                )
+                            })
+                            .collect()
+                    })
+                    .map_err(|err| {
+                        warn!("Mounts: Failure: {}", err.to_string().cyan());
+                        err
+                    })
+                    .unwrap_or(vec!());
+
+                let networks_stat = SYSTEM
+                    .networks()
+                    .and_then(|orig_netifs| {
+                        orig_netifs
+                            .values()
+                            .filter(|netif| {
+                                ! netif.name.starts_with(CELL_NET_INTERFACE)
+                            })
+                            .map(|netif| {
+                                let addrs = netif
+                                    .addrs
+                                    .iter()
+                                    .map(|nif| {
+                                        match nif.addr {
+                                            IpAddr::V4(addr) => {
+                                                format!("{}", addr)
+                                            },
+                                            IpAddr::V6(_addr) => {
+                                                // NOTE: Skip IPv6 format!("{}", addr)
+                                                format!("")
+                                            },
+                                            IpAddr::Empty | IpAddr::Unsupported => {
+                                                format!("")
+                                            },
+                                        }
+                                    })
+                                    .filter(|ref nif| ! nif.is_empty())
+                                    .collect::<List>();
+                                Ok(
+                                    SystatNetif {
+                                        name: Some(netif.name.to_string()),
+                                        addrs: Some(addrs),
+                                    }
+                                )
+                            })
+                            .collect()
+                    })
+                    .unwrap_or(vec!());
+
+                let memory_stat = SYSTEM
+                    .memory()
+                    .and_then(|mem| {
+                        debug!("Memory total: {}. Memory used: {}. Memory free: {}",
+                                mem.total, mem.total - mem.free, mem.free);
                         Ok(
-                            SystatNetif {
-                                name: Some(netif.name.to_string()),
-                                addrs: Some(addrs),
+                            SystatMemory {
+                                total: Some(ByteSize::from(mem.total).as_usize()),
+                                used: Some(ByteSize::from(mem.total - mem.free).as_usize()),
+                                free: Some(ByteSize::from(mem.free).as_usize()),
                             }
                         )
                     })
-                    .collect()
-            })
-            .unwrap_or(vec!());
+                    .map_err(|err| {
+                        warn!("Memory: Failure: {}", err.to_string().red());
+                        err
+                    })
+                    .unwrap_or_default();
 
-        let memory_stat = SYSTEM
-            .memory()
-            .and_then(|mem| {
-                debug!("Memory total: {}. Memory used: {}. Memory free: {}",
-                        mem.total, mem.total - mem.free, mem.free);
-                Ok(
-                    SystatMemory {
-                        total: Some(ByteSize::from(mem.total).as_usize()),
-                        used: Some(ByteSize::from(mem.total - mem.free).as_usize()),
-                        free: Some(ByteSize::from(mem.free).as_usize()),
-                    }
-                )
-            })
-            .map_err(|err| {
-                warn!("Memory: Failure: {}", err.to_string().red());
-                err
-            })
-            .unwrap_or_default();
-
-        let loadavg_stat = SYSTEM
-            .load_average()
-            .and_then(|loadavg| {
-                debug!("Load average: 1min: {},  5min: {},  15min: {}",
-                       loadavg.one.to_string().cyan(), loadavg.five.to_string().cyan(), loadavg.fifteen.to_string().cyan());
-                Ok(
-                    SystatSysLoad {
-                        one: Some(loadavg.one.into()),
-                        five: Some(loadavg.five.into()),
-                        fifteen: Some(loadavg.fifteen.into()),
-                    }
-                )
-            })
-            .map_err(|err| {
-                warn!("Load average: Failure: {}", err.to_string().red());
-                err
-            })
-            .unwrap_or_default();
-
-        let uptime_stat = SYSTEM
-            .uptime()
-            .and_then(|uptime| {
-                let duration = Duration::from(uptime);
-                debug!("Uptime: {}s", duration.as_secs().to_string().cyan());
-                Ok(
-                   duration.as_secs()
-                )
-            })
-            .map_err(|err| {
-                warn!("Uptime: Failure: {}", err.to_string().red());
-                err
-            })
-            .unwrap_or(0);
-
-        let utc_now = Local::now().naive_local();
-        let rfc_date_now = DateTime::<Utc>::from_utc(utc_now, Utc).to_rfc2822();
-        let boottime_stat = SYSTEM
-            .boot_time()
-            .and_then(|boot_time| {
-                let rfc_date = DateTime::from(boot_time).to_rfc2822();
-                debug!("BootTime: {}", rfc_date.to_string().cyan());
-                Ok(
-                   rfc_date
-                )
-            })
-            .map_err(|err| {
-                warn!("BootTime: Failure: {}", err.to_string().red());
-                err
-            })
-            .unwrap_or(rfc_date_now);
-
-        let cputemp_stat = SYSTEM
-            .cpu_temp()
-            .and_then(|cpu_temp| {
-                debug!("CPU Temperature: {}", cpu_temp.to_string().cyan());
-                Ok(cpu_temp)
-            })
-            .map_err(|err| {
-                warn!("CPU Temperature Failure: {}", err.to_string().red())
-            })
-            .unwrap_or(0.0);
-
-        let cpu_stat = SYSTEM
-            .cpu_load_aggregate()
-            .and_then(|main_cpu| {
-                thread::sleep(Duration::from_millis(250)); // XXX: TODO: make a future from it and process async timeout:
-                main_cpu
-                    .done()
-                    .and_then(|cpu| {
-                        debug!("CPU load: {}% user, {}% nice, {}% system, {}% intr, {}% idle ",
-                            cpu.user * 100.0, cpu.nice * 100.0, cpu.system * 100.0, cpu.interrupt * 100.0, cpu.idle * 100.0);
+                let loadavg_stat = SYSTEM
+                    .load_average()
+                    .and_then(|loadavg| {
+                        debug!("Load average: 1min: {},  5min: {},  15min: {}",
+                               loadavg.one.to_string().cyan(), loadavg.five.to_string().cyan(), loadavg.fifteen.to_string().cyan());
                         Ok(
-                            SystatCPU { // NOTE: percentage:
-                                user: Some(100.0 * cpu.user as f64),
-                                system: Some(100.0 * cpu.system as f64),
-                                interrupt: Some(100.0 * cpu.interrupt as f64),
-                                idle: Some(100.0 * cpu.idle as f64),
-                                temperature: Some(cputemp_stat.into()),
+                            SystatSysLoad {
+                                one: Some(loadavg.one.into()),
+                                five: Some(loadavg.five.into()),
+                                fifteen: Some(loadavg.fifteen.into()),
                             }
                         )
                     })
-            })
-            .map_err(|err| {
-                warn!("CPU load: Failure: {}", err.to_string().red());
-                err
-            })
-            .unwrap_or_default();
+                    .map_err(|err| {
+                        warn!("Load average: Failure: {}", err.to_string().red());
+                        err
+                    })
+                    .unwrap_or_default();
 
-        let superuser_processes = CellProcesses::of_uid(0)
-            .and_then(|processes| {
-                Ok(processes)
-            })
-            .unwrap_or_default();
+                let uptime_stat = SYSTEM
+                    .uptime()
+                    .and_then(|uptime| {
+                        let duration = Duration::from(uptime);
+                        debug!("Uptime: {}s", duration.as_secs().to_string().cyan());
+                        Ok(
+                           duration.as_secs()
+                        )
+                    })
+                    .map_err(|err| {
+                        warn!("Uptime: Failure: {}", err.to_string().red());
+                        err
+                    })
+                    .unwrap_or(0);
 
-        // Now wrap everything with a single structure:
-        Systat {
-            loadavg: Some(loadavg_stat),
-            uptime: Some(uptime_stat),
-            boot_time: Some(boottime_stat.into()),
-            cpu: Some(cpu_stat),
-            memory: Some(memory_stat),
-            mounts: Some(mounts_stat),
-            networks: Some(networks_stat),
-            processes: Some(superuser_processes),
-        }
+                let utc_now = Local::now().naive_local();
+                let rfc_date_now = DateTime::<Utc>::from_utc(utc_now, Utc).to_rfc2822();
+                let boottime_stat = SYSTEM
+                    .boot_time()
+                    .and_then(|boot_time| {
+                        let rfc_date = DateTime::from(boot_time).to_rfc2822();
+                        debug!("BootTime: {}", rfc_date.to_string().cyan());
+                        Ok(
+                           rfc_date
+                        )
+                    })
+                    .map_err(|err| {
+                        warn!("BootTime: Failure: {}", err.to_string().red());
+                        err
+                    })
+                    .unwrap_or(rfc_date_now);
+
+                let cputemp_stat = SYSTEM
+                    .cpu_temp()
+                    .and_then(|cpu_temp| {
+                        debug!("CPU Temperature: {}", cpu_temp.to_string().cyan());
+                        Ok(cpu_temp)
+                    })
+                    .map_err(|err| {
+                        warn!("CPU Temperature Failure: {}", err.to_string().red())
+                    })
+                    .unwrap_or(0.0);
+
+                let cpu_stat = SYSTEM
+                    .cpu_load_aggregate()
+                    .and_then(|main_cpu| {
+                        thread::sleep(Duration::from_millis(DEFAULT_CPUSTAT_INTERVAL));
+                        main_cpu
+                            .done()
+                            .and_then(|cpu| {
+                                debug!("CPU load: {}% user, {}% nice, {}% system, {}% intr, {}% idle ",
+                                    cpu.user * 100.0, cpu.nice * 100.0, cpu.system * 100.0, cpu.interrupt * 100.0, cpu.idle * 100.0);
+                                Ok(
+                                    SystatCPU { // NOTE: percentage:
+                                        user: Some(100.0 * cpu.user as f64),
+                                        system: Some(100.0 * cpu.system as f64),
+                                        interrupt: Some(100.0 * cpu.interrupt as f64),
+                                        idle: Some(100.0 * cpu.idle as f64),
+                                        temperature: Some(cputemp_stat.into()),
+                                    }
+                                )
+                            })
+                    })
+                    .map_err(|err| {
+                        warn!("CPU load: Failure: {}", err.to_string().red());
+                        err
+                    })
+                    .unwrap_or_default();
+
+                let superuser_processes = CellProcesses::of_uid(0)
+                    .and_then(|processes| {
+                        Ok(processes)
+                    })
+                    .unwrap_or_default();
+
+                // Now wrap everything with a single structure:
+                Systat {
+                    loadavg: Some(loadavg_stat),
+                    uptime: Some(uptime_stat),
+                    boot_time: Some(boottime_stat.into()),
+                    cpu: Some(cpu_stat),
+                    memory: Some(memory_stat),
+                    mounts: Some(mounts_stat),
+                    networks: Some(networks_stat),
+                    processes: Some(superuser_processes),
+                }
+            }
+        )
+        .join()
+        .unwrap_or_default()
     }
 }
 
