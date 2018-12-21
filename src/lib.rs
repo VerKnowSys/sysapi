@@ -102,7 +102,7 @@ pub const SYSTAT_CPUSTAT_INTERVAL: u64 = 397; /* ms of interval before CPU usage
 
 /// Time in miliseconds to pause before calling same function again (retry):
 /// NOTE: Don't set this value too low, to avoid flood of the "new threads"
-pub const SOLOAD_MT_CALLS_INTERVAL: u64 = 67; /* ms of interval before trying to call function again (waiting for lock) */
+pub const SOLOAD_MT_CALLS_INTERVAL: u64 = 43; /* ms of interval before trying to call function again (waiting for lock) */
 
 /// Modulo this number == 0, then print info with counter state:
 pub const SOLOAD_MT_INFO_TRIGGER_MODULO_NUM: usize = 10000; /* print info with counter state each 10000 calls */
