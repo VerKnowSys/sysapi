@@ -20,8 +20,8 @@ pub fn sanity_checks() {
         warn!("SysAPI: Shared library: '{}' is not installed yet!", DEFAULT_LIBKVMPRO_SHARED.red());
         warn!("SysAPI: This lib provides APIs of: '{}' and '{}' kernel features used to fetch processes data directly from the kernel.", "Kvm".red(), "procstat".red(),);
         warn!("SysAPI: These APIs are: {} without that library!\n", "completely unusable and unavailable".red());
-        warn!("HINT: To install library from provided git-module: {}, simply do:", "lib/kvmpro".green());
-        warn!("      {}\n", "cd lib/kvmpro && bin/test && bin/install && cd ../..".green());
+        warn!("HINT: To install library from provided git-module: {}, simply do:", "lib/kvmpro".cyan());
+        warn!("      {}\n", "cd lib/kvmpro && bin/test && bin/install && cd ../..".cyan());
         warn!("NOTE: You don't have to restart SysAPI server after installation of the shared-library.");
         warn!("NOTE: Once shared-library will be installed - it will be loaded automatically.\n\n");
     }

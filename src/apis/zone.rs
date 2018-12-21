@@ -52,12 +52,13 @@ impl Zone {
                                 valid_ipv4_to.is_unspecified(),
                                 valid_ipv4_to.is_multicast());
                             let err_msg = format!("validate_domain_addresses(): Validation failed for pair: {} -> {}. Validation details:\n\n{}\n{}\n",
-                                                  valid_ipv4_from.to_string().green(), valid_ipv4_to.to_string().green(),
+                                                  valid_ipv4_from.to_string().yellow(), valid_ipv4_to.to_string().yellow(),
                                                   validate_state.to_string().cyan(), validate_state2.to_string().cyan());
                             error!("{}", err_msg);
                             Err(FromStrError::EmptyLabel)
                         } else {
-                            debug!("validate_domain_addresses(): IPv4 pair: {} -> {}", valid_ipv4_from.to_string().green(), valid_ipv4_to.to_string().green());
+                            debug!("validate_domain_addresses(): IPv4 pair: {} -> {}",
+                                   valid_ipv4_from.to_string().cyan(), valid_ipv4_to.to_string().cyan());
                             Ok((valid_ipv4_from, valid_ipv4_to))
                         }
                     })
@@ -71,7 +72,7 @@ impl Zone {
         let response = ThreadedResolver::new()
             .resolve_host(&domain.parse().unwrap())
             .map(|addresses| {
-                debug!("Domain: {} resolves to IPv4(s): [{}]", &domain.green(), &addresses.iter().map(|e| e.to_string()).collect::<String>().green());
+                debug!("Domain: {} resolves to IPv4(s): [{}]", &domain.cyan(), &addresses.iter().map(|e| e.to_string()).collect::<String>().cyan());
                 addresses
                     .iter()
                     .filter(|&element| !element.to_string().contains(":")) /* NOTE: filter out IPv6 - unsupported yet */
@@ -88,7 +89,7 @@ impl Zone {
             })
             .unwrap_or(Some(ip_localhost));
 
-        info!("Domain: {} resolves to IPv4: {}", domain.green(), resolved_ip.unwrap_or(ip_localhost).to_string().cyan());
+        info!("Domain: {} resolves to IPv4: {}", domain.cyan(), resolved_ip.unwrap_or(ip_localhost).to_string().cyan());
         Ok(resolved_ip.unwrap())
     }
 

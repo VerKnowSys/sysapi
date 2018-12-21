@@ -183,7 +183,7 @@ impl Datasets {
                         })
                         .collect();
                     let final_list = &CUT_LAST_COMMA.replace(&string_list, "");
-                    debug!("List of ZFS snapshots of cell: {}: {}", cell_name.green(), final_list.green());
+                    debug!("List of ZFS snapshots of cell: {}: {}", cell_name.cyan(), final_list.cyan());
                     Ok(final_list.to_string())
                 } else {
                     let error_msg = format!("ZFS snapshot listing failed!");
@@ -238,7 +238,7 @@ impl Snapshot {
                                 }
                             )
                         } else {
-                            let error_msg = format!("Unable to create snapshot: {}@{}", dataset_path.green(), snapshot_name.green());
+                            let error_msg = format!("Unable to create snapshot: {}@{}", dataset_path.cyan(), snapshot_name.cyan());
                             error!("{}", error_msg);
                             Err(
                                 Error::new(ErrorKind::Other, error_msg)
@@ -265,7 +265,7 @@ impl Snapshot {
                           String::from_utf8_lossy(&after_snap.stdout).blue(), String::from_utf8_lossy(&after_snap.stderr).white());
                     Ok(())
                 } else {
-                    let error_msg = format!("Unable to destroy snapshot: {}@{}", dataset_path.green(), snapshot_name.green());
+                    let error_msg = format!("Unable to destroy snapshot: {}@{}", dataset_path.cyan(), snapshot_name.cyan());
                     error!("{}", error_msg);
                     Err(
                         Error::new(ErrorKind::Other, error_msg)
@@ -300,7 +300,7 @@ impl Snapshot {
                         })
                         .collect();
                     let final_list = &CUT_LAST_COMMA.replace(&string_list, "");
-                    debug!("List of ZFS snapshots of cell: {}: [{}]", &cell_name.green(), &final_list.green());
+                    debug!("List of ZFS snapshots of cell: {}: [{}]", &cell_name.cyan(), &final_list.cyan());
                     Ok(final_list.to_string())
                 } else {
                     let error_msg = format!("ZFS snapshot listing failed!");
@@ -341,14 +341,14 @@ impl Snapshot {
                     let matching_line = &CUT_LAST_COMMA.replace(&pre_line, "");
                     match matching_line.as_ref() {
                         "" => {
-                            let error_msg = format!("No such snapshot: {}!", snapshot_name.green());
+                            let error_msg = format!("No such snapshot: {}!", snapshot_name.cyan());
                             error!("{}", error_msg);
                             Err(
                                 Error::new(ErrorKind::Other, error_msg)
                             )
                         },
                         entry => {
-                            debug!("ZFS snapshot matching pattern: '{}' is present. Output matched to: '{}'", snapshot_name.green(), entry.green());
+                            debug!("ZFS snapshot matching pattern: '{}' is present. Output matched to: '{}'", snapshot_name.cyan(), entry.cyan());
                             Ok(entry.to_string())
                         }
                     }

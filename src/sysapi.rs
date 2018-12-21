@@ -95,14 +95,13 @@ pub fn main() {
         )
         .apply()
         .and_then(|_| { // Start main event loop:
-            info!("ServeD-SysAPI {}. Panel URL: {}",
-                format!("v{}", version).green(),
-                format!("http://{}", listen_address).green());
+            info!("SysAPI {} - design, implementation: {}", format!("v{}", version).cyan(), CREATED_BY.cyan());
+            info!("ControlPane URL: {}", format!("http://{}", listen_address).cyan());
             Ok(())
         })
         .map_err(|err| {
             error!("{}: Couldn't initialize SysAPI. Details: {}",
-                   "FATAL ERROR".blue(), err.to_string());
+                   "FATAL ERROR".blue(), err.to_string().red());
         })
         .unwrap();
 
@@ -110,8 +109,8 @@ pub fn main() {
     sanity_checks();
 
     runtime.spawn(future::lazy(|| {
-        info!("Status: {}, working on hostname: {}",
-              "Online".green(), current_hostname().green());
+        info!("SysAPI: Status: {}, working on hostname: {}",
+              "Online".cyan(), current_hostname().cyan());
         Ok(())
     }));
 

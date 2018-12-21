@@ -122,7 +122,7 @@ impl Default for Proxies {
                         let name = cell_name.unwrap_or("");
                         let from = proxy_from.unwrap_or("").replace("_", ".");
                         let to = proxy_to.unwrap_or("").replace("_", ".");
-                        debug!("Proxy for cell: {}. Proxy from: {}. Proxy to: {}", name, from, to);
+                        debug!("Proxy for cell: {}. Proxy from: {}. Proxy to: {}", name.cyan(), from.cyan(), to.cyan());
 
                         Proxy::new(&name.to_string(), &from.to_string(), &to.to_string())
                     })
@@ -185,13 +185,13 @@ impl Proxy {
                     })
                     .and_then(|_| {
                         info!("SysAPI: Proxy: Written Web-Proxy config to file: {}. Which belongs to cell: {}",
-                              &proxy_dest_file.green(), &cell_name.green());
+                              &proxy_dest_file.cyan(), &cell_name.cyan());
                         // Finally - return object metadata- since atomic write succeded at this point:
                         Ok(proxy)
                     })
                     .map_err(|err| {
                         let err_msg = format!("Atomic Write Failed for file: {}. Error details: {}!",
-                                              &proxy_dest_file.green(), err.to_string().red());
+                                              &proxy_dest_file.cyan(), err.to_string().red());
                         error!("{}", err_msg);
                         Error::new(ErrorKind::Other, err_msg)
                     })
@@ -204,15 +204,15 @@ impl Proxy {
         let proxy_file_name = format!("{}_proxyfrom_{}_proxyto_{}.conf", cell_name, from.replace(".", "_"), to.replace(".", "_"));
         let proxy_dest_dir = format!("{}/{}/cell-webconfs", SENTRY_PATH, cell_name);
         let proxy_dest_file = format!("{}/{}", proxy_dest_dir, proxy_file_name);
-        debug!("Calling Proxy::destroy() on file: {}", &proxy_dest_file.green());
+        debug!("Calling Proxy::destroy() on file: {}", &proxy_dest_file.cyan());
 
         match fs::remove_file(&proxy_dest_file) {
             Ok(_) => {
-                debug!("Destroyed Proxy configuration from file: {}", &proxy_dest_file.green());
+                debug!("Destroyed Proxy configuration from file: {}", &proxy_dest_file.cyan());
                 Ok(())
             },
             Err(err) => {
-                let err_msg = format!("Error destroying Proxy file: {}! Error details: {}", &proxy_dest_file.green(), err.to_string().red());
+                let err_msg = format!("Error destroying Proxy file: {}! Error details: {}", &proxy_dest_file.cyan(), err.to_string().red());
                 error!("{}", err_msg);
                 Err(Error::new(ErrorKind::Other, err_msg))
             }
