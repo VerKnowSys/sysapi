@@ -7,7 +7,7 @@ use hyper::{StatusCode, Body, Response};
 use serde_json;
 use chrono::Local;
 use mime::*;
-
+use colored::Colorize;
 
 use crate::*;
 use crate::apis::cell::*;
@@ -183,7 +183,7 @@ impl Datasets {
                         })
                         .collect();
                     let final_list = &CUT_LAST_COMMA.replace(&string_list, "");
-                    debug!("List of ZFS snapshots of cell: {}: {}", cell_name, final_list);
+                    debug!("List of ZFS snapshots of cell: {}: {}", cell_name.green(), final_list.green());
                     Ok(final_list.to_string())
                 } else {
                     let error_msg = format!("ZFS snapshot listing failed!");
@@ -228,7 +228,7 @@ impl Snapshot {
                     .and_then(|after_snap| {
                         if after_snap.status.success() {
                             debug!("ZFS snapshot created:\n{}{}",
-                                  String::from_utf8_lossy(&after_snap.stdout), String::from_utf8_lossy(&after_snap.stderr));
+                                  String::from_utf8_lossy(&after_snap.stdout).blue(), String::from_utf8_lossy(&after_snap.stderr).white());
                             Ok(
                                Snapshot {
                                     name: Some(snapshot_name.to_owned()),
@@ -238,7 +238,7 @@ impl Snapshot {
                                 }
                             )
                         } else {
-                            let error_msg = format!("Unable to create snapshot: {}@{}", dataset_path, snapshot_name);
+                            let error_msg = format!("Unable to create snapshot: {}@{}", dataset_path.green(), snapshot_name.green());
                             error!("{}", error_msg);
                             Err(
                                 Error::new(ErrorKind::Other, error_msg)
@@ -262,10 +262,10 @@ impl Snapshot {
             .and_then(|after_snap| {
                 if after_snap.status.success() {
                     debug!("ZFS snapshot destroyed:\n{}{}",
-                          String::from_utf8_lossy(&after_snap.stdout), String::from_utf8_lossy(&after_snap.stderr));
+                          String::from_utf8_lossy(&after_snap.stdout).blue(), String::from_utf8_lossy(&after_snap.stderr).white());
                     Ok(())
                 } else {
-                    let error_msg = format!("Unable to destroy snapshot: {}@{}", dataset_path, snapshot_name);
+                    let error_msg = format!("Unable to destroy snapshot: {}@{}", dataset_path.green(), snapshot_name.green());
                     error!("{}", error_msg);
                     Err(
                         Error::new(ErrorKind::Other, error_msg)
@@ -300,7 +300,7 @@ impl Snapshot {
                         })
                         .collect();
                     let final_list = &CUT_LAST_COMMA.replace(&string_list, "");
-                    debug!("List of ZFS snapshots of cell: {}: [{}]", &cell_name, &final_list);
+                    debug!("List of ZFS snapshots of cell: {}: [{}]", &cell_name.green(), &final_list.green());
                     Ok(final_list.to_string())
                 } else {
                     let error_msg = format!("ZFS snapshot listing failed!");
@@ -341,14 +341,14 @@ impl Snapshot {
                     let matching_line = &CUT_LAST_COMMA.replace(&pre_line, "");
                     match matching_line.as_ref() {
                         "" => {
-                            let error_msg = format!("No such snapshot: {}!", snapshot_name);
+                            let error_msg = format!("No such snapshot: {}!", snapshot_name.green());
                             error!("{}", error_msg);
                             Err(
                                 Error::new(ErrorKind::Other, error_msg)
                             )
                         },
                         entry => {
-                            debug!("ZFS snapshot matching pattern: '{}' is present. Output matched to: '{}'", snapshot_name, entry);
+                            debug!("ZFS snapshot matching pattern: '{}' is present. Output matched to: '{}'", snapshot_name.green(), entry.green());
                             Ok(entry.to_string())
                         }
                     }
@@ -383,7 +383,7 @@ impl Rollback {
             .and_then(|after_rollback| {
                 if after_rollback.status.success() {
                     debug!("ZFS rollbacked! Output:\n{}{}",
-                          String::from_utf8_lossy(&after_rollback.stdout), String::from_utf8_lossy(&after_rollback.stderr));
+                          String::from_utf8_lossy(&after_rollback.stdout).blue(), String::from_utf8_lossy(&after_rollback.stderr).white());
                     Ok(
                        Rollback {
                            name: Some(snapshot_name.to_owned()),
@@ -393,7 +393,7 @@ impl Rollback {
                        }
                     )
                 } else {
-                    let error_msg = format!("Unable to rollback to: {}@{}", dataset_path, snapshot_name);
+                    let error_msg = format!("Unable to rollback to: {}@{}", dataset_path.cyan(), snapshot_name.cyan());
                     error!("{}", error_msg);
                     Err(
                         Error::new(ErrorKind::Other, error_msg)
