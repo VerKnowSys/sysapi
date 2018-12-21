@@ -85,6 +85,15 @@ pub const SENTRY_PATH: &str = "/Shared/Prison/Sentry";
 /// Default protocol for ControlPane:
 pub const DEFAULT_CONTROLPANE_PROTOCOL: &str = "http";
 
+/// Default Cell NetID/ UID state filename:
+pub const DEFAULT_CELL_NETID_FILE: &str = "cell.vlan.number";
+
+/// Default Cell IP address state filename:
+pub const DEFAULT_CELL_IP_FILE: &str = "cell.ip.addresses";
+
+/// Default Cell running state filename:
+pub const DEFAULT_CELL_RUNSTATE_FILE: &str = "cell.running";
+
 /// CpuStat measure interval:
 pub const SYSTAT_CPUSTAT_INTERVAL: u64 = 397; /* ms of interval before CPU usage measure takes place */
 
