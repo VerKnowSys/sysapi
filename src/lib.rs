@@ -14,6 +14,9 @@
         unused_import_braces,
         unused_qualifications)]
 
+/// Use Jemalloc as default allocator:
+#[global_allocator]
+static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
 
 #[macro_use]
 extern crate lazy_static;
