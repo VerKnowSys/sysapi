@@ -84,7 +84,7 @@ impl CellProcesses {
 
 
     /// Status of all ressident processes of cell by a_name
-    pub fn of_cell(a_name: &String) -> Result<Self, Error> {
+    pub fn of_cell(a_name: &str) -> Result<Self, Error> {
         let sentry_dir = format!("{}/{}", SENTRY_PATH, a_name);
         let netid_file = format!("{}/{}", sentry_dir, DEFAULT_CELL_NETID_FILE);
         File::open(&netid_file)

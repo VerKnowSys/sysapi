@@ -166,7 +166,7 @@ impl Proxy {
 
 
     /// Create new Web Proxy configuration:
-    pub fn create(cell_name: &String, from: &String, to: &String) -> Result<Proxy, Error> {
+    pub fn create(cell_name: &str, from: &str, to: &str) -> Result<Proxy, Error> {
         Proxy::new(cell_name, from, to)
             .and_then(|proxy| {
                 // Write Nginx proxy object to local file under dir: /Shared/Prison/Sentry/CELLNAME/cell-webconfs/*.conf:
@@ -200,7 +200,7 @@ impl Proxy {
 
 
     /// Destroy Web Proxy configuration:
-    pub fn destroy(cell_name: &String, from: &String, to: &String) -> Result<(), Error> {
+    pub fn destroy(cell_name: &str, from: &str, to: &str) -> Result<(), Error> {
         let proxy_file_name = format!("{}_proxyfrom_{}_proxyto_{}.conf", cell_name, from.replace(".", "_"), to.replace(".", "_"));
         let proxy_dest_dir = format!("{}/{}/cell-webconfs", SENTRY_PATH, cell_name);
         let proxy_dest_file = format!("{}/{}", proxy_dest_dir, proxy_file_name);
@@ -221,7 +221,7 @@ impl Proxy {
 
 
     /// Nginx proxy config from predefined template:
-    pub fn config_from_template(from_domain: &String, to_domain: &String) -> String {
+    pub fn config_from_template(from_domain: &str, to_domain: &str) -> String {
         /*
          * external/public domain is proxied to internal one
          * We explicitly set Nginx to re-resolve domains

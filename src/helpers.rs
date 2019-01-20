@@ -72,7 +72,7 @@ pub fn sanity_checks() {
 
 
 /// Produce list of dirs/files matching given glob pattern:
-pub fn produce_list(glob_pattern: &String) -> Vec<String> {
+pub fn produce_list(glob_pattern: &str) -> Vec<String> {
     let mut list = vec!();
     for entry in glob(&glob_pattern).unwrap() {
         match entry {
@@ -100,7 +100,7 @@ pub fn produce_list(glob_pattern: &String) -> Vec<String> {
 
 
 /// Lists all cell attributes => /Shared/Prison/Sentry/CELLNAME/cell-attributes/*
-pub fn list_attributes(cell_name: &String) -> Vec<String> {
+pub fn list_attributes(cell_name: &str) -> Vec<String> {
     let glob_pattern = format!("{}/{}/cell-attributes/*", SENTRY_PATH, cell_name);
     debug!("list_attributes(): {}", glob_pattern);
     produce_list(&glob_pattern)

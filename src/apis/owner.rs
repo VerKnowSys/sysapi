@@ -108,7 +108,7 @@ impl Owner {
 
 
     /// Create new Owner
-    pub fn new(name: &String, key: &String) -> Owner {
+    pub fn new(name: &str, key: &str) -> Owner {
         Owner {
             name: Some(name.to_string()),
             key: Some(key.to_string()),

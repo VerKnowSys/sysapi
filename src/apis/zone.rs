@@ -28,7 +28,7 @@ impl Zone {
 
 
     /// Validate each domain pair (from => to)— has also valid/resolvable/non-local address:
-    pub fn validate_domain_addresses(from: &String, to: &String) -> Result<(IpAddr, IpAddr), FromStrError> {
+    pub fn validate_domain_addresses(from: &str, to: &str) -> Result<(IpAddr, IpAddr), FromStrError> {
         Zone::lookup_domain(from)
             .and_then(|valid_ipv4_from| {
                 Zone::lookup_domain(to)
@@ -67,7 +67,7 @@ impl Zone {
 
 
     /// Asynchronously resolves first available IPv4 defined for given "domain":
-    pub fn lookup_domain(domain: &String) -> Result<IpAddr, FromStrError> {
+    pub fn lookup_domain(domain: &str) -> Result<IpAddr, FromStrError> {
         let ip_localhost = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)); // Used as fallback if domain resolve fails
         let response = ThreadedResolver::new()
             .resolve_host(&domain.parse().unwrap())
