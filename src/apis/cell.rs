@@ -115,7 +115,7 @@ impl Default for Cells {
 impl ToString for Cell {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
+            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}"))
     }
 }
 
@@ -124,7 +124,7 @@ impl ToString for Cell {
 impl ToString for Cells {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
+            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}"))
     }
 }
 
@@ -140,7 +140,7 @@ impl IntoResponse for Cell {
                     StatusCode::OK,
                     APPLICATION_JSON,
                     serde_json::to_string(&self)
-                        .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
+                        .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}")),
                 ),
             None =>
                 create_response(
@@ -162,7 +162,7 @@ impl IntoResponse for Cells {
             StatusCode::OK,
             APPLICATION_JSON,
             serde_json::to_string(&self)
-                .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
+                .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}")),
         )
     }
 }
@@ -178,7 +178,7 @@ impl Cell {
 
 
     /// Load cell state from system files:
-    pub fn state(name: &String) -> Option<Cell> {
+    pub fn state(name: &str) -> Option<Cell> {
         let sentry_dir = format!("{}/{}", SENTRY_PATH, name);
         let attributes_dir = format!("{}/{}", sentry_dir, "cell-attributes");
         let status_file = format!("{}/{}", sentry_dir, DEFAULT_CELL_RUNSTATE_FILE);
@@ -203,7 +203,7 @@ impl Cell {
                     error!("Couldn't read cell file: {}. Fallback to 127.1", ipv4_file.cyan());
                     err
                 })
-                .unwrap_or(DEFAULT_IP_FALLBACK.to_string());
+                .unwrap_or_else(|_| DEFAULT_IP_FALLBACK.to_string());
 
             // netid => /Shared/Prison/Sentry/CELLNAME/cell.vlan.number
             let netid = File::open(&netid_file)
@@ -220,7 +220,7 @@ impl Cell {
                     error!("Couldn't read cell netid file: {}. Fallback to 0", netid_file.cyan());
                     err
                 })
-                .unwrap_or("0".to_string());
+                .unwrap_or_else(|_| "0".to_string());
 
             // domain => /Shared/Prison/Sentry/CELLNAME/cell-domains/local.conf
             let domain = File::open(&domain_file)
@@ -250,7 +250,7 @@ impl Cell {
                     error!("Couldn't read domain file: {}. Reason: {}. Fallback to localhost!", domain_file.cyan(), err.to_string().cyan());
                     err
                 })
-                .unwrap_or(DEFAULT_HOSTNAME_FALLBACK.to_string());
+                .unwrap_or_else(|_| DEFAULT_HOSTNAME_FALLBACK.to_string());
 
             // status => /Shared/Prison/Sentry/CELLNAME/cell.status
             let status = File::open(&status_file)
@@ -279,7 +279,7 @@ impl Cell {
                             error!("{}", err);
                             err
                         })
-                        .unwrap_or(String::from(""));
+                        .unwrap_or_else(|_| String::from(""));
                     debug!("Cell: {}, attribute: {}, value: {}", name.cyan(), attribute.cyan(), attribute_value.cyan());
                     format!("{}={}", attribute, attribute_value)
                 })
@@ -291,9 +291,7 @@ impl Cell {
                 domain: Some(domain),
                 netid: Some(netid),
                 attributes: Some(attributes),
-                status: status,
-
-                .. Cell::default()
+                status,
             };
             debug!("Get cell: {}", cell_result.to_string().cyan());
             Some(cell_result)
@@ -308,7 +306,7 @@ impl Cell {
 
 
 /// Add SSH pubkey to a cell
-pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<(), Error> {
+pub fn add_ssh_pubkey_to_cell(name: &str, ssh_pubkey: &str) -> Result<(), Error> {
     Command::new(GVR_BIN)
         .arg("set")
         .arg(name)
@@ -329,7 +327,7 @@ pub fn add_ssh_pubkey_to_cell(name: &String, ssh_pubkey: &String) -> Result<(), 
 
 
 /// Create cell
-pub fn create_cell(name: &String) -> Result<(), Error> {
+pub fn create_cell(name: &str) -> Result<(), Error> {
     Command::new(GVR_BIN)
         .arg("create")
         .arg(name)
@@ -348,7 +346,7 @@ pub fn create_cell(name: &String) -> Result<(), Error> {
 
 
 /// Destroy cell
-pub fn destroy_cell(name: &String) -> Result<(), Error> {
+pub fn destroy_cell(name: &str) -> Result<(), Error> {
     Command::new(GVR_BIN)
         .arg("destroy")
         .arg(name)

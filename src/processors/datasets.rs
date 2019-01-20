@@ -90,7 +90,7 @@ pub fn zfs_dataset_list_handler(state: State) -> (State, Response<Body>) {
             error!("Datasets list. Error details: {}", err);
             err
         })
-        .unwrap_or(String::from(""));
+        .unwrap_or_else(|_| String::from(""));
     match pre_list.as_ref() {
         "" => {
             let res = create_response(&state, StatusCode::NOT_FOUND, APPLICATION_JSON,
@@ -122,7 +122,7 @@ pub fn zfs_snapshot_list_handler(state: State) -> (State, Response<Body>) {
             error!("Snapshot list error: {}", err);
             err
         })
-        .unwrap_or(String::from(""));
+        .unwrap_or_else(|_| String::from(""));
     match pre_list.as_ref() {
         "" => {
             let res = create_response(&state, StatusCode::NOT_FOUND, APPLICATION_JSON,
@@ -152,7 +152,7 @@ pub fn zfs_snapshot_get_handler(state: State) -> (State, Snapshot) {
             error!("Snapshot state check error: {}", err);
             err
         })
-        .unwrap_or(String::from(""));
+        .unwrap_or_else(|_| String::from(""));
     match list.as_ref() {
         "" => {
             debug!("Empty snapshot - Not found: @{}", snapshot_name);

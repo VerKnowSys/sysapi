@@ -133,7 +133,7 @@ impl Default for CellProcesses {
 impl ToString for CellProcess {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or(String::from("{\"status\": \"SerializationFailure: CellProcess\"}"))
+            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure: CellProcess\"}"))
     }
 }
 
@@ -142,7 +142,7 @@ impl ToString for CellProcess {
 impl ToString for CellProcesses {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or(String::from("{\"status\": \"SerializationFailure: CellProcesses\"}"))
+            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure: CellProcesses\"}"))
     }
 }
 
@@ -155,7 +155,7 @@ impl IntoResponse for CellProcess {
             StatusCode::OK,
             APPLICATION_JSON,
             serde_json::to_string(&self)
-                .unwrap_or(String::from("{\"status\": \"SerializationFailure: CellProcess\"}")),
+                .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure: CellProcess\"}")),
         )
     }
 }
@@ -171,7 +171,7 @@ impl IntoResponse for CellProcesses {
                     StatusCode::OK,
                     APPLICATION_JSON,
                     serde_json::to_string(&self)
-                        .unwrap_or(String::from("{\"status\": \"SerializationFailure: CellProcesses\"}")),
+                        .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure: CellProcesses\"}")),
                 ),
             None =>
                 create_response(

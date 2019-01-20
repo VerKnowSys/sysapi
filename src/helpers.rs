@@ -9,7 +9,7 @@ use crate::*;
 /// Get current hostname as String
 pub fn current_hostname() -> String {
     get_hostname()
-        .unwrap_or(DEFAULT_HOSTNAME_FALLBACK.to_string())
+        .unwrap_or_else(|| DEFAULT_HOSTNAME_FALLBACK.to_string())
 }
 
 

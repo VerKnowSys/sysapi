@@ -136,7 +136,7 @@ impl Default for Proxies {
 impl ToString for Proxy {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
+            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}"))
     }
 }
 
@@ -145,7 +145,7 @@ impl Proxy {
 
 
     /// Generate proxy entry (validation pass for: from/to is required)
-    pub fn new(cell_name: &String, from: &String, to: &String) -> Result<Proxy, Error> {
+    pub fn new(cell_name: &str, from: &str, to: &str) -> Result<Proxy, Error> {
         Zone::validate_domain_addresses(from, to)
             .and_then(|(valid_ipv4_from, valid_ipv4_to)| {
                 // When both domains are valid, create Proxy object:
@@ -243,7 +243,7 @@ server {{
 }}
     ",
         from_domain,
-        &DEFAULT_DNS.parse().unwrap_or(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1))), // resolver
+        &DEFAULT_DNS.parse().unwrap_or_else(|_| IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1))), // resolver
         to_domain)
     }
 
@@ -262,7 +262,7 @@ impl IntoResponse for Proxy {
                     StatusCode::OK,
                     APPLICATION_JSON,
                     serde_json::to_string(&self)
-                        .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
+                        .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}")),
                 ),
             None =>
                 create_response(
@@ -284,7 +284,7 @@ impl IntoResponse for Proxies {
             StatusCode::OK,
             APPLICATION_JSON,
             serde_json::to_string(&self)
-                .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
+                .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}")),
         )
     }
 }

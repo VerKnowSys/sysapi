@@ -219,7 +219,7 @@ impl Default for Systat {
                         warn!("Mounts: Failure: {}", err.to_string().cyan());
                         err
                     })
-                    .unwrap_or(vec!());
+                    .unwrap_or_else(|_| vec!());
 
                 let networks_stat = SYSTEM
                     .networks()
@@ -258,7 +258,7 @@ impl Default for Systat {
                             })
                             .collect()
                     })
-                    .unwrap_or(vec!());
+                    .unwrap_or_else(|_| vec!());
 
                 let memory_stat = SYSTEM
                     .memory()
@@ -396,7 +396,7 @@ impl Default for Systat {
 impl ToString for Systat {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
+            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}"))
     }
 }
 

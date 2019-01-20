@@ -87,7 +87,7 @@ impl Zone {
             .and_then(|ipv4_resolved| {
                 Ok(ipv4_resolved)
             })
-            .unwrap_or(Some(ip_localhost));
+            .unwrap_or_else(|_| Some(ip_localhost));
 
         info!("Domain: {} resolves to IPv4: {}", domain.cyan(), resolved_ip.unwrap_or(ip_localhost).to_string().cyan());
         Ok(resolved_ip.unwrap())

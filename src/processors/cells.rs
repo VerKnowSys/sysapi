@@ -73,7 +73,7 @@ pub fn cells_get_handler(state: State) -> (State, Cells) {
 pub fn cell_get_handler(state: State) -> (State, Cell) {
     let uri = Uri::borrow_from(&state).to_string();
     let name = uri.replace(CELL_RESOURCE, "");
-    (state, Cell::state(&name).unwrap_or(Cell::new())) // XXX: TODO: it should load current service state and return json
+    (state, Cell::state(&name).unwrap_or_default()) // XXX: TODO: it should load current service state and return json
 }
 
 

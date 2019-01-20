@@ -82,7 +82,7 @@ pub struct Datasets {
 impl ToString for Snapshot {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
+            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}"))
     }
 }
 
@@ -91,7 +91,7 @@ impl ToString for Snapshot {
 impl ToString for Snapshots {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
+            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}"))
     }
 }
 
@@ -100,7 +100,7 @@ impl ToString for Snapshots {
 impl ToString for Rollback {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
+            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}"))
     }
 }
 
@@ -116,7 +116,7 @@ impl IntoResponse for Snapshot {
                     StatusCode::OK,
                     APPLICATION_JSON,
                     serde_json::to_string(&self)
-                        .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
+                        .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}")),
                 ),
             None =>
                 create_response(
@@ -140,7 +140,7 @@ impl IntoResponse for Rollback {
                     StatusCode::OK,
                     APPLICATION_JSON,
                     serde_json::to_string(&self)
-                        .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
+                        .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}")),
                 ),
             None =>
                 create_response(

@@ -76,10 +76,10 @@ pub fn main() {
         .level(loglevel)
         .chain(
             log_file(DEFAULT_LOG_FILE)
-                .unwrap_or(
+                .unwrap_or_else(|_|
                     File::open(DEFAULT_STDOUT_DEV)
-                        .expect(
-                            &format!("{}: STDOUT device '{}' is not available! Something is terribly wrong here!",
+                        .unwrap_or_else(|_|
+                            panic!("{}: STDOUT device '{}' is not available! Something is terribly wrong here!",
                                      "FATAL ERROR".blue(), DEFAULT_STDOUT_DEV.cyan())
                         )
                 )

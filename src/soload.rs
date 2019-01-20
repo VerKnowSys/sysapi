@@ -38,15 +38,15 @@ pub fn string_from_native_fn(fun_symbol_name: &[u8], uid: uid_t) -> String {
             let object: kvmpro_t = function_from_symbol(uid);
             forget(lib); // NOTE: Skipping this call causes significant memory leak per-each function call!
             Ok(
-               String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or(empty_list_string())
+               String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or_else(|_| empty_list_string())
             )
         })
         .map_err(|err| {
-            let function_name = String::from_utf8(fun_symbol_name.to_vec()).unwrap_or("fn_with_no_name".to_string());
+            let function_name = String::from_utf8(fun_symbol_name.to_vec()).unwrap_or_else(|_| "fn_with_no_name".to_string());
             error!("FAILURE of: {}(): No such function-symbol found in library: {}. Details: {}.",
                    function_name.cyan(), DEFAULT_LIBKVMPRO_SHARED.cyan(), err.to_string().red());
         })
-        .unwrap_or(empty_list_string())
+        .unwrap_or_else(|_| empty_list_string())
 }
 
 
@@ -72,7 +72,7 @@ pub fn processes_of_uid(uid: uid_t) -> String {
         }
     )
     .join()
-    .unwrap_or(empty_list_string())
+    .unwrap_or_else(|_| empty_list_string())
 }
 
 
@@ -98,7 +98,7 @@ pub fn processes_of_uid_short(uid: uid_t) -> String {
         }
     )
     .join()
-    .unwrap_or(empty_list_string())
+    .unwrap_or_else(|_| empty_list_string())
 }
 
 
@@ -108,10 +108,10 @@ pub fn processes_of_uid_short(uid: uid_t) -> String {
 //
 //
 // let object: kvmpro_t = unsafe { get_process_usage_t(uid) };
-// String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or(empty_list_string())
+// String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or_else(|_| empty_list_string())
 //
 // let object: kvmpro_t = unsafe { get_process_usage_short_t(uid) };
-// String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or(empty_list_string())
+// String::from_utf8(object.bytes[0..object.length].to_vec()).unwrap_or_else(|_| empty_list_string())
 //
 // extern "C" {
 //     /// Get processes + network connections - directly from kernel
