@@ -93,7 +93,7 @@ pub fn cell_post_handler(mut state: State) -> Box<HandlerFuture> {
             Ok(valid_body) => {
                 let uri = Uri::borrow_from(&state).to_string();
                 let name = uri.replace(CELL_RESOURCE, "");
-                let ssh_pubkey = String::from_utf8(valid_body.to_vec()).unwrap_or(String::new()); // Read SSH pubkey from request body:
+                let ssh_pubkey = String::from_utf8(valid_body.to_vec()).unwrap_or_default(); // Read SSH pubkey from request body:
                 info!("Got request to create new cell: {}, with ed25519-pubkey: {} (key-length: {})",
                       name, ssh_pubkey, ssh_pubkey.len());
 

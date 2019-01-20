@@ -79,7 +79,6 @@ impl CellProcesses {
     pub fn of_uid(an_uid: uid_t) -> Result<Self, serde_json::Error> {
         let procs_json = processes_of_uid(an_uid); // Deserialize JSON to CellProcesses structure
         serde_json::from_str(&procs_json)
-            .and_then(|cell_processes| Ok(cell_processes))
     }
 
 
@@ -97,7 +96,6 @@ impl CellProcesses {
             .and_then(|uid_line| {
                 uid_line
                     .parse::<u32>()
-                    .and_then(|cell_uid| Ok(cell_uid))
                     .map_err(|err| Error::new(ErrorKind::Other, err.to_string()))
             })
             .and_then(|cell_uid| {

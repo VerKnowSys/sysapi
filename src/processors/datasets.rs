@@ -28,10 +28,9 @@ pub fn zfs_snapshot_delete_handler(mut state: State) -> Box<HandlerFuture> {
             Ok(valid_body) => {
                 let uri = Uri::borrow_from(&state).to_string();
                 let cell_and_snapshot_name = uri.replace(SNAPSHOT_RESOURCE, "");
-                let snapshot_name: String = cell_and_snapshot_name.split("/").skip(1).take(1).collect();
-                let cell_name: String = cell_and_snapshot_name.split("/").take(1).collect();
-                let dataset_path = String::from_utf8(valid_body.to_vec())
-                                                        .unwrap_or(String::new()); // Read full ZFS dataset path from the body
+                let snapshot_name: String = cell_and_snapshot_name.split('/').skip(1).take(1).collect();
+                let cell_name: String = cell_and_snapshot_name.split('/').take(1).collect();
+                let dataset_path = String::from_utf8(valid_body.to_vec()).unwrap_or_default(); // Read full ZFS dataset path from the body
                 debug!("zfs_snapshot_get_handler(): About to destroy snapshot: {}@{} of cell: {}",
                        dataset_path, snapshot_name, cell_name);
                 if dataset_path.len() < 10
@@ -79,7 +78,7 @@ pub fn zfs_snapshot_delete_handler(mut state: State) -> Box<HandlerFuture> {
 pub fn zfs_dataset_list_handler(state: State) -> (State, Response<Body>) {
     let uri = Uri::borrow_from(&state).to_string();
     let cell_and_snapshot_name = uri.replace(DATASETS_RESOURCE, "");
-    let cell_name: String = cell_and_snapshot_name.split("/").skip(1).take(1).collect(); // first is "list", second "cell_name"
+    let cell_name: String = cell_and_snapshot_name.split('/').skip(1).take(1).collect(); // first is "list", second "cell_name"
 
     let pre_list = Datasets::list(&cell_name)
         .and_then(|string_list| {
@@ -111,7 +110,7 @@ pub fn zfs_dataset_list_handler(state: State) -> (State, Response<Body>) {
 pub fn zfs_snapshot_list_handler(state: State) -> (State, Response<Body>) {
     let uri = Uri::borrow_from(&state).to_string();
     let cell_and_snapshot_name = uri.replace(SNAPSHOT_RESOURCE, "");
-    let cell_name: String = cell_and_snapshot_name.split("/").skip(1).take(1).collect(); // first is "list", second "cell_name"
+    let cell_name: String = cell_and_snapshot_name.split('/').skip(1).take(1).collect(); // first is "list", second "cell_name"
 
     let pre_list = Snapshot::list(&cell_name)
         .and_then(|string_list| {
@@ -143,11 +142,10 @@ pub fn zfs_snapshot_list_handler(state: State) -> (State, Response<Body>) {
 pub fn zfs_snapshot_get_handler(state: State) -> (State, Snapshot) {
     let uri = Uri::borrow_from(&state).to_string();
     let cell_and_snapshot_name = uri.replace(SNAPSHOT_RESOURCE, "");
-    let cell_name: String = cell_and_snapshot_name.split("/").take(1).collect();
-    let snapshot_name: String = cell_and_snapshot_name.split("/").skip(1).take(1).collect();
+    let cell_name: String = cell_and_snapshot_name.split('/').take(1).collect();
+    let snapshot_name: String = cell_and_snapshot_name.split('/').skip(1).take(1).collect();
 
     let list = Snapshot::state(&cell_name, &snapshot_name)
-        .and_then(|snapshot| Ok(snapshot))
         .map_err(|err| {
             error!("Snapshot state check error: {}", err);
             err
@@ -159,7 +157,7 @@ pub fn zfs_snapshot_get_handler(state: State) -> (State, Snapshot) {
             (state, Snapshot::default())
         },
         snapshot => {
-            let dataset_path: &String = &snapshot.split("@").take(1).collect();
+            let dataset_path: &String = &snapshot.split('@').take(1).collect();
             let snapshot_obj = Snapshot::new(&cell_name,
                                              &dataset_path.replace("\\\"", "").replace("\"", ""),
                                              &snapshot_name).unwrap();
@@ -179,10 +177,10 @@ pub fn zfs_snapshot_post_handler(mut state: State) -> Box<HandlerFuture> {
             Ok(valid_body) => {
                 let uri = Uri::borrow_from(&state).to_string();
                 let cell_and_snapshot_name = uri.replace(SNAPSHOT_RESOURCE, "");
-                let cell_name: String = cell_and_snapshot_name.split("/").take(1).collect();
-                let snapshot_name: String = cell_and_snapshot_name.split("/").skip(1).take(1).collect();
+                let cell_name: String = cell_and_snapshot_name.split('/').take(1).collect();
+                let snapshot_name: String = cell_and_snapshot_name.split('/').skip(1).take(1).collect();
 
-                let dataset_path = String::from_utf8(valid_body.to_vec()).unwrap_or(String::new()); // Read ZFS dataset_path
+                let dataset_path = String::from_utf8(valid_body.to_vec()).unwrap_or_default(); // Read ZFS dataset_path
                 info!("Got request to create new snapshot: {}@{} for cell: {}",
                       dataset_path, snapshot_name, cell_name);
 
@@ -192,7 +190,7 @@ pub fn zfs_snapshot_post_handler(mut state: State) -> Box<HandlerFuture> {
                     || snapshot_name.len() > 27
                     || dataset_path.len() < 9 // zroot/nme - minimal dataset path
                     || dataset_path.len() > 512
-                    || dataset_path.contains("@") {
+                    || dataset_path.contains('@') {
                     let res = create_response(&state, StatusCode::NOT_ACCEPTABLE, APPLICATION_JSON, Body::from("{\"status\": \"Not Acceptable\"}"));
                     future::ok((state, res))
                 } else {
@@ -225,9 +223,9 @@ pub fn zfs_rollback_post_handler(mut state: State) -> Box<HandlerFuture> {
             Ok(valid_body) => {
                 let uri = Uri::borrow_from(&state).to_string();
                 let cell_and_snapshot_name = uri.replace(ROLLBACK_RESOURCE, "");
-                let cell_name: String = cell_and_snapshot_name.split("/").take(1).collect();
-                let snapshot_name: String = cell_and_snapshot_name.split("/").skip(1).take(1).collect();
-                let dataset_path = String::from_utf8(valid_body.to_vec()).unwrap_or(String::new()); // Read ZFS dataset_path
+                let cell_name: String = cell_and_snapshot_name.split('/').take(1).collect();
+                let snapshot_name: String = cell_and_snapshot_name.split('/').skip(1).take(1).collect();
+                let dataset_path = String::from_utf8(valid_body.to_vec()).unwrap_or_default(); // Read ZFS dataset_path
                 info!("Got request for rollback to: {}@{} for cell: {}",
                       dataset_path, snapshot_name, cell_name);
 
@@ -237,7 +235,7 @@ pub fn zfs_rollback_post_handler(mut state: State) -> Box<HandlerFuture> {
                     || snapshot_name.len() > 27
                     || dataset_path.len() < 9 // zroot/nme - minimal dataset path
                     || dataset_path.len() > 512
-                    || dataset_path.contains("@") {
+                    || dataset_path.contains('@') {
                     let res = create_response(&state, StatusCode::NOT_ACCEPTABLE, APPLICATION_JSON, Body::from("{\"status\": \"Not Acceptable\"}"));
                     future::ok((state, res))
                 } else {

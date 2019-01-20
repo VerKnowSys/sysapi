@@ -46,14 +46,14 @@ pub fn router() -> Router {
         // …/version
         route
             .associate(
-                &format!("/version"), |handler| {
+                &"/version".to_string(), |handler| {
                     handler.get().to(api_version_get_handler);
                 });
 
         // …/systat
         route
             .associate(
-                &format!("/systat"), |handler| {
+                &"/systat".to_string(), |handler| {
                     handler.get().to(api_systat_get_handler);
                 });
 

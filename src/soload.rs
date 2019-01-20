@@ -12,7 +12,7 @@ use crate::{*, helpers::empty_list_string};
 /// Data structure, returned by functions dynamically loaded from: libkvmpro.so:
 pub struct kvmpro_t {
     length: size_t,
-    bytes: [u8; 262144],
+    bytes: [u8; 262_144],
 }
 
 
@@ -66,7 +66,7 @@ pub fn processes_of_uid(uid: uid_t) -> String {
                 Err(err) => {
                     debug!("Failed to acquire thread lock. Details: {}", err.to_string().red());
                     sleep(Duration::from_millis(SOLOAD_MT_CALLS_INTERVAL));
-                    return processes_of_uid(uid)
+                    processes_of_uid(uid)
                 }
             }
         }
@@ -92,7 +92,7 @@ pub fn processes_of_uid_short(uid: uid_t) -> String {
                 Err(err) => {
                     debug!("Failed to acquire thread lock. Details: {}", err.to_string().red());
                     sleep(Duration::from_millis(SOLOAD_MT_CALLS_INTERVAL));
-                    return processes_of_uid_short(uid)
+                    processes_of_uid_short(uid)
                 }
             }
         }

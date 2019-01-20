@@ -174,7 +174,7 @@ impl Datasets {
             .and_then(|after_snap| {
                 if after_snap.status.success() {
                     let string_list: String = String::from_utf8_lossy(&after_snap.stdout)
-                        .split("\n")
+                        .split('\n')
                         .filter(|elem| {
                             elem.contains(cell_name)
                         })
@@ -186,7 +186,7 @@ impl Datasets {
                     debug!("List of ZFS snapshots of cell: {}: {}", cell_name.cyan(), final_list.cyan());
                     Ok(final_list.to_string())
                 } else {
-                    let error_msg = format!("ZFS snapshot listing failed!");
+                    let error_msg = "ZFS snapshot listing failed!".to_string();
                     error!("{}", error_msg);
                     Err(
                         Error::new(ErrorKind::Other, error_msg)
@@ -291,7 +291,7 @@ impl Snapshot {
             .and_then(|after_snap| {
                 if after_snap.status.success() {
                     let string_list: String = String::from_utf8_lossy(&after_snap.stdout)
-                        .split("\n")
+                        .split('\n')
                         .filter(|elem| {
                             elem.contains(cell_name)
                         })
@@ -303,7 +303,7 @@ impl Snapshot {
                     debug!("List of ZFS snapshots of cell: {}: [{}]", &cell_name.cyan(), &final_list.cyan());
                     Ok(final_list.to_string())
                 } else {
-                    let error_msg = format!("ZFS snapshot listing failed!");
+                    let error_msg = "ZFS snapshot listing failed!".to_string();
                     error!("{}", error_msg);
                     Err(
                         Error::new(ErrorKind::Other, error_msg)
@@ -330,7 +330,7 @@ impl Snapshot {
                 if after_snap.status.success() {
                     let stdout = String::from_utf8_lossy(&after_snap.stdout);
                     let pre_line: String = stdout
-                        .split("\n")
+                        .split('\n')
                         .filter(|elem| {
                             elem.contains(&format!("@{}", snapshot_name))
                         })
@@ -353,7 +353,7 @@ impl Snapshot {
                         }
                     }
                 } else {
-                    let error_msg = format!("Failed to list any snapshot!");
+                    let error_msg = "Failed to list any snapshot!".to_string();
                     error!("{}", error_msg);
                     Err(
                         Error::new(ErrorKind::Other, error_msg)

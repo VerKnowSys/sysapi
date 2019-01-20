@@ -240,10 +240,10 @@ impl Default for Systat {
                                             },
                                             IpAddr::V6(_addr) => {
                                                 // NOTE: Skip IPv6 format!("{}", addr)
-                                                format!("")
+                                                "".to_string()
                                             },
                                             IpAddr::Empty | IpAddr::Unsupported => {
-                                                format!("")
+                                                "".to_string()
                                             },
                                         }
                                     })
@@ -267,9 +267,9 @@ impl Default for Systat {
                                 mem.total, mem.total - mem.free, mem.free);
                         Ok(
                             SystatMemory {
-                                total: Some(ByteSize::from(mem.total).as_usize()),
-                                used: Some(ByteSize::from(mem.total - mem.free).as_usize()),
-                                free: Some(ByteSize::from(mem.free).as_usize()),
+                                total: Some(mem.total.as_usize()),
+                                used: Some((mem.total - mem.free).as_usize()),
+                                free: Some(mem.free.as_usize()),
                             }
                         )
                     })
@@ -300,8 +300,7 @@ impl Default for Systat {
 
                 let uptime_stat = SYSTEM
                     .uptime()
-                    .and_then(|uptime| {
-                        let duration = Duration::from(uptime);
+                    .and_then(|duration| {
                         debug!("Uptime: {}s", duration.as_secs().to_string().cyan());
                         Ok(
                            duration.as_secs()
@@ -318,7 +317,7 @@ impl Default for Systat {
                 let boottime_stat = SYSTEM
                     .boot_time()
                     .and_then(|boot_time| {
-                        let rfc_date = DateTime::from(boot_time).to_rfc2822();
+                        let rfc_date = boot_time.to_rfc2822();
                         debug!("BootTime: {}", rfc_date.to_string().cyan());
                         Ok(
                            rfc_date
@@ -352,10 +351,10 @@ impl Default for Systat {
                                     cpu.user * 100.0, cpu.nice * 100.0, cpu.system * 100.0, cpu.interrupt * 100.0, cpu.idle * 100.0);
                                 Ok(
                                     SystatCPU { // NOTE: percentage:
-                                        user: Some(100.0 * cpu.user as f64),
-                                        system: Some(100.0 * cpu.system as f64),
-                                        interrupt: Some(100.0 * cpu.interrupt as f64),
-                                        idle: Some(100.0 * cpu.idle as f64),
+                                        user: Some(100.0 * f64::from(cpu.user)),
+                                        system: Some(100.0 * f64::from(cpu.system)),
+                                        interrupt: Some(100.0 * f64::from(cpu.interrupt)),
+                                        idle: Some(100.0 * f64::from(cpu.idle)),
                                         temperature: Some(cputemp_stat.into()),
                                     }
                                 )
@@ -377,7 +376,7 @@ impl Default for Systat {
                 Systat {
                     loadavg: Some(loadavg_stat),
                     uptime: Some(uptime_stat),
-                    boot_time: Some(boottime_stat.into()),
+                    boot_time: Some(boottime_stat),
                     cpu: Some(cpu_stat),
                     memory: Some(memory_stat),
                     mounts: Some(mounts_stat),
@@ -409,7 +408,7 @@ impl IntoResponse for Systat {
             StatusCode::OK,
             APPLICATION_JSON,
             serde_json::to_string(&self)
-                .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
+                .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}")),
         )
     }
 }
