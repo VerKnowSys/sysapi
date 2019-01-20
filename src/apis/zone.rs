@@ -75,8 +75,7 @@ impl Zone {
                 debug!("Domain: {} resolves to IPv4(s): [{}]", &domain.cyan(), &addresses.iter().map(|e| e.to_string()).collect::<String>().cyan());
                 addresses
                     .iter()
-                    .filter(|&element| !element.to_string().contains(":")) /* NOTE: filter out IPv6 - unsupported yet */
-                    .next()
+                    .find(|&element| !element.to_string().contains(':')) /* NOTE: filter out IPv6 - unsupported yet */
                     .and_then(|&ipv4_first| {
                         Some(ipv4_first)
                     })
