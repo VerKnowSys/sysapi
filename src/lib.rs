@@ -14,160 +14,166 @@
         unused_import_braces,
         unused_qualifications)]
 
+/// Use Jemalloc as default allocator:
+#[global_allocator]
+static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
+
+#[macro_use]
+extern crate lazy_static;
 
 #[macro_use]
 extern crate log;
-extern crate fern;
-extern crate chrono;
-#[macro_use]
-extern crate lazy_static;
-extern crate futures;
-extern crate gotham;
-extern crate hyper;
-extern crate mime;
-extern crate regex;
+
 #[macro_use]
 extern crate serde_derive;
-extern crate tokio;
-extern crate abstract_ns;
-// extern crate ns_dns_tokio;
-extern crate ns_std_threaded;
-
-extern crate serde;
-extern crate serde_json;
-extern crate glob;
-extern crate hostname;
-extern crate domain;
-extern crate atomicwrites;
-extern crate systemstat;
-extern crate libc;
 
 
-/// Public sysapi modules:
-pub mod api;
+// Library constants, used by the project:
 
-/// Public webapi modules:
-pub mod webapi;
+/// Software author :)
+pub const CREATED_BY: &str = "Daniel (@dmilith) Dettlaff";
+
+/// Default network device name - used by virtual network stack for cells.
+/// Link schema: Host: epairaNET_ID_NUMBER <---> Cell: epairbNET_ID_NUMBER
+pub const CELL_NET_INTERFACE: &str = "epair";
+
+/// Absolute path to libkvmpro.so shared library installed on the production system:
+pub const DEFAULT_LIBKVMPRO_SHARED: &str = "/usr/lib/libkvmpro.so";
+
+/// Project directory (for static files access for router):
+pub const PROJECT_DIRECTORY: &str = "/Projects/sysapi";
+
+/// Default log output file:
+pub const DEFAULT_LOG_FILE: &str = "/var/log/sysapi.log";
+
+/// Default stdout POSIX system device:
+pub const DEFAULT_STDOUT_DEV: &str = "/dev/stdout";
+
+// /// Default stderr POSIX system device:
+// pub const DEFAULT_STDERR_DEV: &str = "/dev/stderr";
+
+/// Default fallback for hostname:
+pub const DEFAULT_HOSTNAME_FALLBACK: &str = "localhost";
+
+/// Default fallback for IPv4:
+pub const DEFAULT_IP_FALLBACK: &str = "127.0.0.1";
+
+/// svdOS cell governor:
+pub const GVR_BIN: &str = "/usr/bin/gvr";
+
+/// ZFS utility:
+pub const ZFS_BIN: &str = "/sbin/zfs";
+
+/// BSD jail utility:
+pub const JAIL_BIN: &str = "/usr/sbin/jail";
+
+/// BSD jail-exec utility:
+pub const JEXEC_BIN: &str = "/usr/sbin/jexec";
+
+/// Default username (jail user):
+pub const CELL_USERNAME: &str = "worker";
+
+/// Default local DNS server address:
+pub const DEFAULT_DNS: &str = "172.16.3.1";
+
+/// Default listen address to listen on:
+pub const DEFAULT_ADDRESS: &str = "172.16.3.1:80";
+
+/// Default path to Prison root dir:
+pub const PRISON_PATH: &str = "/Shared/Prison";
+
+/// Default path to cells data dirs:
+pub const CELLS_PATH: &str = "/Shared/Prison/Cells";
+
+/// Default path to sentry metadata dirs:
+pub const SENTRY_PATH: &str = "/Shared/Prison/Sentry";
+
+/// Default protocol for ControlPane:
+pub const DEFAULT_CONTROLPANE_PROTOCOL: &str = "http";
+
+/// Default Cell NetID/ UID state filename:
+pub const DEFAULT_CELL_NETID_FILE: &str = "cell.vlan.number";
+
+/// Default Cell IP address state filename:
+pub const DEFAULT_CELL_IP_FILE: &str = "cell.ip.addresses";
+
+/// Default Cell running state filename:
+pub const DEFAULT_CELL_RUNSTATE_FILE: &str = "cell.running";
+
+/// CpuStat measure interval:
+pub const SYSTAT_CPUSTAT_INTERVAL: u64 = 397; /* ms of interval before CPU usage measure takes place */
+
+/// Time in miliseconds to pause before calling same function again (retry):
+/// NOTE: Don't set this value too low, to avoid flood of the "new threads"
+pub const SOLOAD_MT_CALLS_INTERVAL: u64 = 43; /* ms of interval before trying to call function again (waiting for lock) */
+
+/// Modulo this number == 0, then print info with counter state:
+pub const SOLOAD_MT_INFO_TRIGGER_MODULO_NUM: usize = 10000; /* print info with counter state each 10000 calls */
 
 
-// use std::sync::RwLock;
-// use tokio_core::reactor::{Core, Remote};
-pub use fern::colors::{Color, ColoredLevelConfig};
 
-pub use api::*;
-pub use webapi::*;
-pub use webapi::cells::*;
+// EOF project constants.
 
+
+
+/// HTTP Request params static strings:
+
+/// Cell management:
+pub const CELL_RESOURCE: &str = "/cell/";
+
+/// Cell lists management:
+pub const CELLS_RESOURCE: &str = "/cells/";
+
+/// Igniter management:
+pub const IGNITER_RESOURCE: &str = "/igniter/";
+
+/// DNS zone management:
+pub const ZONE_RESOURCE: &str = "/zone/";
+
+/// Web proxy management:
+pub const PROXY_RESOURCE: &str = "/proxy/";
+
+/// Web proxies management:
+pub const PROXIES_RESOURCE: &str = "/proxies/";
+
+/// Cell status management:
+pub const STATUS_RESOURCE: &str = "/status/";
+
+/// Cell ZFS Snapshot management:
+pub const SNAPSHOT_RESOURCE: &str = "/snapshot/";
+
+/// Cell ZFS Rollback management:
+pub const ROLLBACK_RESOURCE: &str = "/rollback/";
+
+/// Cell ZFS datasets management:
+pub const DATASETS_RESOURCE: &str = "/datasets/";
+
+
+
+//
+// Public modules:
+//
+
+
+/// Public helpers, functions used by other modules:
+pub mod helpers;
+
+/// Public api modules used to "talk" with underlying system:
+pub mod apis;
+
+/// Web processors to handle WebAPI calls over HTTP:
+pub mod processors;
+
+/// Main router for Web processors:
+pub mod webrouter;
+
+/// Map C functions from a Shared-Object system library:
+pub mod soload;
+
+
+//
+// Private modules:
+//
 
 #[cfg(test)]
-mod tests {
-    // Load all internal modules:
-    use hyper::*;
-    use gotham::test::TestServer;
-    use regex::Regex;
-    use super::*;
-
-
-    // Precompile NAME_PATTERN only once:
-    lazy_static! {
-        pub static ref NAME_PATTERN: Regex = {
-            Regex::new(r"^[a-zA-Z0-9]*$").unwrap()
-        };
-    }
-
-
-    #[test]
-    fn test_name_pattern() {
-        assert!(NAME_PATTERN.is_match("2asd01F4013201d"));
-        assert!(!NAME_PATTERN.is_match("2-asd01F4013201d"));
-        assert!(!NAME_PATTERN.is_match("2.asd01F4013201d"));
-        assert!(!NAME_PATTERN.is_match("2_asd01F4013201d"));
-        assert!(!NAME_PATTERN.is_match("2 asd01F4013201d"));
-        assert!(!NAME_PATTERN.is_match("2@asd01F4013201d"));
-    }
-
-
-    #[test]
-    fn test_hostname_too_short() {
-        let test_server = TestServer::new(router::router()).unwrap();
-        let response = test_server
-            .client()
-            .post("http://localhost/cell/12", Body::from("".to_string()), mime::TEXT_PLAIN)
-            .perform()
-            .unwrap();
-        assert_eq!(response.status(), StatusCode::NOT_ACCEPTABLE);
-    }
-
-
-    #[test]
-    fn test_hostname_too_long() {
-        let test_server = TestServer::new(router::router()).unwrap();
-        let response = test_server
-            .client()
-            .post("http://localhost/cell/123456789012345678901234567890", Body::from("".to_string()), mime::TEXT_PLAIN)
-            .perform()
-            .unwrap();
-        assert_eq!(response.status(), StatusCode::NOT_ACCEPTABLE);
-    }
-
-
-    #[test]
-    fn test_no_ssh_pubkey_in_body() {
-        let test_server = TestServer::new(router::router()).unwrap();
-        let response = test_server
-            .client()
-            .post("http://localhost/cell/12345", Body::from("".to_string()), mime::TEXT_PLAIN)
-            .perform()
-            .unwrap();
-        assert_eq!(response.status(), StatusCode::NOT_ACCEPTABLE);
-    }
-
-
-    #[test]
-    fn test_too_short_ssh_pubkey_in_body() {
-        let test_server = TestServer::new(router::router()).unwrap();
-        let response = test_server
-            .client()
-            .post("http://localhost/cell/12345", "my-nokey", mime::TEXT_PLAIN)
-            .perform()
-            .unwrap();
-        assert_eq!(response.status(), StatusCode::NOT_ACCEPTABLE);
-    }
-
-
-    // #[test]
-    // fn test_ssh_pubkey_in_body() {
-    //     use std::fs;
-    //     let test_server = TestServer::new(router::router()).unwrap();
-    //     let hostname = "test12345";
-    //     let valid_sshed25519_pubkey = "AAAAC3NzaC1lZDI1NTE5AAAAIEafihGp0at+QR94JaF+NkJ4XuZLjleEz/owVzRBqC9d";
-    //     let filename = format!("{}/{}", CUSTODY_PATH, hostname);
-    //     fs::remove_file(filename.clone()).unwrap_or(());
-    //     let response = test_server
-    //         .client()
-    //         .post(&format!("http://localhost/cell/{}", hostname), valid_sshed25519_pubkey, mime::TEXT_PLAIN)
-    //         .perform()
-    //         .unwrap();
-    //     assert_eq!(response.status(), StatusCode::Created);
-
-    //     let mut f = File::open(filename.clone()).unwrap();
-    //     let mut contents = String::new();
-    //     f.read_to_string(&mut contents).unwrap_or(0);
-    //     assert_eq!(contents, format!("{}\n", valid_sshed25519_pubkey));
-    //     fs::remove_file(filename).unwrap_or(());
-    // }
-
-
-    #[test]
-    fn test_delete_not_existing_is_not_modified() {
-        let test_server = TestServer::new(router::router()).unwrap();
-        let response = test_server
-            .client()
-            .delete("http://localhost/cell/test12345")
-            .perform()
-            .unwrap();
-        assert_eq!(response.status(), StatusCode::NOT_MODIFIED);
-    }
-
-
-}
+mod tests;

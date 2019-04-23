@@ -1,12 +1,35 @@
 [package]
 name = "sysapi"
-version = "0.8.0"
+version = "0.12.7"
 authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
+edition = '2018'
 build = "build.rs"
 
 
-[build-dependencies]
-cc = "1.0"
+[lib]
+name = "sysapi"
+path = "src/lib.rs"
+crate-type = ["rlib"]
+
+
+[[bin]]
+name = "sysapi"
+path = "src/sysapi.rs"
+
+
+[[bin]]
+name = "sysapi_bench_kernel_kvm-procstat-uid65-sockstat"
+path = "src/benches/kernel_kvm-procstat-uid65-sockstat.rs"
+
+
+[[bin]]
+name = "sysapi_bench_kernel_kvm-procstat-uid65"
+path = "src/benches/kernel_kvm-procstat-uid65.rs"
+
+
+[[example]]
+name = "psuid65tojson"
+path = "src/examples/psuid65tojson.rs"
 
 
 [dependencies]
@@ -34,7 +57,6 @@ lazy_static = "1.1"
 
 uuid = { version = "0.6", features = ["v4"] }
 rand = "0.4"
-num_cpus = "1.2"
 regex = "0.2"
 chrono = "0.4"
 glob = "0.2"
@@ -42,5 +64,73 @@ hostname = "0.1"
 atomicwrites = "0.2"
 systemstat = "0.1"
 libc = "0.2"
+libloading = "0.5"
 
 bencher = "0.1"
+jemallocator = "0.1.8"
+
+#
+# Explicit Project Setup details:
+#
+
+
+# The release profile, used for `cargo build --release`.
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+panic = 'abort'
+incremental = false
+overflow-checks = true
+
+
+# The benchmarking profile, used for `cargo bench` and `cargo test --release`.
+[profile.bench]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+incremental = false
+overflow-checks = true
+
+
+# The testing profile, used for `cargo test`.
+[profile.test]
+opt-level = 1
+debug = 2
+rpath = false
+lto = false
+debug-assertions = true
+codegen-units = 12
+incremental = true
+overflow-checks = true
+
+
+# The development (default) profile, used for `cargo build`.
+[profile.dev]
+opt-level = 0                 # controls the `--opt-level` the compiler builds with.
+                              # 0-1 is good for debugging. 2 is well-optimized. Max is 3.
+                              # 's' attempts to reduce size, 'z' reduces size even more.
+debug = 2                     # (u32 or bool) Include debug information (debug symbols).
+                              # Equivalent to `-C debuginfo=2` compiler flag.
+debug-assertions = true       # controls whether debug assertions are enabled
+                              # (e.g. debug_assert!() and arithmetic overflow checks)
+rpath = false                 # controls whether compiler should set loader paths.
+                              # If true, passes `-C rpath` flag to the compiler.
+lto = false                   # Link Time Optimization usually reduces size of binaries
+                              # and static libraries. Increases compilation time.
+                              # If true, passes `-C lto` flag to the compiler, and if a
+                              # string is specified like 'thin' then `-C lto=thin` will
+                              # be passed.
+codegen-units = 8             # if > 1 enables parallel code generation which improves
+                              # compile times, but prevents some optimizations.
+                              # Passes `-C codegen-units`.
+panic = 'unwind'              # panic strategy (`-C panic=...`), can also be 'abort'
+incremental = true            # whether or not incremental compilation is enabled
+overflow-checks = true        # use overflow checks for integer arithmetic.
+                              # Passes the `-C overflow-checks=...` flag to the compiler.

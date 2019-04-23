@@ -1,7 +1,6 @@
 use gotham::state::State;
 
-
-use api::systat::*;
+use crate::apis::systat::Systat;
 
 
 /// handle GET for /version

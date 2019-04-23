@@ -11,11 +11,11 @@ use mime::*;
 use std::net::*;
 use std::io::{Write, Error, ErrorKind};
 use atomicwrites::{AtomicFile,AllowOverwrite};
+use colored::Colorize;
 
-
-use api::*;
-use zone::*;
-use webapi::utils::list_proxies;
+use crate::*;
+use crate::apis::zone::*;
+use crate::helpers::list_proxies;
 
 
 use regex::Regex;
@@ -122,7 +122,7 @@ impl Default for Proxies {
                         let name = cell_name.unwrap_or("");
                         let from = proxy_from.unwrap_or("").replace("_", ".");
                         let to = proxy_to.unwrap_or("").replace("_", ".");
-                        debug!("Proxy for cell: {}. Proxy from: {}. Proxy to: {}", name, from, to);
+                        debug!("Proxy for cell: {}. Proxy from: {}. Proxy to: {}", name.cyan(), from.cyan(), to.cyan());
 
                         Proxy::new(&name.to_string(), &from.to_string(), &to.to_string())
                     })
@@ -136,7 +136,7 @@ impl Default for Proxies {
 impl ToString for Proxy {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
+            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}"))
     }
 }
 
@@ -145,7 +145,7 @@ impl Proxy {
 
 
     /// Generate proxy entry (validation pass for: from/to is required)
-    pub fn new(cell_name: &String, from: &String, to: &String) -> Result<Proxy, Error> {
+    pub fn new(cell_name: &str, from: &str, to: &str) -> Result<Proxy, Error> {
         Zone::validate_domain_addresses(from, to)
             .and_then(|(valid_ipv4_from, valid_ipv4_to)| {
                 // When both domains are valid, create Proxy object:
@@ -166,7 +166,7 @@ impl Proxy {
 
 
     /// Create new Web Proxy configuration:
-    pub fn create(cell_name: &String, from: &String, to: &String) -> Result<Proxy, Error> {
+    pub fn create(cell_name: &str, from: &str, to: &str) -> Result<Proxy, Error> {
         Proxy::new(cell_name, from, to)
             .and_then(|proxy| {
                 // Write Nginx proxy object to local file under dir: /Shared/Prison/Sentry/CELLNAME/cell-webconfs/*.conf:
@@ -184,14 +184,14 @@ impl Proxy {
                         )
                     })
                     .and_then(|_| {
-                        info!("Proxy: Written Web-Proxy config to file: {}. Which belongs to cell: {}",
-                              &proxy_dest_file, &cell_name);
+                        info!("SysAPI: Proxy: Written Web-Proxy config to file: {}. Which belongs to cell: {}",
+                              &proxy_dest_file.cyan(), &cell_name.cyan());
                         // Finally - return object metadata- since atomic write succeded at this point:
                         Ok(proxy)
                     })
                     .map_err(|err| {
-                        let err_msg = format!("Atomic Write Failed for file: {}. Error details: {:?}!",
-                                              &proxy_dest_file, err);
+                        let err_msg = format!("Atomic Write Failed for file: {}. Error details: {}!",
+                                              &proxy_dest_file.cyan(), err.to_string().red());
                         error!("{}", err_msg);
                         Error::new(ErrorKind::Other, err_msg)
                     })
@@ -200,19 +200,19 @@ impl Proxy {
 
 
     /// Destroy Web Proxy configuration:
-    pub fn destroy(cell_name: &String, from: &String, to: &String) -> Result<(), Error> {
+    pub fn destroy(cell_name: &str, from: &str, to: &str) -> Result<(), Error> {
         let proxy_file_name = format!("{}_proxyfrom_{}_proxyto_{}.conf", cell_name, from.replace(".", "_"), to.replace(".", "_"));
         let proxy_dest_dir = format!("{}/{}/cell-webconfs", SENTRY_PATH, cell_name);
         let proxy_dest_file = format!("{}/{}", proxy_dest_dir, proxy_file_name);
-        debug!("Calling Proxy::destroy() on file: {}", &proxy_dest_file);
+        debug!("Calling Proxy::destroy() on file: {}", &proxy_dest_file.cyan());
 
         match fs::remove_file(&proxy_dest_file) {
             Ok(_) => {
-                debug!("Destroyed Proxy configuration from file: {}", &proxy_dest_file);
+                debug!("Destroyed Proxy configuration from file: {}", &proxy_dest_file.cyan());
                 Ok(())
             },
             Err(err) => {
-                let err_msg = format!("Error destroying Proxy file: {}! Error details: {:?}", &proxy_dest_file, err);
+                let err_msg = format!("Error destroying Proxy file: {}! Error details: {}", &proxy_dest_file.cyan(), err.to_string().red());
                 error!("{}", err_msg);
                 Err(Error::new(ErrorKind::Other, err_msg))
             }
@@ -221,7 +221,7 @@ impl Proxy {
 
 
     /// Nginx proxy config from predefined template:
-    pub fn config_from_template(from_domain: &String, to_domain: &String) -> String {
+    pub fn config_from_template(from_domain: &str, to_domain: &str) -> String {
         /*
          * external/public domain is proxied to internal one
          * We explicitly set Nginx to re-resolve domains
@@ -243,7 +243,7 @@ server {{
 }}
     ",
         from_domain,
-        &DEFAULT_DNS.parse().unwrap_or(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1))), // resolver
+        &DEFAULT_DNS.parse().unwrap_or_else(|_| IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1))), // resolver
         to_domain)
     }
 
@@ -262,7 +262,7 @@ impl IntoResponse for Proxy {
                     StatusCode::OK,
                     APPLICATION_JSON,
                     serde_json::to_string(&self)
-                        .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
+                        .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}")),
                 ),
             None =>
                 create_response(
@@ -284,7 +284,7 @@ impl IntoResponse for Proxies {
             StatusCode::OK,
             APPLICATION_JSON,
             serde_json::to_string(&self)
-                .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
+                .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}")),
         )
     }
 }

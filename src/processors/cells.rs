@@ -8,8 +8,9 @@ use mime::*;
 
 
 // Load all internal modules:
-use api::*;
-use api::cell::*;
+use crate::*;
+use crate::apis::cell::*;
+use crate::apis::status::*;
 
 
 // Precompile CELL_NAME_PATTERN only once:
@@ -72,7 +73,15 @@ pub fn cells_get_handler(state: State) -> (State, Cells) {
 pub fn cell_get_handler(state: State) -> (State, Cell) {
     let uri = Uri::borrow_from(&state).to_string();
     let name = uri.replace(CELL_RESOURCE, "");
-    (state, Cell::state(&name).unwrap_or(Cell::new())) // XXX: TODO: it should load current service state and return json
+    (state, Cell::state(&name).unwrap_or_default()) // XXX: TODO: it should load current service state and return json
+}
+
+
+/// handle GET for /status/:cell (name given) - list processes of a single cell
+pub fn cell_status_get_handler(state: State) -> (State, CellProcesses) {
+    let uri = Uri::borrow_from(&state).to_string();
+    let name = uri.replace(STATUS_RESOURCE, "");
+    (state, CellProcesses::of_cell(&name).unwrap_or_default())
 }
 
 
@@ -84,7 +93,7 @@ pub fn cell_post_handler(mut state: State) -> Box<HandlerFuture> {
             Ok(valid_body) => {
                 let uri = Uri::borrow_from(&state).to_string();
                 let name = uri.replace(CELL_RESOURCE, "");
-                let ssh_pubkey = String::from_utf8(valid_body.to_vec()).unwrap_or(String::new()); // Read SSH pubkey from request body:
+                let ssh_pubkey = String::from_utf8(valid_body.to_vec()).unwrap_or_default(); // Read SSH pubkey from request body:
                 info!("Got request to create new cell: {}, with ed25519-pubkey: {} (key-length: {})",
                       name, ssh_pubkey, ssh_pubkey.len());
 

@@ -1,0 +1,59 @@
+#!/bin/sh
+
+
+reset_module_state () {
+    if [ -d "lib/kvmpro" ]; then
+        cd lib/kvmpro \
+            && git reset --hard
+        cd ../..
+    fi
+    return 0
+}
+
+
+update_all_repos () {
+    git pull \
+        --recurse-submodules \
+            || failure "Failed to pull submodules recursively!"
+
+    if [ -f "${PWD}/.gitmodules" ]; then
+        git submodule foreach \
+            git pull \
+                --jobs 2 \
+                "origin" "master" \
+                    || failure "Failed to pull submodules from: 'origin master'!"
+
+        git submodule update \
+            --jobs 2 \
+            --remote \
+            --recursive \
+                || failure "Failed to update submodule!"
+    fi
+    return 0
+}
+
+
+failure () {
+    printf "\nFAILURE: %s!\n\n" "${*}"
+    exit 1
+}
+
+
+success () {
+    exit
+}
+
+
+# main function:
+main () {
+    reset_module_state && \
+    update_all_repos && \
+        success
+
+    # or else - run failure handler that something went wrong:
+    failure "bin/update has failed!"
+}
+
+
+# run updater:
+main

@@ -1,54 +1,96 @@
 #!/bin/sh
 # blame: @dmilith
-# 2018-11-22-0129-1542846591
+# 2018-12-10-0127-1544401657
 
 
-_kvmpro_repo="https://github.com/VerKnowSys/kvmpro.git"
+# NOTE: Explicitly set "release" as default release type:
+_rel_type="${1:-release}"
 
-_bin_name="sysapi"
-_sysapi_dest_bin="/usr/bin/${_bin_name}"
-_uname="$(uname 2>/dev/null)"
-_cargo_project_dir="$(pwd 2>/dev/null)"
-_cargo_release_flag="--release"
-_release_type="${1:-release}"
-if [ "release" != "${_release_type}" ]; then
-    unset _cargo_release_flag
+. bin/common "${_rel_type}"
+if [ "release" = "${_rel_type}" ]; then
+    bin/clean purge
+else
+    bin/clean
 fi
 
 
-case "${_uname}" in
-    FreeBSD)
-        if [ ! -d ../kvmpro ]; then
-            echo "Fetch repository: kvmpro"
-            cd ..
-            git clone --jobs=4 "${_kvmpro_repo}"
-            cd kvmpro
-        else
-            echo "Update repository: kvmpro"
-            cd ../kvmpro
-            git pull --jobs=4
-        fi
-        bin/clean
-        bin/install
-        echo
+if [ ! -f "${_kvmpro_sharedlib}" ]; then
+    echo "WARN: Required library is missing: /usr/lib/libkvmpro.so, so it will be built for you :)"
+    cd lib/kvmpro
+    bin/install
+    cd ../..
+fi
 
-        cd "${_cargo_project_dir}"
-        git pull --jobs 4
 
-        bin/clean
-        echo "Build: SysAPI"
-        RUSTFLAGS="-lkvm -lprocstat" cargo build --jobs=4 ${_cargo_release_flag} && \
-            killall -TERM ${_bin_name} 2>/dev/null
+strip_product () {
+    echo "Strip: SysAPI: ${_bin_product_target}" \
+        && strip -s -d "${_bin_product_target}" \
+        && return 0
 
-        echo "Strip and Install: SysAPI"
-        strip -s -d "target/${_release_type}/${_bin_name}"
-        install -v "target/${_release_type}/${_bin_name}" "${_sysapi_dest_bin}" && \
-            echo "Successfully installed: SysAPI"
-        ;;
+    return 1
+}
 
-    *)
-        echo "Platform not supported: ${_uname}" && \
-            exit 1
-        ;;
 
-esac
+enable_hardening_on_product () {
+    echo "Explicitly enable all hardening features for: SysAPI"
+    hbsdcontrol pax enable aslr "${_sysapi_dest_bin}" \
+        && hbsdcontrol pax enable mprotect "${_sysapi_dest_bin}" \
+        && hbsdcontrol pax enable pageexec "${_sysapi_dest_bin}" \
+        && hbsdcontrol pax enable shlibrandom "${_sysapi_dest_bin}" \
+        && hbsdcontrol pax enable segvguard "${_sysapi_dest_bin}" \
+        && hbsdcontrol pax enable disallow_map32bit "${_sysapi_dest_bin}" \
+        && return 0
+
+    return 1
+}
+
+
+stop_supervisor () {
+    _sysapi_supervisor_pid="$(cat "${_sysapi_supervisor_pidfile}" 2>/dev/null)"
+    if [ -n "${_sysapi_supervisor_pid}" ]; then
+        kill -0 "${_sysapi_supervisor_pid}" \
+            && kill -TERM "${_sysapi_supervisor_pid}" \
+            && echo "Stopped supervisor: SysAPI" \
+            && return 0
+    fi
+    return 1
+}
+
+
+start_supervisor () {
+    nohup \
+        daemon \
+        -R1 \
+        -o "${_sysapi_logfile}" \
+        -P "${_sysapi_supervisor_pidfile}" \
+        "${_sysapi_dest_bin}" \
+            >/dev/null 2>&1 \
+            && echo "Started SysAPI supervisor daemon" \
+            && return 0
+    return 1
+}
+
+
+install_product () {
+    unset _start_supervisor_after_install
+    stop_supervisor \
+        && _start_supervisor_after_install=YES
+
+    install -v "${_bin_product_target}" "${_sysapi_dest_bin}" \
+        && enable_hardening_on_product \
+        && echo "Installed: SysAPI binary: ${_bin_product_target}"
+
+    if [ "YES" = "${_start_supervisor_after_install}" ]; then
+        start_supervisor
+    fi
+    return 0
+}
+
+
+# Strip and Install product:
+bin/build "${_rel_type}" \
+    && strip_product \
+    && install_product \
+    && exit 0
+
+exit 1

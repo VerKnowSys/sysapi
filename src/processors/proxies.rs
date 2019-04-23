@@ -6,9 +6,8 @@ use gotham::handler::{HandlerFuture, IntoHandlerError};
 use mime::*;
 
 
-// Load all internal modules:
-use api::*;
-use api::proxy::*;
+use crate::*;
+use crate::apis::proxy::*;
 
 
 /// Handle POSTs /proxy/:cell/:from/:to
@@ -19,9 +18,9 @@ pub fn web_proxy_post_handler(mut state: State) -> Box<HandlerFuture> {
             Ok(_valid_body) => {
                 let uri = Uri::borrow_from(&state).to_string();
                 let cell_from_to = uri.replace(PROXY_RESOURCE, "");
-                let cell_name: String = cell_from_to.split("/").take(1).collect();
-                let from: String = cell_from_to.split("/").skip(1).take(1).collect();
-                let to: String = cell_from_to.split("/").skip(2).take(1).collect();
+                let cell_name: String = cell_from_to.split('/').take(1).collect();
+                let from: String = cell_from_to.split('/').skip(1).take(1).collect();
+                let to: String = cell_from_to.split('/').skip(2).take(1).collect();
 
                 // TODO: XXX: add some validations? Especially for malicious wildcard redirects or stuff like that :)
                 // if from.len() < 4
@@ -61,9 +60,9 @@ pub fn web_proxy_delete_handler(mut state: State) -> Box<HandlerFuture> {
             Ok(_valid_body) => {
                 let uri = Uri::borrow_from(&state).to_string();
                 let cell_from_to = uri.replace(PROXY_RESOURCE, "");
-                let cell_name: String = cell_from_to.split("/").take(1).collect();
-                let from: String = cell_from_to.split("/").skip(1).take(1).collect();
-                let to: String = cell_from_to.split("/").skip(2).take(1).collect();
+                let cell_name: String = cell_from_to.split('/').take(1).collect();
+                let from: String = cell_from_to.split('/').skip(1).take(1).collect();
+                let to: String = cell_from_to.split('/').skip(2).take(1).collect();
                 debug!("web_proxy_delete_handler(): cell_name: {}, from: {}, to: {}", cell_name, from, to);
 
                 match Proxy::destroy(&cell_name.to_string(), &from.to_string(), &to.to_string()) {

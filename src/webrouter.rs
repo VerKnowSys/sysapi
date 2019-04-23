@@ -1,25 +1,24 @@
 use gotham::router::Router;
-use gotham::router::builder::{build_simple_router, DefineSingleRoute, DrawRoutes};
-use gotham::handler::assets::*;
+
+use crate::*;
+use crate::processors::cells::*;
+use crate::processors::datasets::*;
+use crate::processors::proxies::*;
+use crate::processors::systats::*;
 
 
-use api::*;
-use webapi::internals::*;
-use webapi::cells::*;
-use webapi::datasets::*;
-use webapi::proxies::*;
-
-
-/// Define router
+/// Router for the API WebApp:
 pub fn router() -> Router {
+    use gotham::handler::assets::*;
+    use gotham::router::builder::{build_simple_router, DefineSingleRoute, DrawRoutes};
+
+
     // TODO: define all missing routes:
     // TODO: const IGNITER_RESOURCE: &'static str = "/igniter/";
     // TODO: const ZONE_RESOURCE: &'static str = "/zone/";
-    // TODO: const STATUS_RESOURCE: &'static str = "/status/";
 
 
     build_simple_router(|route| {
-
 
         /* Dashboard */
 
@@ -47,15 +46,22 @@ pub fn router() -> Router {
         // …/version
         route
             .associate(
-                &format!("/version"), |handler| {
+                &"/version".to_string(), |handler| {
                     handler.get().to(api_version_get_handler);
                 });
 
         // …/systat
         route
             .associate(
-                &format!("/systat"), |handler| {
+                &"/systat".to_string(), |handler| {
                     handler.get().to(api_systat_get_handler);
+                });
+
+        // …/status/:cell
+        route
+            .associate(
+                &format!("{}:cell", STATUS_RESOURCE), |handler| {
+                    handler.get().to(cell_status_get_handler);
                 });
 
         // …/cells/list
@@ -115,8 +121,9 @@ pub fn router() -> Router {
         // …/proxies/list
         route
             .associate(
-                &format!("{}:list", PROXIES_RESOURCE), |handler| {
+                &format!("{}list", PROXIES_RESOURCE), |handler| {
                     handler.get().to(web_proxies_get_handler);
                 });
     })
 }
+

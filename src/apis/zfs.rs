@@ -7,11 +7,11 @@ use hyper::{StatusCode, Body, Response};
 use serde_json;
 use chrono::Local;
 use mime::*;
+use colored::Colorize;
 
-
-use api::*;
-use api::cell::*;
-use webapi::datasets::CUT_LAST_COMMA;
+use crate::*;
+use crate::apis::cell::*;
+use crate::processors::datasets::CUT_LAST_COMMA;
 
 
 /// ZFS Rollback wrapper
@@ -82,7 +82,7 @@ pub struct Datasets {
 impl ToString for Snapshot {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
+            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}"))
     }
 }
 
@@ -91,7 +91,7 @@ impl ToString for Snapshot {
 impl ToString for Snapshots {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
+            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}"))
     }
 }
 
@@ -100,7 +100,7 @@ impl ToString for Snapshots {
 impl ToString for Rollback {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}"))
+            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}"))
     }
 }
 
@@ -116,7 +116,7 @@ impl IntoResponse for Snapshot {
                     StatusCode::OK,
                     APPLICATION_JSON,
                     serde_json::to_string(&self)
-                        .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
+                        .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}")),
                 ),
             None =>
                 create_response(
@@ -140,7 +140,7 @@ impl IntoResponse for Rollback {
                     StatusCode::OK,
                     APPLICATION_JSON,
                     serde_json::to_string(&self)
-                        .unwrap_or(String::from("{\"status\": \"SerializationFailure\"}")),
+                        .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}")),
                 ),
             None =>
                 create_response(
@@ -159,7 +159,7 @@ impl Datasets {
 
 
     /// List all datasets of a cell:
-    pub fn list(cell_name: &String) -> Result<String, Error> {
+    pub fn list(cell_name: &str) -> Result<String, Error> {
         Command::new(JEXEC_BIN)
             .arg("-U")
             .arg(CELL_USERNAME)
@@ -174,7 +174,7 @@ impl Datasets {
             .and_then(|after_snap| {
                 if after_snap.status.success() {
                     let string_list: String = String::from_utf8_lossy(&after_snap.stdout)
-                        .split("\n")
+                        .split('\n')
                         .filter(|elem| {
                             elem.contains(cell_name)
                         })
@@ -183,10 +183,10 @@ impl Datasets {
                         })
                         .collect();
                     let final_list = &CUT_LAST_COMMA.replace(&string_list, "");
-                    debug!("List of ZFS snapshots of cell: {}: {}", cell_name, final_list);
+                    debug!("List of ZFS snapshots of cell: {}: {}", cell_name.cyan(), final_list.cyan());
                     Ok(final_list.to_string())
                 } else {
-                    let error_msg = format!("ZFS snapshot listing failed!");
+                    let error_msg = "ZFS snapshot listing failed!".to_string();
                     error!("{}", error_msg);
                     Err(
                         Error::new(ErrorKind::Other, error_msg)
@@ -203,7 +203,7 @@ impl Snapshot {
 
 
     /// Create snapshot of dataset with given name:
-    pub fn new(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<Snapshot, Error> {
+    pub fn new(cell_name: &str, dataset_path: &str, snapshot_name: &str) -> Result<Snapshot, Error> {
         Ok(Snapshot {
             name: Some(snapshot_name.to_owned()),
             cell_name: Some(cell_name.to_owned()),
@@ -214,7 +214,7 @@ impl Snapshot {
 
 
     /// Create snapshot of dataset with given name:
-    pub fn create(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<Snapshot, Error> {
+    pub fn create(cell_name: &str, dataset_path: &str, snapshot_name: &str) -> Result<Snapshot, Error> {
         Snapshot::new(&cell_name, &dataset_path, &snapshot_name)
             .and_then(|_new_cell| {
                 Command::new(JEXEC_BIN)
@@ -228,7 +228,7 @@ impl Snapshot {
                     .and_then(|after_snap| {
                         if after_snap.status.success() {
                             debug!("ZFS snapshot created:\n{}{}",
-                                  String::from_utf8_lossy(&after_snap.stdout), String::from_utf8_lossy(&after_snap.stderr));
+                                  String::from_utf8_lossy(&after_snap.stdout).blue(), String::from_utf8_lossy(&after_snap.stderr).white());
                             Ok(
                                Snapshot {
                                     name: Some(snapshot_name.to_owned()),
@@ -238,7 +238,7 @@ impl Snapshot {
                                 }
                             )
                         } else {
-                            let error_msg = format!("Unable to create snapshot: {}@{}", dataset_path, snapshot_name);
+                            let error_msg = format!("Unable to create snapshot: {}@{}", dataset_path.cyan(), snapshot_name.cyan());
                             error!("{}", error_msg);
                             Err(
                                 Error::new(ErrorKind::Other, error_msg)
@@ -250,7 +250,7 @@ impl Snapshot {
 
 
     /// Destroy existing snapshot with given name:
-    pub fn destroy(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<(), Error> {
+    pub fn destroy(cell_name: &str, dataset_path: &str, snapshot_name: &str) -> Result<(), Error> {
         Command::new(JEXEC_BIN)
             .arg("-U")
             .arg(CELL_USERNAME)
@@ -262,10 +262,10 @@ impl Snapshot {
             .and_then(|after_snap| {
                 if after_snap.status.success() {
                     debug!("ZFS snapshot destroyed:\n{}{}",
-                          String::from_utf8_lossy(&after_snap.stdout), String::from_utf8_lossy(&after_snap.stderr));
+                          String::from_utf8_lossy(&after_snap.stdout).blue(), String::from_utf8_lossy(&after_snap.stderr).white());
                     Ok(())
                 } else {
-                    let error_msg = format!("Unable to destroy snapshot: {}@{}", dataset_path, snapshot_name);
+                    let error_msg = format!("Unable to destroy snapshot: {}@{}", dataset_path.cyan(), snapshot_name.cyan());
                     error!("{}", error_msg);
                     Err(
                         Error::new(ErrorKind::Other, error_msg)
@@ -276,7 +276,7 @@ impl Snapshot {
 
 
     /// List all snapshots of a cell:
-    pub fn list(cell_name: &String) -> Result<String, Error> {
+    pub fn list(cell_name: &str) -> Result<String, Error> {
         Command::new(JEXEC_BIN)
             .arg("-U")
             .arg(CELL_USERNAME)
@@ -291,7 +291,7 @@ impl Snapshot {
             .and_then(|after_snap| {
                 if after_snap.status.success() {
                     let string_list: String = String::from_utf8_lossy(&after_snap.stdout)
-                        .split("\n")
+                        .split('\n')
                         .filter(|elem| {
                             elem.contains(cell_name)
                         })
@@ -300,10 +300,10 @@ impl Snapshot {
                         })
                         .collect();
                     let final_list = &CUT_LAST_COMMA.replace(&string_list, "");
-                    debug!("List of ZFS snapshots of cell: {}: [{}]", &cell_name, &final_list);
+                    debug!("List of ZFS snapshots of cell: {}: [{}]", &cell_name.cyan(), &final_list.cyan());
                     Ok(final_list.to_string())
                 } else {
-                    let error_msg = format!("ZFS snapshot listing failed!");
+                    let error_msg = "ZFS snapshot listing failed!".to_string();
                     error!("{}", error_msg);
                     Err(
                         Error::new(ErrorKind::Other, error_msg)
@@ -314,7 +314,7 @@ impl Snapshot {
 
 
     /// Check snapshot state under a cell:
-    pub fn state(cell_name: &String, snapshot_name: &String) -> Result<String, Error> {
+    pub fn state(cell_name: &str, snapshot_name: &str) -> Result<String, Error> {
         Command::new(JEXEC_BIN)
             .arg("-U")
             .arg(CELL_USERNAME)
@@ -330,7 +330,7 @@ impl Snapshot {
                 if after_snap.status.success() {
                     let stdout = String::from_utf8_lossy(&after_snap.stdout);
                     let pre_line: String = stdout
-                        .split("\n")
+                        .split('\n')
                         .filter(|elem| {
                             elem.contains(&format!("@{}", snapshot_name))
                         })
@@ -341,19 +341,19 @@ impl Snapshot {
                     let matching_line = &CUT_LAST_COMMA.replace(&pre_line, "");
                     match matching_line.as_ref() {
                         "" => {
-                            let error_msg = format!("No such snapshot: {}!", snapshot_name);
+                            let error_msg = format!("No such snapshot: {}!", snapshot_name.cyan());
                             error!("{}", error_msg);
                             Err(
                                 Error::new(ErrorKind::Other, error_msg)
                             )
                         },
                         entry => {
-                            debug!("ZFS snapshot matching pattern: '{}' is present. Output matched to: '{}'", snapshot_name, entry);
+                            debug!("ZFS snapshot matching pattern: '{}' is present. Output matched to: '{}'", snapshot_name.cyan(), entry.cyan());
                             Ok(entry.to_string())
                         }
                     }
                 } else {
-                    let error_msg = format!("Failed to list any snapshot!");
+                    let error_msg = "Failed to list any snapshot!".to_string();
                     error!("{}", error_msg);
                     Err(
                         Error::new(ErrorKind::Other, error_msg)
@@ -370,7 +370,7 @@ impl Rollback {
 
 
     /// Rollback dataset to given snapshot name:
-    pub fn new(cell_name: &String, dataset_path: &String, snapshot_name: &String) -> Result<Rollback, Error> {
+    pub fn new(cell_name: &str, dataset_path: &str, snapshot_name: &str) -> Result<Rollback, Error> {
         Command::new(JEXEC_BIN)
             .arg("-U")
             .arg(CELL_USERNAME)
@@ -383,7 +383,7 @@ impl Rollback {
             .and_then(|after_rollback| {
                 if after_rollback.status.success() {
                     debug!("ZFS rollbacked! Output:\n{}{}",
-                          String::from_utf8_lossy(&after_rollback.stdout), String::from_utf8_lossy(&after_rollback.stderr));
+                          String::from_utf8_lossy(&after_rollback.stdout).blue(), String::from_utf8_lossy(&after_rollback.stderr).white());
                     Ok(
                        Rollback {
                            name: Some(snapshot_name.to_owned()),
@@ -393,18 +393,14 @@ impl Rollback {
                        }
                     )
                 } else {
-                    let error_msg = format!("Unable to rollback to: {}@{}", dataset_path, snapshot_name);
+                    let error_msg = format!("Unable to rollback to: {}@{}", dataset_path.cyan(), snapshot_name.cyan());
                     error!("{}", error_msg);
                     Err(
                         Error::new(ErrorKind::Other, error_msg)
                     )
                 }
             })
-
     }
 
 
-
 }
-
-

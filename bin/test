@@ -1,0 +1,49 @@
+#!/bin/sh
+# blame: @dmilith
+# 2018-12-20-1942-1545331365
+
+
+. bin/common "${*}"
+
+
+echo
+echo
+echo "Project directory: ${_cargo_project_dir}"
+echo "Project product: ${_bin_name}"
+echo "System type: ${_uname}"
+echo
+echo
+
+
+failure () {
+    printf "FAILURE: %b\n" "${@}"
+    exit 1
+}
+
+
+case "${_uname}" in
+    FreeBSD)
+        cd "${_cargo_project_dir}"
+        bin/update
+
+        printf "\nDisabling 'mprotect' hardening feature for 'rustdoc' utility\n"
+        _rustdoc="$(which rustdoc)"
+        if [ -x "${_rustdoc}" ]; then
+            hbsdcontrol pax disable mprotect "${_rustdoc}" \
+                || failure "Couldn't disable mprotect for binary: ${_rustdoc}"
+        else
+            failure "Couldn't find 'rustdoc' in PATH! Required for bin/test!"
+        fi
+
+        printf "\n\nBuilding: Library: SysAPI\n"
+        cargo test
+        if [ "0" != "${?}" ]; then
+            failure "Test: Library: Failed!"
+        fi
+        ;;
+
+    *)
+        failure "Platform not supported: ${_uname}"
+        ;;
+
+esac
