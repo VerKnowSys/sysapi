@@ -22,7 +22,7 @@ function render_cells() {
   <div class=\"brand-card-body\"> \
       <div class=\"text-value cui-cursor\"></div> \
       <div class=\"text-value cui-moon\"></div> \
-      <a href=\"#\" class=\"badge\"><div name=\"__NAME__\" onclick=\"confirm('Are you sure you wish to destroy this Cell?');\" class=\"delete_cell text-value cui-circle-x\"></div></a> \
+      <a href=\"#\" class=\"badge\"><div name=\"__NAME__\" onclick=\"return confirm('Are you sure you wish to destroy this Cell?');\" class=\"delete_cell text-value cui-circle-x\"></div></a> \
   </div> \
   <div class=\"brand-card-body\"> \
     <div> \
