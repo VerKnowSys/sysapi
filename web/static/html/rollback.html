@@ -33,7 +33,7 @@
           Dataset successfully rollback'ed!
         </div>
       </form>
-    <button class="btn btn-warning" onclick="return confirm('Are you sure you wish to rollback? You cannot revert this!'); create_rollback();">Rollback to snapshot</button>
+    <button class="btn btn-warning" onclick="if (confirm('Are you sure you wish to rollback? You cannot revert this!')) create_rollback();">Rollback to snapshot</button>
   </div>
 </div>
 
