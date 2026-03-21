@@ -2,7 +2,7 @@
 name = "sysapi"
 version = "0.12.7"
 authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
-edition = '2018'
+edition = "2024"
 build = "build.rs"
 
 
@@ -107,7 +107,7 @@ rpath = false
 lto = false
 debug-assertions = true
 codegen-units = 12
-incremental = true
+incremental = false
 overflow-checks = true
 
 
@@ -131,6 +131,6 @@ codegen-units = 8             # if > 1 enables parallel code generation which im
                               # compile times, but prevents some optimizations.
                               # Passes `-C codegen-units`.
 panic = 'unwind'              # panic strategy (`-C panic=...`), can also be 'abort'
-incremental = true            # whether or not incremental compilation is enabled
+incremental = false           # whether or not incremental compilation is enabled
 overflow-checks = true        # use overflow checks for integer arithmetic.
                               # Passes the `-C overflow-checks=...` flag to the compiler.
