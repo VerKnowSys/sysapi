@@ -1,7 +1,8 @@
+use serde::{Deserialize, Serialize};
+
 /// Igniter Actions
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 pub enum Actions {
-
     /// Create service
     Create,
 
@@ -31,11 +32,9 @@ pub enum Actions {
 /// Service igniter representation:
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Igniter {
-
     /// Name of the service
     service_name: Option<String>,
 
     /// Igniter action
     action: Option<Actions>,
-
 }

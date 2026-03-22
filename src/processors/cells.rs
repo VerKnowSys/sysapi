@@ -1,20 +1,13 @@
-use hyper::*;
+use regex::Regex;
+use rocket::{delete, get, http::Status, post, response::status::Custom, serde::json::Json};
 use std::path::Path;
-use futures::{future, Future, Stream};
-use gotham::helpers::http::response::create_response;
-use gotham::state::{FromState, State};
-use gotham::handler::{HandlerFuture, IntoHandlerError};
-use mime::*;
-
 
 // Load all internal modules:
-use crate::*;
 use crate::apis::cell::*;
 use crate::apis::status::*;
+use crate::*;
 
 
-// Precompile CELL_NAME_PATTERN only once:
-use regex::Regex;
 lazy_static! {
 
     /// Cell name restriction - has to match following pattern:
@@ -25,120 +18,94 @@ lazy_static! {
 }
 
 
-
-/// Extract the main elements of the request except for the `Body`
-// fn print_request_elements(state: &State) {
-//     let method = Method::borrow_from(state);
-//     let uri = Uri::borrow_from(state);
-//     let http_version = HttpVersion::borrow_from(state);
-//     let headers = Headers::borrow_from(state);
-//     info!("Method: {:?}", method);
-//     info!("URI: {:?}", uri);
-//     info!("HTTP Version: {:?}", http_version);
-//     info!("Headers: {:?}", headers);
-// }
-
-
-/// Handle DELETEs
-pub fn cell_delete_handler(state: State) -> (State, Response<Body>) {
-    let uri = Uri::borrow_from(&state).to_string();
-    let name = uri.replace(CELL_RESOURCE, "");
-    let cell_dir = format!("{}/{}", CELLS_PATH, name);
+/// Handle DELETEs for /cell/:cell
+#[delete("/cell/<cell>")]
+pub fn cell_delete_handler(cell: String) -> Json<String> {
+    let cell_dir = format!("{}/{}", CELLS_PATH, cell);
 
     if Path::new(&cell_dir).exists() {
-        match destroy_cell(&name) {
-            Ok(_) => {
-                let res = create_response(&state, StatusCode::OK, APPLICATION_JSON, Body::from("{\"status\": \"Ok\"}"));
-                (state, res)
-            },
-            Err(_) => {
-                let res = create_response(&state, StatusCode::BAD_REQUEST, APPLICATION_JSON, Body::from("{\"status\": \"Bad Request\"}"));
-                (state, res)
-            }
+        match destroy_cell(&cell) {
+            Ok(_) => Json("{\"status\": \"Ok\"}".to_string()),
+            Err(_) => Json("{\"status\": \"Bad Request\"}".to_string()),
         }
     } else {
-        let res = create_response(&state, StatusCode::NOT_MODIFIED, APPLICATION_JSON, Body::from("{\"status\": \"Not Modified\"}"));
-        (state, res)
+        Json("{\"status\": \"Not Modified\"}".to_string())
     }
 }
 
 
-/// Handle GET for /cells/list (no cell name) - list all cells
-pub fn cells_get_handler(state: State) -> (State, Cells) {
-    (state, Cells::default())
+/// Handle GET for /cells/list
+#[get("/cells/list")]
+pub fn cells_get_handler() -> Json<Cells> {
+    Json(Cells::default())
 }
 
 
-/// handle GET for /cell/:cell (name given) - list single cell
-pub fn cell_get_handler(state: State) -> (State, Cell) {
-    let uri = Uri::borrow_from(&state).to_string();
-    let name = uri.replace(CELL_RESOURCE, "");
-    (state, Cell::state(&name).unwrap_or_default()) // XXX: TODO: it should load current service state and return json
+/// handle GET for /cell/:cell
+#[get("/cell/<cell>")]
+pub fn cell_get_handler(cell: String) -> Json<Cell> {
+    Json(Cell::state(&cell).unwrap_or_default())
 }
 
 
-/// handle GET for /status/:cell (name given) - list processes of a single cell
-pub fn cell_status_get_handler(state: State) -> (State, CellProcesses) {
-    let uri = Uri::borrow_from(&state).to_string();
-    let name = uri.replace(STATUS_RESOURCE, "");
-    (state, CellProcesses::of_cell(&name).unwrap_or_default())
+/// handle GET for /status/:cell
+#[get("/status/<cell>")]
+pub fn cell_status_get_handler(cell: String) -> Json<CellProcesses> {
+    Json(CellProcesses::of_cell(&cell).unwrap_or_default())
 }
 
 
-/// Handle POSTs
-pub fn cell_post_handler(mut state: State) -> Box<HandlerFuture> {
-    let f = Body::take_from(&mut state)
-        .concat2()
-        .then(|full_body| match full_body {
-            Ok(valid_body) => {
-                let uri = Uri::borrow_from(&state).to_string();
-                let name = uri.replace(CELL_RESOURCE, "");
-                let ssh_pubkey = String::from_utf8(valid_body.to_vec()).unwrap_or_default(); // Read SSH pubkey from request body:
-                info!("Got request to create new cell: {}, with ed25519-pubkey: {} (key-length: {})",
-                      name, ssh_pubkey, ssh_pubkey.len());
+/// Handle POSTs for /cell/:cell
+#[post("/cell/<cell>", data = "<body>")]
+pub async fn cell_post_handler(cell: String, body: String) -> Custom<Json<String>> {
+    let ssh_pubkey = body.trim().to_string();
+    info!(
+        "Got request to create new cell: {}, with ed25519-pubkey: {} (key-length: {})",
+        cell,
+        ssh_pubkey,
+        ssh_pubkey.len()
+    );
 
-                // Validate all input data:
-                let cell_dir = format!("{}/{}", CELLS_PATH, name);
-                if Path::new(&cell_dir).exists() {
-                    let res = create_response(&state, StatusCode::CONFLICT, APPLICATION_JSON, Body::from("{\"status\": \"Conflict\"}"));
-                    return future::ok((state, res))
-                }
+    // Validate all input data:
+    let cell_dir = format!("{}/{}", CELLS_PATH, cell);
+    if Path::new(&cell_dir).exists() {
+        return Custom(
+            Status::Conflict,
+            Json("{\"status\": \"Conflict\"}".to_string()),
+        );
+    }
 
-                if !CELL_NAME_PATTERN.is_match(&name)
-                    || ssh_pubkey.len() < 68 // Ed25519 should be at least 68, but not longer than 70 bytes long
-                    || ssh_pubkey.len() > 70
-                    || name.len() < 3        // Hostname can't be shorter than 3 chars and not longer than 27 chars
-                    || name.len() > 27 {
-                    let res = create_response(&state, StatusCode::NOT_ACCEPTABLE, APPLICATION_JSON, Body::from("{\"status\": \"Not Acceptable\"}"));
-                    return future::ok((state, res))
-                }
+    if !CELL_NAME_PATTERN.is_match(&cell)
+        || ssh_pubkey.len() < 68 // Ed25519 should be at least 68, but not longer than 70 bytes long
+        || ssh_pubkey.len() > 70
+        || cell.len() < 3        // Hostname can't be shorter than 3 chars and not longer than 27 chars
+        || cell.len() > 27
+    {
+        return Custom(
+            Status::NotAcceptable,
+            Json("{\"status\": \"Not Acceptable\"}".to_string()),
+        );
+    }
 
-                // Execute gvr create + gvr set
-                match create_cell(&name)
-                    .and_then(|_| {
-                        info!("Cell created: {}.", name);
-                        add_ssh_pubkey_to_cell(&name, &ssh_pubkey)
-                    })
-                    .map_err(|err| {
-                        error!("Failure: Cell: {} couldn't be created! Please contact administator or file a bug!\nError details: {}", name, err);
-                        err
-                    }) {
-
-                    // create a new response based on the result:
-                    Ok(_) => {
-                        info!("Cell started: {}", name);
-                        let res = create_response(&state, StatusCode::CREATED, APPLICATION_JSON, Body::from("{\"status\": \"Created\"}"));
-                        future::ok((state, res))
-                    },
-                    Err(err) => {
-                        error!("Failed to create cell: {}. Last error: {}", name, err);
-                        let res = create_response(&state, StatusCode::EXPECTATION_FAILED, APPLICATION_JSON, Body::from("{\"status\": \"Expectation Failed\"}"));
-                        future::ok((state, res))
-                    }
-                }
-            }
-            Err(e) => future::err((state, e.into_handler_error()))
-        });
-
-    Box::new(f)
+    // Execute gvr create + gvr set
+    match create_cell(&cell).and_then(|_| {
+        info!("Cell created: {}.", cell);
+        add_ssh_pubkey_to_cell(&cell, &ssh_pubkey)
+    }) {
+        // create a new response based on the result:
+        Ok(_) => {
+            info!("Cell started: {}", cell);
+            Custom(
+                Status::Created,
+                Json("{\"status\": \"Created\"}".to_string()),
+            )
+        }
+        Err(err) => {
+            error!("Failed to create cell: {}. Last error: {}", cell, err);
+            Custom(
+                Status::ExpectationFailed,
+                Json("{\"status\": \"Expectation Failed\"}".to_string()),
+            )
+        }
+    }
 }

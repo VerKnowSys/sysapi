@@ -1,24 +1,17 @@
-// use std::path::Path;
-// use std::io::BufReader;
-use gotham::state::State;
-use gotham::handler::IntoResponse;
-use hyper::{StatusCode, Body, Response};
+use serde::{Deserialize, Serialize};
 use serde_json;
-use gotham::helpers::http::response::create_response;
-use std::fs;
-use mime::*;
 
-use std::net::*;
-use std::io::{Write, Error, ErrorKind};
-use atomicwrites::{AtomicFile,AllowOverwrite};
-use colored::Colorize;
-
-use crate::*;
-use crate::apis::zone::*;
-use crate::helpers::list_proxies;
-
-
+use atomicwrites::{AllowOverwrite, AtomicFile};
 use regex::Regex;
+use std::{
+    fs,
+    io::{Error, Write},
+    net::*,
+};
+
+use crate::{apis::zone::*, helpers::list_proxies, *};
+
+
 lazy_static! {
     /// Regex to extract cell name from proxy file name:
     pub static ref CELL_NAME_FROM_FILE_NAME_PATTERN: Regex = {
@@ -41,7 +34,6 @@ lazy_static! {
 /// Web proxy wrapper:
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Proxy {
-
     /// Proxy belocngs to cell with name:
     pub cell: Option<String>,
 
@@ -59,108 +51,96 @@ pub struct Proxy {
 
     /// Generated Nginx-Proxy configuration:
     pub config: Option<String>,
-
 }
 
 
 /// Proxies (Proxy List) structure for easy list management
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Proxies {
-
     /// List of all proxies
-    pub list: Vec<Proxy>
-
-}
-
-
-impl Default for Proxy {
-    fn default() -> Proxy {
-        Proxy{
-            cell: None,
-            config: None,
-            from: None,
-            from_ipv4: None,
-            to: None,
-            to_ipv4: None,
-        }
-    }
+    pub list: Vec<Proxy>,
 }
 
 
 impl Default for Proxies {
     fn default() -> Proxies {
         Proxies {
-            list:
-                list_proxies()
-                    .iter()
-                    .flat_map(|proxy_file_name| {
-                        // Infer data from proxy file name:
-                        let cell_name = &CELL_NAME_FROM_FILE_NAME_PATTERN
-                            .captures(&proxy_file_name)
-                            .and_then(|cap| {
-                                match cap.get(1).map_or("", |m| m.as_str()) {
-                                    "" => None,
-                                    domain => Some(domain),
-                                }
-                            });
-                        let proxy_from = &PROXYFROM_FROM_FILE_NAME_PATTERN
-                            .captures(&proxy_file_name)
-                            .and_then(|cap| {
-                                match cap.get(1).map_or("", |m| m.as_str()) {
-                                    "" => None,
-                                    domain => Some(domain),
-                                }
-                            });
-                        let proxy_to = &PROXYTO_FROM_FILE_NAME_PATTERN
-                            .captures(&proxy_file_name)
-                            .and_then(|cap| {
-                                match cap.get(1).map_or("", |m| m.as_str()) {
-                                    "" => None,
-                                    domain => Some(domain),
-                                }
-                            });
-                        let name = cell_name.unwrap_or("");
-                        let from = proxy_from.unwrap_or("").replace("_", ".");
-                        let to = proxy_to.unwrap_or("").replace("_", ".");
-                        debug!("Proxy for cell: {}. Proxy from: {}. Proxy to: {}", name.cyan(), from.cyan(), to.cyan());
+            list: list_proxies()
+                .iter()
+                .flat_map(|proxy_file_name| {
+                    // Infer data from proxy file name:
+                    let cell_name = &CELL_NAME_FROM_FILE_NAME_PATTERN
+                        .captures(proxy_file_name)
+                        .and_then(|cap| {
+                            match cap.get(1).map_or("", |m| m.as_str()) {
+                                "" => None,
+                                domain => Some(domain),
+                            }
+                        });
+                    let proxy_from = &PROXYFROM_FROM_FILE_NAME_PATTERN
+                        .captures(proxy_file_name)
+                        .and_then(|cap| {
+                            match cap.get(1).map_or("", |m| m.as_str()) {
+                                "" => None,
+                                domain => Some(domain),
+                            }
+                        });
+                    let proxy_to = &PROXYTO_FROM_FILE_NAME_PATTERN
+                        .captures(proxy_file_name)
+                        .and_then(|cap| {
+                            match cap.get(1).map_or("", |m| m.as_str()) {
+                                "" => None,
+                                domain => Some(domain),
+                            }
+                        });
+                    let name = cell_name.unwrap_or("");
+                    let from = proxy_from.unwrap_or("").replace("_", ".");
+                    let to = proxy_to.unwrap_or("").replace("_", ".");
+                    debug!(
+                        "Proxy for cell: {}. Proxy from: {}. Proxy to: {}",
+                        name.cyan(),
+                        from.cyan(),
+                        to.cyan()
+                    );
 
-                        Proxy::new(&name.to_string(), &from.to_string(), &to.to_string())
-                    })
-                    .collect()
+                    Proxy::new(name, &from.to_string(), &to.to_string())
+                })
+                .collect(),
         }
     }
 }
 
 
 /// Serialize to JSON on .to_string()
-impl ToString for Proxy {
-    fn to_string(&self) -> String {
-        serde_json::to_string(&self)
-            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}"))
+impl std::fmt::Display for Proxy {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string(&self)
+                .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}"))
+        )
     }
 }
 
 
 impl Proxy {
-
-
     /// Generate proxy entry (validation pass for: from/to is required)
     pub fn new(cell_name: &str, from: &str, to: &str) -> Result<Proxy, Error> {
         Zone::validate_domain_addresses(from, to)
-            .and_then(|(valid_ipv4_from, valid_ipv4_to)| {
-                // When both domains are valid, create Proxy object:
-                Ok(Proxy {
+            .map(|(valid_ipv4_from, valid_ipv4_to)| {
+                Proxy {
                     cell: Some(cell_name.to_string()),
                     config: Some(Proxy::config_from_template(from, to)),
                     from: Some(from.to_string()),
                     from_ipv4: Some(valid_ipv4_from),
                     to: Some(to.to_string()),
                     to_ipv4: Some(valid_ipv4_to),
-                })
+                }
             })
             .map_err(|err| {
                 error!("{}", err);
-                Error::new(ErrorKind::Other, err)
+                Error::other(err)
             })
     }
 
@@ -183,17 +163,17 @@ impl Proxy {
                                 .as_bytes()
                         )
                     })
-                    .and_then(|_| {
+                    .map(|_| {
                         info!("SysAPI: Proxy: Written Web-Proxy config to file: {}. Which belongs to cell: {}",
                               &proxy_dest_file.cyan(), &cell_name.cyan());
                         // Finally - return object metadata- since atomic write succeded at this point:
-                        Ok(proxy)
+                        proxy
                     })
                     .map_err(|err| {
                         let err_msg = format!("Atomic Write Failed for file: {}. Error details: {}!",
                                               &proxy_dest_file.cyan(), err.to_string().red());
                         error!("{}", err_msg);
-                        Error::new(ErrorKind::Other, err_msg)
+                        Error::other(err_msg)
                     })
             })
     }
@@ -201,20 +181,35 @@ impl Proxy {
 
     /// Destroy Web Proxy configuration:
     pub fn destroy(cell_name: &str, from: &str, to: &str) -> Result<(), Error> {
-        let proxy_file_name = format!("{}_proxyfrom_{}_proxyto_{}.conf", cell_name, from.replace(".", "_"), to.replace(".", "_"));
+        let proxy_file_name = format!(
+            "{}_proxyfrom_{}_proxyto_{}.conf",
+            cell_name,
+            from.replace(".", "_"),
+            to.replace(".", "_")
+        );
         let proxy_dest_dir = format!("{}/{}/cell-webconfs", SENTRY_PATH, cell_name);
         let proxy_dest_file = format!("{}/{}", proxy_dest_dir, proxy_file_name);
-        debug!("Calling Proxy::destroy() on file: {}", &proxy_dest_file.cyan());
+        debug!(
+            "Calling Proxy::destroy() on file: {}",
+            &proxy_dest_file.cyan()
+        );
 
         match fs::remove_file(&proxy_dest_file) {
             Ok(_) => {
-                debug!("Destroyed Proxy configuration from file: {}", &proxy_dest_file.cyan());
+                debug!(
+                    "Destroyed Proxy configuration from file: {}",
+                    &proxy_dest_file.cyan()
+                );
                 Ok(())
-            },
+            }
             Err(err) => {
-                let err_msg = format!("Error destroying Proxy file: {}! Error details: {}", &proxy_dest_file.cyan(), err.to_string().red());
+                let err_msg = format!(
+                    "Error destroying Proxy file: {}! Error details: {}",
+                    &proxy_dest_file.cyan(),
+                    err.to_string().red()
+                );
                 error!("{}", err_msg);
-                Err(Error::new(ErrorKind::Other, err_msg))
+                Err(Error::other(err_msg))
             }
         }
     }
@@ -227,7 +222,8 @@ impl Proxy {
          * We explicitly set Nginx to re-resolve domains
          * using our local DNS server
          */
-        format!(r"
+        format!(
+            r"
 server {{
     listen 80;
     server_name {};
@@ -242,49 +238,11 @@ server {{
     access_log off;
 }}
     ",
-        from_domain,
-        &DEFAULT_DNS.parse().unwrap_or_else(|_| IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1))), // resolver
-        to_domain)
-    }
-
-
-}
-
-
-/// Implement response for GETs:
-impl IntoResponse for Proxy {
-    fn into_response(self, state: &State) -> Response<Body> {
-        // serialize only if name is set - so Proxy is initialized/ exists
-        match self.from {
-            Some(_) =>
-                create_response(
-                    state,
-                    StatusCode::OK,
-                    APPLICATION_JSON,
-                    serde_json::to_string(&self)
-                        .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}")),
-                ),
-            None =>
-                create_response(
-                    state,
-                    StatusCode::NOT_FOUND,
-                    APPLICATION_JSON,
-                    Body::from("{\"status\": \"NotFound\"}"),
-                )
-        }
-    }
-}
-
-
-/// Implement response for GETs:
-impl IntoResponse for Proxies {
-    fn into_response(self, state: &State) -> Response<Body> {
-        create_response(
-            state,
-            StatusCode::OK,
-            APPLICATION_JSON,
-            serde_json::to_string(&self)
-                .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}")),
+            from_domain,
+            &DEFAULT_DNS
+                .parse()
+                .unwrap_or_else(|_| IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1))), // resolver
+            to_domain
         )
     }
 }

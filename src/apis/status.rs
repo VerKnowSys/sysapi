@@ -1,17 +1,13 @@
-use gotham::state::State;
-use std::io::{Error, ErrorKind};
-use gotham::handler::IntoResponse;
-use hyper::{StatusCode, Body, Response};
-use serde_json;
-use std::io::prelude::*;
-use gotham::helpers::http::response::create_response;
-use std::io::BufReader;
-use std::fs::File;
-use mime::*;
 use libc::*;
-use colored::Colorize;
+use serde::{Deserialize, Serialize};
+use serde_json;
+use std::{
+    fs::File,
+    io::{BufReader, Error, prelude::*},
+};
 
-use crate::{SENTRY_PATH, DEFAULT_CELL_NETID_FILE, soload::processes_of_uid};
+use crate::soload::processes_of_uid;
+use crate::*;
 
 
 /// List CellProcess type alias:
@@ -21,7 +17,6 @@ pub type ListCellProcesses = Vec<CellProcess>;
 /// A single cell process status:
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CellProcess {
-
     /// Process-IDentifier:
     pub pid: Option<usize>,
 
@@ -57,24 +52,19 @@ pub struct CellProcess {
 
     /// Process stats including bound UDP or TCP ports/addresses and other info:
     pub stat_info: Option<String>,
-
 }
 
 
 /// Status of all processes running in a cell:
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CellProcesses {
-
     /// Cell processes list:
     pub list: Option<ListCellProcesses>,
-
 }
 
 
 /// Default CellProcesses implementation:
 impl CellProcesses {
-
-
     /// Status of all ressident processes running as UID:
     pub fn of_uid(an_uid: uid_t) -> Result<Self, serde_json::Error> {
         let procs_json = processes_of_uid(an_uid); // Deserialize JSON to CellProcesses structure
@@ -90,23 +80,21 @@ impl CellProcesses {
             .and_then(|file| {
                 let mut line = String::new();
                 BufReader::new(file)
-                    .read_line(&mut line)
-                    .and_then(|_| Ok(str::trim(&line).to_string()))
+                    .read_line(&mut line).map(|_| str::trim(&line).to_string())
             })
             .and_then(|uid_line| {
                 uid_line
                     .parse::<u32>()
-                    .map_err(|err| Error::new(ErrorKind::Other, err.to_string()))
+                    .map_err(|err| Error::other(err.to_string()))
             })
             .and_then(|cell_uid| {
                 if cell_uid > 0 {
                     CellProcesses::of_uid(cell_uid)
-                       .and_then(|ps_full| {
+                       .inspect(|ps_full| {
                            debug!("CellProcesses::of_cell(cell_uid: {}): {} JSON: '{}'",
                                   cell_uid.to_string().cyan(), a_name.cyan(), ps_full.to_string().cyan());
-                           Ok(ps_full)
                        })
-                       .map_err(|err| Error::new(ErrorKind::Other, err.to_string()))
+                       .map_err(|err| Error::other(err.to_string()))
                 } else {
                     // NOTE: We can't return 0 for security reasons, so this is to explicitly return no data for "0":
                     warn!("CellProcesses::of_cell(cell_uid: 0). Using uid 0 (super-user) is disallowed for security reasons!");
@@ -121,63 +109,33 @@ impl CellProcesses {
 impl Default for CellProcesses {
     fn default() -> CellProcesses {
         CellProcesses {
-            list: None
+            list: None,
         }
     }
 }
 
 
 /// Serialize to JSON on .to_string()
-impl ToString for CellProcess {
-    fn to_string(&self) -> String {
-        serde_json::to_string(&self)
-            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure: CellProcess\"}"))
-    }
-}
-
-
-/// Serialize to JSON on .to_string()
-impl ToString for CellProcesses {
-    fn to_string(&self) -> String {
-        serde_json::to_string(&self)
-            .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure: CellProcesses\"}"))
-    }
-}
-
-
-/// Implement response for GETs:
-impl IntoResponse for CellProcess {
-    fn into_response(self, state: &State) -> Response<Body> {
-        create_response(
-            state,
-            StatusCode::OK,
-            APPLICATION_JSON,
+impl std::fmt::Display for CellProcess {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
             serde_json::to_string(&self)
-                .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure: CellProcess\"}")),
+                .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}"))
         )
     }
 }
 
 
-/// Implement response for GETs:
-impl IntoResponse for CellProcesses {
-    fn into_response(self, state: &State) -> Response<Body> {
-        match self.list {
-            Some(_) =>
-                create_response(
-                    state,
-                    StatusCode::OK,
-                    APPLICATION_JSON,
-                    serde_json::to_string(&self)
-                        .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure: CellProcesses\"}")),
-                ),
-            None =>
-                create_response(
-                    state,
-                    StatusCode::NOT_FOUND,
-                    APPLICATION_JSON,
-                    Body::from("{\"status\": \"CellProcesses: None\"}"),
-                )
-        }
+/// Serialize to JSON on .to_string()
+impl std::fmt::Display for CellProcesses {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string(&self)
+                .unwrap_or_else(|_| String::from("{\"status\": \"SerializationFailure\"}"))
+        )
     }
 }

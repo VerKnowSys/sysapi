@@ -1,7 +1,5 @@
 // build.rs
 
 fn main() {
-    println!("{}\n{}\n",
-            "cargo:rustc-link-lib=dylib=kvmpro",
-            "cargo:rustc-link-search=native=/usr/lib");
+    println!("cargo:rustc-link-lib=dylib=kvmpro\ncargo:rustc-link-search=native=/usr/lib\n");
 }

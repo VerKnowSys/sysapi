@@ -1,6 +1,6 @@
 [package]
 name = "sysapi"
-version = "0.12.7"
+version = "0.12.8"
 authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
 edition = "2024"
 build = "build.rs"
@@ -33,41 +33,40 @@ path = "src/examples/psuid65tojson.rs"
 
 
 [dependencies]
-gotham = "0.3"
-gotham_derive = "0.3"
-hyper = { version = "0.12", features = [] }
+rocket = { version = "0.5.1", features = ["json"] }
 
-log = "0.4"
-fern = { version = "0.5", features = ["colored"] }
-colored = "1.6"
+tracing = { version = "0.1.44", features = ["log", "attributes", "std"] }
+tracing-subscriber = { version = "0.3.19", features = ["registry", "fmt", "env-filter"] }
 
-serde = "1"
-serde_derive = "1"
-serde_json = "1"
+colored = "2.1"
 
-futures = "0.1"
-tokio = "0.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+tokio = { version = "1", features = ["full"] }
 mime = "0.3"
 
-domain = "0.2"
-abstract-ns = "0.4"
-ns-std-threaded = "0.3"
+# domain = "0.2"
+# abstract-ns = "0.4"
+# ns-std-threaded = "0.3"
+# Replacing old DNS crates with trust-dns-resolver or just use std if possible
+trust-dns-resolver = "0.23"
 
-lazy_static = "1.1"
+lazy_static = "1.4"
 
-uuid = { version = "0.6", features = ["v4"] }
-rand = "0.4"
-regex = "0.2"
+uuid = { version = "1.8", features = ["v4"] }
+rand = "0.8"
+regex = "1.10"
 chrono = "0.4"
-glob = "0.2"
-hostname = "0.1"
-atomicwrites = "0.2"
-systemstat = "0.1"
+glob = "0.3"
+hostname = "0.4"
+atomicwrites = "0.4"
+systemstat = "0.2"
 libc = "0.2"
-libloading = "0.5"
+libloading = "0.8"
 
 bencher = "0.1"
-jemallocator = "0.1.8"
+jemallocator = "0.5"
 
 #
 # Explicit Project Setup details:

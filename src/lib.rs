@@ -2,17 +2,17 @@
 
 //! Crate docs
 
-
 #![deny(
-        missing_docs,
-        unstable_features,
-        unsafe_code,
-        missing_debug_implementations,
-        missing_copy_implementations,
-        trivial_casts,
-        trivial_numeric_casts,
-        unused_import_braces,
-        unused_qualifications)]
+    missing_docs,
+    unstable_features,
+    unsafe_code,
+    missing_debug_implementations,
+    missing_copy_implementations,
+    trivial_casts,
+    trivial_numeric_casts,
+    unused_import_braces,
+    unused_qualifications
+)]
 
 /// Use Jemalloc as default allocator:
 #[global_allocator]
@@ -21,12 +21,13 @@ static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
 #[macro_use]
 extern crate lazy_static;
 
-#[macro_use]
-extern crate log;
+pub use colored::*;
+pub use tracing::{Level, debug, error, info, instrument, span, trace, warn};
+use tracing_subscriber::prelude::*;
+use tracing_subscriber::{EnvFilter, Registry, fmt, reload};
 
-#[macro_use]
-extern crate serde_derive;
-
+/// Type alias for tracing reload handle
+pub type TracingEnvFilterHandle = reload::Handle<EnvFilter, Registry>;
 
 // Library constants, used by the project:
 
@@ -111,13 +112,10 @@ pub const SOLOAD_MT_CALLS_INTERVAL: u64 = 43; /* ms of interval before trying to
 pub const SOLOAD_MT_INFO_TRIGGER_MODULO_NUM: usize = 10000; /* print info with counter state each 10000 calls */
 
 
-
 // EOF project constants.
 
 
-
 /// HTTP Request params static strings:
-
 /// Cell management:
 pub const CELL_RESOURCE: &str = "/cell/";
 
@@ -149,7 +147,6 @@ pub const ROLLBACK_RESOURCE: &str = "/rollback/";
 pub const DATASETS_RESOURCE: &str = "/datasets/";
 
 
-
 //
 // Public modules:
 //
@@ -169,6 +166,32 @@ pub mod webrouter;
 
 /// Map C functions from a Shared-Object system library:
 pub mod soload;
+
+
+/// Initialize logger:
+pub fn initialize_logger() -> TracingEnvFilterHandle {
+    let filter = match EnvFilter::try_from_default_env() {
+        Ok(f) => f,
+        Err(_) => EnvFilter::from("info"),
+    };
+    let (filter, handle) = reload::Layer::new(filter);
+
+    let fmt_layer = fmt::layer()
+        .compact()
+        .with_target(true)
+        .with_line_number(false)
+        .with_file(false)
+        .with_thread_names(false)
+        .with_thread_ids(false)
+        .with_ansi(true);
+
+    tracing_subscriber::registry()
+        .with(filter)
+        .with(fmt_layer)
+        .init();
+
+    handle
+}
 
 
 //
